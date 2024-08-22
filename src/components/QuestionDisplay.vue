@@ -1,0 +1,232 @@
+<template>
+  <div
+    class="container px-1 py-1 d-block justify-content-center"
+    style="max-width: 450px"
+  >
+    <div class="progress mb-1 justify-content-start" style="height: 3px">
+      <div
+        :class="{
+          'progress-bar bar-high': barLength >= 60,
+          'progress-bar bar-medium': 60 > barLength && barLength >= 35,
+          'progress-bar bar-low': 35 > barLength && barLength >= 15,
+          'progress-bar bar-danger': barLength < 15,
+        }"
+        role="progressbar"
+        :style="{ width: barLength + '%' }"
+      ></div>
+    </div>
+    <ResultGrid :act="curInd" />
+    <div class="row border m-auto" style="min-width: 280px; min-height: 180px">
+      <p class="mt-1">{{ displayedText }}</p>
+    </div>
+    <div class="mt-2 mb-2">
+      <div
+        class="form-floating inputbox"
+        :class="{ invisible: !answerOK }"
+      >
+        <input
+          ref = "answerInput"
+          type="answer"
+          :disabled="!answerOK"
+          class="form-control"
+          id="answer"
+          placeholder="Your Answer"
+          v-model="answer"
+          autocomplete="off"
+        />
+        <label for="answer">{{ labelText }}</label>
+      </div>
+    </div>
+    <QuestionButtons
+      :onPause="startCountDown"
+      :onNext="startDisplayingText"
+      :onAnswer="checkAnswer"
+    />
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref, watch, nextTick } from "vue";
+import { useRouter } from "vue-router";
+import QuestionButtons from "./QuestionButtons.vue";
+import ResultGrid from "./ResultGrid.vue";
+import { useCheckAnswer } from "../composables";
+import {
+  useResultStore,
+  useQuestionStore,
+  useButtonStatusStore,
+} from "../store";
+
+export default defineComponent({
+  name: "QuestionDisplay",
+  components: { QuestionButtons, ResultGrid },
+  setup() {
+    // the time, and question numbers
+    const countDownTime: number = 15; //seconds
+    const displaySpeed: number = 120; // chr / miliseconds
+    const fastForwardSpeed: number = 30; // chr / miliseconds
+    const totalQuestionCount: number = 9; //zero indexed
+
+    // get store data
+    const router = useRouter();
+    const res = useResultStore();
+    const buttonStatus = useButtonStatusStore();
+    buttonStatus.reset();
+    const qStore = useQuestionStore();
+
+    // data for ref
+    const curInd = ref<number>(-1); //zero indexed
+    const displayedText = ref<string>("");
+    const barLength = ref<number>(100);
+    const answerOK = ref<boolean>(false);
+    const answer = ref<string>("");
+    const labelText = ref<string>("先按鈴 再回答!");
+    const answerInput = ref<HTMLInputElement | null>(null);
+    // const difficulty = ref<string>("");
+    // const rating = ref<number>(0);
+
+    //local var
+    var countDownInterval: any = 0;
+    var questionInterval: any = 0;
+
+    const displayTextByCharacter = (
+      t: string,
+      index: number,
+      text: string,
+      speed: number
+    ) => {
+      let char = index; //character index
+      let curText = t; //displayed full text
+      answerOK.value = false; //not allow to answer when tex displaying
+      questionInterval = setInterval(() => {
+        if (char < text.length) {
+          curText += text[char];
+          displayedText.value = curText;
+          char++;
+        } else {
+          if (speed === displaySpeed) {
+            //this is a normal display
+            startCountDown();
+          } else {
+            //this is a fastforward display
+            buttonStatus.endQeustion();
+            clearInterval(questionInterval);
+          }
+        }
+      }, speed);
+    };
+
+    const changeLabelText = () => {
+      let len = qStore.checkAnswerLength(curInd.value);
+      if (len > 0) {
+        labelText.value = `最佳答案 : 中文${len}字`;
+      } else {
+        labelText.value = `最佳答案 : 非中文${-len}詞`;
+      }
+    };
+
+    const getAdjustTime =() => {
+      let len = qStore.checkAnswerLength(curInd.value);
+      let adjustedCountDownTime = countDownTime;
+
+      if (len >= 4) {
+        adjustedCountDownTime = countDownTime * 1.4
+      }
+      else if(len <= 2 && len > 0){
+        adjustedCountDownTime = countDownTime * 0.7
+      }
+      else if(len < 0 && Math.abs(len) >= 2){
+        adjustedCountDownTime = countDownTime * 1.4
+      }
+      return adjustedCountDownTime
+    }
+
+    const startCountDown = () => {
+      //when user push the pause button
+
+      buttonStatus.pauseQuestion();
+      changeLabelText();
+      stopDisplayingText();
+      answerOK.value = true; // allow to answer
+      let adjustedCountDownTime = getAdjustTime();
+
+      var start = new Date().getTime();
+
+      countDownInterval = setInterval(function () {
+        let curTime = new Date().getTime() - start;
+        barLength.value = Math.floor(
+          Math.max((1 - curTime / (adjustedCountDownTime * 1000)) * 100, 0)
+        );
+        if (curTime > adjustedCountDownTime * 1010) {
+          // 1.01x tolerance
+          clearInterval(countDownInterval);
+          checkAnswer();
+        }
+      }, countDownTime * 10); //countDonwTime * x means the refresh rate of cout down.
+    };
+
+    const startDisplayingText = () => {
+      curInd.value++; //current local question index
+      buttonStatus.displayQuestion();
+      // difficulty.value = qStore.getDifficulty(curInd.value);
+      // rating.value = qStore.getRating(curInd.value);
+
+      barLength.value = 100;
+      answer.value = ""; //init countdown bar and answer value
+      displayTextByCharacter(
+        "",
+        0,
+        qStore.getQuestion(curInd.value).q_text,
+        displaySpeed
+      );
+    };
+
+    const stopDisplayingText = () => {
+      res.setRes(curInd.value, { interval: displayedText.value.length }); //store the stop point
+      clearInterval(questionInterval); //stop the question
+    };
+
+    const checkAnswer = () => {
+      buttonStatus.submitAnswer();
+      clearInterval(countDownInterval);
+
+      useCheckAnswer(curInd.value, answer.value); //check if the answer is right and write the result to store
+      displayTextByCharacter(
+        displayedText.value,
+        displayedText.value.length,
+        qStore.getQuestion(curInd.value).q_text,
+        fastForwardSpeed
+      ); //quickly show the text remained
+      if (curInd.value >= totalQuestionCount) {
+        //reach the end of the session
+        buttonStatus.endSession();
+        setTimeout(() => {
+          router.replace("/result");
+        }, 3000); //wait 3 sec, show result
+      }
+    };
+
+    watch(answerOK, async (newValue) => {
+      if (newValue) {
+        await nextTick();
+        answerInput.value?.focus();
+      }
+    });
+
+    return {
+      checkAnswer,
+      startDisplayingText,
+      startCountDown,
+      labelText,
+      answerInput,
+      // rating,
+      // difficulty,
+      curInd,
+      answer,
+      answerOK,
+      barLength,
+      displayedText,
+    };
+  },
+});
+</script>

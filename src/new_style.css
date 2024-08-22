@@ -1,0 +1,193 @@
+:root {
+  zoom: 180%;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --myblack: #242424;
+  --black-text: rgba(0, 0, 0, 0.87);
+  --mywhite: rgba(255, 255, 255, 0.87);
+
+  --mygray-light: rgba(255, 255, 255, 0.69);
+  --mygray: rgb(91, 91, 91);
+  --mygray-dark: rgb(53, 53, 53);
+
+  --mylinkblue: #1c977d;
+  --mylinkblue-light: #23b897;
+
+  --myorange-dark: #c4742a;
+  --myorange: #ec8c33;
+  --myorange-light: #f59e4d;
+
+  --myred: #ec4f33;
+
+  --mytheme-shine: #00ffff;
+  --mytheme-lighter: #02dada;
+  --mytheme-light: #00b7b7;
+  --mytheme: #039393;
+  --mytheme-dark: #156160;
+
+  --bs-body-color: var(--mywhite);
+  --bs-secondary-color: var(--mywhite);
+  --bs-tertiary-color: var(--mywhite);
+  --bs-emphasis-color: var(--mywhite);
+
+  --bs-border-color: var(--mytheme-dark);
+
+  --bs-body-bg: var(--myblack);
+  --bs-secondary-bg: var(--myblack);
+  --bs-tertiary-bg: var(--myblack);
+  --bs-emphasis-bg: var(--myblack);
+
+  --bs-text-primary: var(--mywhite);
+  --bs-text-primary-emphasis: var(--mywhite);
+  --bs-primary: var(--mytheme);
+  --bs-primary-bg-subtle: var(--mytheme-light);
+}
+
+.alert-primary {
+  color: var(--black-text);
+  border: var(--mytheme-dark);
+}
+
+h1,
+h2 {
+  text-align: center;
+}
+
+/* color of buttons */
+.btn-primary {
+  background-color: var(--mytheme);
+  border-color: var(--mytheme);
+}
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary.active,
+.open > .dropdown-toggle.btn-primary {
+  background-color: var(--mytheme-light) !important;
+  border-color: var(--mytheme-light) !important;
+}
+
+.btn-secondary {
+  background-color: var(--mygray-dark);
+  border-color: var(--mygray-dark);
+}
+.btn-secondary:hover,
+.btn-secondary:active,
+.btn-secondary.active,
+.open > .dropdown-toggle.btn-secondary {
+  background-color: var(--mygray) !important;
+  border-color: var(--mygray) !important;
+}
+
+.btn-danger {
+  background-color: var(--myorange);
+  border-color: var(--myorange);
+}
+.btn-danger:hover,
+.btn-danger:active,
+.btn-danger.active,
+.open > .dropdown-toggle.btn-danger {
+  background-color: var(--myorange-light) !important;
+  border-color: var(--myorange-light) !important;
+}
+.text-danger {
+  color: var(--bs-danger) !important;
+}
+
+input,
+label {
+  color: var(--mygray-light) !important;
+}
+
+/* form hilight color */
+.form-control:focus {
+  border-color: var(--mytheme-light);
+  box-shadow: 0 1px 1px var(--myblack) inset, 0 0 8px var(--mytheme-shine);
+  outline: 0 none;
+}
+/* color of hyper link */
+a,
+a:visited {
+  color: var(--mylinkblue) !important;
+  text-decoration: none;
+}
+
+a:hover,
+a:active {
+  background-color: var(--mygray-dark) !important;
+  color: var(--mylinkblue-light) !important;
+  text-decoration: none;
+}
+
+/* change the show pass eyemark color */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  filter: invert(75%);
+}
+/* change autofill color */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--myblack) inset !important;
+  -webkit-text-fill-color: var(--mywhite);
+}
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--myblack) inset !important;
+  -webkit-text-fill-color: var(--mywhite);
+}
+
+.grid-item {
+  display: flex;
+  border: 1px var(--bs-border-color) solid;
+}
+.text-correct {
+  color: var(--mytheme-light);
+}
+.text-incorrect {
+  color: var(--myorange-dark);
+}
+.text-normal {
+  color: var(--mytheme);
+}
+.text-low {
+  color: var(--myred);
+}
+
+.grid-item .active {
+  background-color: var(--mygray-dark);
+}
+
+.list-group .active {
+  background-color: var(--mytheme);
+  border-color: var(--mytheme-light);
+}
+.list-group-item {
+  cursor: pointer;
+}
+
+.bar-high {
+  background-color: var(--mytheme-light);
+}
+.bar-medium {
+  background-color: var(--mylinkblue-light);
+}
+.bar-low {
+  background-color: var(--myorange);
+}
+.bar-danger {
+  background-color: var(--myred);
+}
+
+#text-danger {
+  color: var(--myorange) !important;
+}
+
+@media screen and (max-width: 450px) {
+  :root {
+    zoom: 100%;
+  }
+}
