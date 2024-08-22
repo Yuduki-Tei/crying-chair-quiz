@@ -28,7 +28,3 @@ thus there might be lots of bug and stupid mplementation.
 Also, this is my first open source project,  
 so if you found anything want to tell me or want to fix, just do what you want.  
 I will really appreciate that.
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
