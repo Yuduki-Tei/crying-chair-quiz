@@ -11,7 +11,7 @@ and Firebase Store as database.
 ## Working on
 ・question contribution function  
 ・tutorial and newcomer mode  
-・more detailed user profile page
+・more detailed user profile page  
 ・a welcom banner
 
 ## Planning to do ~~someday~~
