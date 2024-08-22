@@ -12,7 +12,7 @@ and Firebase Store as database.
 ・question contribution function  
 ・tutorial and newcomer mode  
 ・more detailed user profile page  
-・a welcom banner
+・a welcome banner
 
 ## Planning to do ~~someday~~
 ・achievement system  
