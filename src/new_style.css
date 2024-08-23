@@ -65,6 +65,7 @@ h2 {
   background-color: var(--mytheme);
   border-color: var(--mytheme);
 }
+
 .btn-primary:hover,
 .btn-primary:active,
 .btn-primary.active,
@@ -180,6 +181,10 @@ input:-webkit-autofill:focus {
 }
 .bar-danger {
   background-color: var(--myred);
+}
+
+.modal {
+  background-color: var(--mygray-dark);
 }
 
 #text-danger {

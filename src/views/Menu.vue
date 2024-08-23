@@ -1,4 +1,5 @@
 <template>
+  <!-- <HelloBanner /> -->
   <div class="container px-4 py-5">
     <div class="d-flex justify-content-center align-content-center">
       <h2 class="pb-2 text-md-start border-bottom">Menu</h2>
@@ -45,7 +46,7 @@
         <div
           class="icon-square text-body-emphasis d-inline-flex align-items-center justify-content-center fs-3 flex-shrink-0 me-3"
         >
-        <i class="bi bi-boxes"></i>
+          <i class="bi bi-boxes"></i>
         </div>
         <div>
           <h3 class="fs-2 text-body-emphasis">分類十題</h3>
@@ -67,10 +68,11 @@
 import { defineComponent } from "vue";
 import { useRouter } from "vue-router";
 import DropDown from "../components/DropDown.vue";
+import HelloBanner from "../components/HelloBanner.vue";
 
 export default defineComponent({
   name: "Menu",
-  components: { DropDown },
+  components: { DropDown, HelloBanner },
   setup() {
     const router = useRouter();
     const goToPage = (page: string) => {
