@@ -36,9 +36,17 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   name: "HelloBanner",
   setup() {
-    const showModal = ref(true);
+    const helloID = "20240823"
+    const showModal = ref<Boolean>();
+    if (!localStorage.getItem("helloID") || localStorage.getItem("helloID") !== helloID) {
+      showModal.value = true;
+    }
+    else{
+      showModal.value = false;
+    }
     const closeModal = () => {
       showModal.value = false;
+      localStorage.setItem("helloID", helloID);
     };
     return {
       showModal,

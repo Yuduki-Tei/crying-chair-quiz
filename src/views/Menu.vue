@@ -1,5 +1,5 @@
 <template>
-  <!-- <HelloBanner /> -->
+  <HelloBanner />
   <div class="container px-4 py-5">
     <div class="d-flex justify-content-center align-content-center">
       <h2 class="pb-2 text-md-start border-bottom">Menu</h2>
