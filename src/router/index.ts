@@ -7,6 +7,7 @@ import Random_10 from "../views/Random_10.vue";
 import UserProfile from "../views/UserProfile.vue";
 import Result from "../views/Result.vue";
 import Cat_10 from "../views/Cat_10.vue";
+import Contribution from "../views/Contribution.vue";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 
 // route for local development
@@ -21,6 +22,7 @@ import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 //   { path: "/user-data", component: UserProfile },
 //   { path: "/leaderboard", component: Menu },
 //   { path: "/result", component: Result },
+//   { path: "/contribution", component: Contribution },
 // ];
 
 // route for production environment

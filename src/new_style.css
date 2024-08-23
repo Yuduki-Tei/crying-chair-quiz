@@ -62,8 +62,8 @@ h2 {
 
 /* color of buttons */
 .btn-primary {
-  background-color: var(--mytheme);
-  border-color: var(--mytheme);
+  background-color: var(--mytheme) !important;
+  border-color: var(--mytheme) !important;
 }
 
 .btn-primary:hover,
@@ -75,8 +75,8 @@ h2 {
 }
 
 .btn-secondary {
-  background-color: var(--mygray-dark);
-  border-color: var(--mygray-dark);
+  background-color: var(--mygray-dark) !important;
+  border-color: var(--mygray-dark) !important;
 }
 .btn-secondary:hover,
 .btn-secondary:active,
@@ -112,6 +112,11 @@ label {
   box-shadow: 0 1px 1px var(--myblack) inset, 0 0 8px var(--mytheme-shine);
   outline: 0 none;
 }
+
+.dropdown-toggle::after {
+  display: none;
+}
+
 /* color of hyper link */
 a,
 a:visited {

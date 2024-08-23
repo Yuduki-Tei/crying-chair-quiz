@@ -60,9 +60,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.dropdown-toggle::after {
-  display: none;
-}
-</style>
