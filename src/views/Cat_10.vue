@@ -1,4 +1,5 @@
 <template>
+  <DropDown v-if="!catSelected"/>
   <Quiz v-if="catSelected" :pageTitle="`${selectedCategory}十題`" :qType="selectedCategory" />
   <div
     class="container justify-content-center pt-5 mt-5"
@@ -31,10 +32,11 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import Quiz from "../components/Quiz.vue";
+import DropDown from "../components/DropDown.vue";
 
 export default defineComponent({
   name: "Cat_10",
-  components: { Quiz },
+  components: { Quiz, DropDown },
   setup() {
     const catSelected = ref<boolean>(false);
     const categories = [
