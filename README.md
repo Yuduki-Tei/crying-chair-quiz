@@ -6,7 +6,7 @@ and Firebase Store as database.
 ・basic UI  
 ・basic user login/ register and data processing function  
 ・basic database interaction function  
-・a HAYAOSHI quiz page with three different game mode
+・a HAYAOSHI quiz page with three different game mode  
 ・a welcome banner
 
 ## Working on
