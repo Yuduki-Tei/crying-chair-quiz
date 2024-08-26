@@ -87,29 +87,20 @@ export default defineComponent({
     const isMac = navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isMac){
-        if (startOK.value && event.key === "Enter") {
-            displayNextQuestion();
-          } else if (stopOK.value && event.key === "Enter") {
-            pauseQuestion();
-          } else if (answerOK.value && event.key === "Enter" && (event.metaKey|| event.ctrlKey)) {
-            checkAnswer();
-          } else if (nextOK.value && event.key === "Enter") {
-            displayNextQuestion();
-          };
-      }else{
-        if (event.key === "Enter") {
-          if (startOK.value) {
-            displayNextQuestion();
-          } else if (stopOK.value) {
-            pauseQuestion();
-          } else if (answerOK.value) {
-            checkAnswer();
-          } else if (nextOK.value) {
-            displayNextQuestion();
-          };
+      if (event.key === "Enter") {
+        event.preventDefault();
+        if (startOK.value) {
+          displayNextQuestion();
+        } else if (stopOK.value) {
+          pauseQuestion();
+        } else if (answerOK.value && !isMac) {
+          checkAnswer();
+        } else if (answerOK.value && isMac && (event.metaKey|| event.ctrlKey)){
+          checkAnswer();
+        } else if (nextOK.value) {
+          displayNextQuestion();
         };
-      }
+      };
     };
 
     onMounted(() => {

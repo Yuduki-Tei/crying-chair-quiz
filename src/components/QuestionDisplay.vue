@@ -179,7 +179,7 @@ export default defineComponent({
       answerOK.value = true; // allow to answer
       _changeLabelText();
       _stopDisplayingText();
-      if (countDownInterval === 0){
+      if (barLength.value === 100){
         _startCountDown();
       };
     };
