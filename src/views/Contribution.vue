@@ -2,7 +2,7 @@
     <DropDown />
     <div class="container px-1 py-1 d-block justify-content-center pt-5" style="max-width: 450px">
         <h2 class="mb-3 fw-normal">題目投稿</h2>
-      <form>
+      <form class = "p-1">
         <div class="row mb-3">
           <!-- Main Category Dropdown -->
           <div class="col">
@@ -45,14 +45,14 @@
             </div>
           </div>
         </div>
-  
+        {{detail}}
         <div class="mb-3">
           <label for="qText" class="form-label">問題本文</label>
-          <textarea class="form-control" id="qText" rows="3" required></textarea>
+          <textarea class="form-control" id="qText" rows="3" v-model="qText" required />
         </div>
         <div class="mb-3">
-          <label for="qAnswers" class="form-label">答案</label>
-          <input class="form-control" id="qAnswers" required />
+          <label for="aText" class="form-label">答案</label>
+          <input class="form-control" id="aText" v-model="aText" required />
         </div>
       </form>
     </div>
@@ -192,9 +192,12 @@ export default defineComponent({
         ]
         };
 
+        const detail = ref<string>('');
         const selectedCat = ref<string>('');
         const selectedSubcat = ref<string>('');
         const subCats = ref<string[]>([]);
+        const qText = ref<string>('');
+        const aText = ref<string>('');
 
         const selectCategory = (cat: string) => {
             selectedCat.value = cat;
@@ -206,8 +209,13 @@ export default defineComponent({
             selectedSubcat.value = subcat;
         };
 
+        console.log(qText.value)
+
         return {
         cats,
+        qText,
+        aText,
+        detail,
         selectedCat,
         selectedSubcat,
         subCats,
