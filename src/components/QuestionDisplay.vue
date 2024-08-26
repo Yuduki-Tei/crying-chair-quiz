@@ -38,7 +38,7 @@
       </div>
     </div>
     <QuestionButtons
-      :onPause="startCountDown"
+      :onPause="buttonStop"
       :onNext="startDisplayingText"
       :onAnswer="checkAnswer"
     />
@@ -82,14 +82,12 @@ export default defineComponent({
     const answer = ref<string>("");
     const labelText = ref<string>("先按鈴 再回答!");
     const answerInput = ref<HTMLInputElement | null>(null);
-    // const difficulty = ref<string>("");
-    // const rating = ref<number>(0);
-
+    
     //local var
     var countDownInterval: any = 0;
     var questionInterval: any = 0;
 
-    const displayTextByCharacter = (
+    const _displayTextByCharacter = (
       t: string,
       index: number,
       text: string,
@@ -104,28 +102,30 @@ export default defineComponent({
           displayedText.value = curText;
           char++;
         } else {
+          clearInterval(questionInterval);
           if (speed === displaySpeed) {
             //this is a normal display
-            startCountDown();
+            _startCountDown();
+
           } else {
             //this is a fastforward display
             buttonStatus.endQeustion();
-            clearInterval(questionInterval);
-          }
-        }
+            _checkSessionEnd();
+          };
+        };
       }, speed);
     };
 
-    const changeLabelText = () => {
+    const _changeLabelText = () => {
       let len = qStore.checkAnswerLength(curInd.value);
       if (len > 0) {
         labelText.value = `最佳答案 : 中文${len}字`;
       } else {
         labelText.value = `最佳答案 : 非中文${-len}詞`;
-      }
+      };
     };
 
-    const getAdjustTime =() => {
+    const _getAdjustTime =() => {
       let len = qStore.checkAnswerLength(curInd.value);
       let adjustedCountDownTime = countDownTime;
 
@@ -133,22 +133,16 @@ export default defineComponent({
         adjustedCountDownTime = countDownTime * 1.4
       }
       else if(len <= 2 && len > 0){
-        adjustedCountDownTime = countDownTime * 0.7
+        adjustedCountDownTime = countDownTime * 0.8
       }
       else if(len < 0 && Math.abs(len) >= 2){
         adjustedCountDownTime = countDownTime * 1.4
-      }
+      };
       return adjustedCountDownTime
     }
 
-    const startCountDown = () => {
-      //when user push the pause button
-
-      buttonStatus.pauseQuestion();
-      changeLabelText();
-      stopDisplayingText();
-      answerOK.value = true; // allow to answer
-      let adjustedCountDownTime = getAdjustTime();
+    const _startCountDown = () => {
+      let adjustedCountDownTime = _getAdjustTime();
 
       var start = new Date().getTime();
 
@@ -161,19 +155,42 @@ export default defineComponent({
           // 1.01x tolerance
           clearInterval(countDownInterval);
           checkAnswer();
-        }
-      }, countDownTime * 10); //countDonwTime * x means the refresh rate of cout down.
+        };
+      }, countDownTime * 10); //the refresh rate of cout down times/ miliseconds, can be any.
+    };
+
+    const _stopDisplayingText = () => {
+      res.setRes(curInd.value, { interval: displayedText.value.length }); //store the stop point
+      clearInterval(questionInterval); //stop the question
+    };
+    
+    const _checkSessionEnd = () =>{
+      if (curInd.value >= totalQuestionCount) {
+        //reach the end of the session
+        buttonStatus.endSession();
+        setTimeout(() => {
+          router.replace("/result");
+        }, 3000); //wait 3 sec, show result
+      };
+    };
+
+    const buttonStop = () =>{
+      //when user push the pause button
+      answerOK.value = true; // allow to answer
+      _changeLabelText();
+      _stopDisplayingText();
+      if (countDownInterval === 0){
+        _startCountDown();
+      };
     };
 
     const startDisplayingText = () => {
-      curInd.value++; //current local question index
       buttonStatus.displayQuestion();
-      // difficulty.value = qStore.getDifficulty(curInd.value);
-      // rating.value = qStore.getRating(curInd.value);
+      curInd.value++; //current local question index
 
       barLength.value = 100;
       answer.value = ""; //init countdown bar and answer value
-      displayTextByCharacter(
+      _displayTextByCharacter(
         "",
         0,
         qStore.getQuestion(curInd.value).q_text,
@@ -181,46 +198,32 @@ export default defineComponent({
       );
     };
 
-    const stopDisplayingText = () => {
-      res.setRes(curInd.value, { interval: displayedText.value.length }); //store the stop point
-      clearInterval(questionInterval); //stop the question
-    };
-
     const checkAnswer = () => {
       buttonStatus.submitAnswer();
       clearInterval(countDownInterval);
 
       useCheckAnswer(curInd.value, answer.value); //check if the answer is right and write the result to store
-      displayTextByCharacter(
+      _displayTextByCharacter(
         displayedText.value,
         displayedText.value.length,
         qStore.getQuestion(curInd.value).q_text,
         fastForwardSpeed
       ); //quickly show the text remained
-      if (curInd.value >= totalQuestionCount) {
-        //reach the end of the session
-        buttonStatus.endSession();
-        setTimeout(() => {
-          router.replace("/result");
-        }, 3000); //wait 3 sec, show result
-      }
     };
 
     watch(answerOK, async (newValue) => {
       if (newValue) {
         await nextTick();
         answerInput.value?.focus();
-      }
+      };
     });
 
     return {
       checkAnswer,
       startDisplayingText,
-      startCountDown,
+      buttonStop,
       labelText,
       answerInput,
-      // rating,
-      // difficulty,
       curInd,
       answer,
       answerOK,

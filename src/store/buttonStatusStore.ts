@@ -2,42 +2,56 @@ import { defineStore } from "pinia";
 
 export const useButtonStatusStore = defineStore("ButtonStatus", {
   state: () => ({
-    isSessionStarted: false,
-    isSessionNotStarted: true,
-    isAsking: false,
-    isCountingDown: false,
-    isEnd: true,
+    answerOK: false,
+    nextOK: false,
+    startOK: true,
+    stopOK: false,
   }),
   actions: {
     displayQuestion() {
       // when push the start button
-      this.isSessionNotStarted = false;
-      this.isAsking = true;
-      this.isEnd = false;
-      this.isSessionStarted = true;
+      this.stopOK = true;
+
+      this.answerOK = false;
+      this.nextOK = false;
+      this.startOK = false;
     },
     pauseQuestion() {
       // when push the pause button
-      this.isAsking = false;
-      this.isCountingDown = true;
+      this.answerOK = true;
+
+      this.nextOK = false;
+      this.startOK = false;
+      this.stopOK = false;
+    },
+    disableAll() {
+      // when push the answer button
+      this.answerOK = false;
+      this.nextOK = false;
+      this.startOK = false;
+      this.stopOK = false;
     },
     submitAnswer() {
-      // when push the answer button
-      this.isCountingDown = false;
+      this.disableAll();
+    },
+    endSession() {
+      this.disableAll();
     },
     endQeustion() {
       // when the displaying text reaches it's end
-      this.isEnd = true;
+      this.nextOK = true;
+
+      this.answerOK = false;
+      this.startOK = false;
+      this.stopOK = false;
     },
-    endSession() {
-      this.isSessionStarted = false;
-    },
+
     reset() {
-      this.isSessionStarted = false;
-      this.isSessionNotStarted = true;
-      this.isAsking = false;
-      this.isCountingDown = false;
-      this.isEnd = true;
+      this.startOK = true;
+
+      this.answerOK = false;
+      this.nextOK = false;
+      this.stopOK = false;
     },
   },
 });

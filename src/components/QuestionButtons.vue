@@ -7,7 +7,7 @@
       v-if="stopOK"
       @click="pauseQuestion"
     >
-      Stop
+      我知道 !
     </button>
     <button
       type="button"
@@ -16,7 +16,7 @@
       v-if="startOK"
       @click.once ="displayNextQuestion"
     >
-      Start
+      開始
     </button>
     <button
       type="submit"
@@ -25,7 +25,7 @@
       v-if="answerOK"
       @click ="checkAnswer"
     >
-      Answer
+      回答
     </button>
   </div>
   <div class="col text-end">
@@ -64,17 +64,13 @@ export default defineComponent({
   setup(props) {
     const buttonStatus = useButtonStatusStore();
 
-    const answerOK = computed(() => buttonStatus.isCountingDown);
-    const nextOK = computed(
-      () => buttonStatus.isEnd && buttonStatus.isSessionStarted
-    );
-    const stopOK = computed(() => buttonStatus.isAsking);
-    const startOK = computed(
-      () => buttonStatus.isEnd && buttonStatus.isSessionNotStarted
-    );
+    const answerOK = computed(() => buttonStatus.answerOK);
+    const nextOK = computed(() => buttonStatus.nextOK);
+    const stopOK = computed(() => buttonStatus.stopOK);
+    const startOK = computed(() => buttonStatus.startOK);
 
     const pauseQuestion = () => {
-      buttonStatus.displayQuestion();
+      buttonStatus.pauseQuestion();
       props.onPause && props.onPause();
     };
 
