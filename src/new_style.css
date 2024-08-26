@@ -201,3 +201,8 @@ input:-webkit-autofill:focus {
     zoom: 100%;
   }
 }
+@media screen and (max-width: 1024px) {
+  :root {
+    zoom: 130%;
+  }
+}
