@@ -7,12 +7,13 @@ and Firebase Store as database.
 ・basic user login/ register and data processing function  
 ・basic database interaction function  
 ・a HAYAOSHI quiz page with three different game mode  
+・a welcome banner
 
 ## Working on
 ・question contribution function  
 ・tutorial and newcomer mode  
 ・more detailed user profile page  
-・a welcome banner
+・Leaderboard page  
 
 ## Planning to do ~~someday~~
 ・achievement system  
