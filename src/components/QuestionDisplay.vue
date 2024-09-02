@@ -3,18 +3,7 @@
     class="container px-1 py-1 d-block justify-content-center"
     style="max-width: 450px"
   >
-    <div class="progress mb-1 justify-content-start" style="height: 3px">
-      <div
-        :class="{
-          'progress-bar bar-high': barLength >= 60,
-          'progress-bar bar-medium': 60 > barLength && barLength >= 35,
-          'progress-bar bar-low': 35 > barLength && barLength >= 15,
-          'progress-bar bar-danger': barLength < 15,
-        }"
-        role="progressbar"
-        :style="{ width: barLength + '%' }"
-      ></div>
-    </div>
+    <CountdownBar :barLength = "barLength"/>
     <ResultGrid :act="curInd" />
     <div class="row border m-auto" style="min-width: 280px; min-height: 180px">
       <p class="mt-1">{{ displayedText }}</p>
@@ -50,6 +39,7 @@ import { defineComponent, ref, watch, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import QuestionButtons from "./QuestionButtons.vue";
 import ResultGrid from "./ResultGrid.vue";
+import CountdownBar from "./CountdownBar.vue";
 import { useCheckAnswer } from "../composables";
 import {
   useResultStore,
@@ -59,7 +49,7 @@ import {
 
 export default defineComponent({
   name: "QuestionDisplay",
-  components: { QuestionButtons, ResultGrid },
+  components: { QuestionButtons, ResultGrid, CountdownBar },
   setup() {
     // the time, and question numbers
     const countDownTime: number = 15; //seconds
