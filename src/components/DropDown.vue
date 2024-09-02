@@ -26,7 +26,7 @@
       </li>
       <li v-if="user"><hr class="dropdown-divider" /></li>
       <li v-if="user">
-        <a class="dropdown-item" id="text-danger" href="#" @click="logOut"
+        <a class="dropdown-item" id="text-danger" @click="logOut"
           ><i class="bi bi-box-arrow-right"></i> 帳號登出</a
         >
       </li>
