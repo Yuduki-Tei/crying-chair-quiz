@@ -1,70 +1,78 @@
 <template>
-    <DropDown />
-    <div class="container px-1 py-1 d-block justify-content-center pt-5" style="max-width: 450px">
-        <h2 class="mb-3 fw-normal">題目投稿</h2>
-      <form class = "p-1">
-        <div class="row mb-3">
-          <!-- Main Category Dropdown -->
-          <div class="col">
-            <div class="dropdown">
-              <button
-                class="btn btn-secondary dropdown-toggle w-100"
-                type="button"
-                id="dropdownCategory"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                {{ selectedCat || "選擇分類" }}
-              </button>
-              <ul class="dropdown-menu w-100">
-                <li v-for="(_, cat) in cats" :key="cat">
-                  <a class="dropdown-item" @click="selectCategory(cat as string)">{{ cat }}</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-  
-          <!-- Subcategory Dropdown -->
-          <div class="col">
-            <div class="dropdown">
-              <button
-                class="btn btn-secondary dropdown-toggle w-100"
-                type="button"
-                id="dropdownSubcategory"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                :disabled="!subCats.length"
-              >
-                {{ selectedSubcat || "選擇子分類" }}
-              </button>
-              <ul class="dropdown-menu w-100">
-                <li v-for="subcat in subCats" :key="subcat">
-                  <a class="dropdown-item" @click="selectSubcategory(subcat)">{{ subcat }}</a>
-                </li>
-              </ul>
-            </div>
+  <Loading v-if = "loading"/>
+  <Agreement />
+  <DropDown />
+  <div class="container d-block justify-content-center pt-4" style="max-width: 450px">
+      <h2 class="fw-normal">題目投稿</h2>
+    <form @submit.prevent= "submitForm">
+      <div class="row mb-3">
+        <!-- Main Category Dropdown -->
+        <div class="col">
+          <div class="dropdown mt-0">
+            <button
+              class="btn btn-secondary dropdown-toggle w-100"
+              type="button"
+              id="dropdownCategory"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              {{ selectedCat || "選擇分類" }}
+            </button>
+            <ul class="dropdown-menu w-100">
+              <li v-for="(_, cat) in cats" :key="cat">
+                <a class="dropdown-item" @click="selectCategory(cat as string)">{{ cat }}</a>
+              </li>
+            </ul>
           </div>
         </div>
-        <p class = "border-bottom"> {{detail}}</p>
-        <div class="mb-3">
-          <label for="qText" class="form-label">問題本文</label>
-          <textarea class="form-control" id="qText" rows="3" v-model="qText" required />
+
+        <!-- Subcategory Dropdown -->
+        <div class="col">
+          <div class="dropdown mt-0">
+            <button
+              class="btn btn-secondary dropdown-toggle w-100"
+              type="button"
+              id="dropdownSubcategory"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              :disabled="!subCats.length"
+            >
+              {{ selectedSubcat || "選擇子分類" }}
+            </button>
+            <ul class="dropdown-menu w-100">
+              <li v-for="subcat in subCats" :key="subcat">
+                <a class="dropdown-item" @click="selectSubcategory(subcat)">{{ subcat }}</a>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="aText" class="form-label">答案</label>
-          <input class="form-control" id="aText" v-model="aText" required />
-        </div>
-      </form>
-    </div>
-  </template>
+      </div>
+      <p class = "border-bottom"> {{detail}}</p>
+      <div class="mb-3">
+        <label for="qText" class="form-label">問題本文</label>
+        <textarea class="form-control" id="qText" rows="3" v-model="qText" required />
+      </div>
+      <div class="mb-3">
+        <label for="aText" class="form-label">答案</label>
+        <input class="form-control" id="aText" v-model="aText" required />
+      </div>
+      <button class="btn btn-primary w-100 py-2" type="submit">
+          送出投稿
+      </button>
+    </form>
+  </div>
+</template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import Loading from "../components/Loading.vue"
 import DropDown from "../components/DropDown.vue";
+import Agreement from "../components/Agreement.vue";
+import { useUserStore } from "../store";
 
 export default defineComponent({
   subCat: "Contribution",
-  components:{ DropDown },
+  components:{ DropDown, Agreement, Loading },
   setup() {
     const cats: { [cat: string]: { subCat: string; detail: string }[] } = 
     {'文學': [{'subCat': '中文文學（古典）', 'detail': '與中文古典文學（白話文運動前 ～1910年前）有關的問題。詩詞歌賦一概歸類至此。'}, 
@@ -177,6 +185,19 @@ export default defineComponent({
         const subCats = ref<string[]>([]);
         const qText = ref<string>('');
         const aText = ref<string>('');
+        const loading = ref<boolean>(false);
+
+        const user = useUserStore();
+
+        const initRefs = () => {
+          detail.value = '';
+          selectedCat.value = '';
+          selectedSubcat.value = '';
+          subCats.value = [];
+          qText.value = '';
+          aText.value = '';
+          loading.value = false;
+        }
 
         const selectCategory = (cat: string) => {
             subCats.value = [];
@@ -197,6 +218,30 @@ export default defineComponent({
             });
         };
 
+        const submitForm = () => {
+          loading.value = true;
+          const formData = new FormData();
+          formData.append("entry.2118350034", user.dataList.user_mail);
+          formData.append("entry.1527881372", selectedCat.value);
+          formData.append("entry.1316067929", selectedSubcat.value);
+          formData.append("entry.511086283", qText.value);
+          formData.append("entry.586558809", aText.value);
+          fetch("https://docs.google.com/forms/d/e/1FAIpQLSeci8E0u9d0RKMtMk8N07bvQ6EPNylzhDY-hKjlDtXblKxIfw/formResponse", {
+            method: "POST",
+            body: formData,
+            mode: "no-cors"
+          })
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.error("Error submitting form", error);
+          });
+          setTimeout(() => {
+            initRefs();
+        }, 1000);
+        };
+
         return {
         cats,
         qText,
@@ -205,6 +250,8 @@ export default defineComponent({
         selectedCat,
         selectedSubcat,
         subCats,
+        loading,
+        submitForm,
         selectCategory,
         selectSubcategory,
         };
