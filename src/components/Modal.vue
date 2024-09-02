@@ -17,6 +17,15 @@
             >
               {{ confirmText }}
             </button>
+            <router-link v-if = "reject" to = "/menu" replace>
+              <button
+                type="button"
+                class="btn btn-secondary w-100"
+                data-bs-dismiss="modal"
+              >
+              {{ rejectText }}
+              </button>
+            </router-link>
           </div>
         </div>
       </div>
@@ -39,6 +48,14 @@ export default defineComponent({
     confirmText:{
       type: String,
       default: "好喔"
+    },
+    reject:{
+      type: Boolean,
+      default: false,
+    },
+    rejectText:{
+      type: String,
+      default: "返回"
     }
   },
   setup() {
