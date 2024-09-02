@@ -5,14 +5,14 @@
       class="col m-0 p-0 ratio ratio-1x1 grid-item"
     >
       <span
-        class="font-monospace text-center fs-2 fw-bold"
+        class="font-monospace fs-2 fw-bold d-flex align-items-center justify-content-center"
         :class="{
           'text-correct': item.correct,
           'text-incorrect': !item.correct,
           active: index === act,
         }"
       >
-        <i
+        <i class = "d-flex align-items-center justify-content-center"
           v-if="item.done"
           :class="{
             'bi bi-circle': item.correct,
