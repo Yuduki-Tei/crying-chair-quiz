@@ -37,7 +37,7 @@ export const useButtonStatusStore = defineStore("ButtonStatus", {
     endSession() {
       this.disableAll();
     },
-    endQeustion() {
+    endQuestion() {
       // when the displaying text reaches it's end
       this.nextOK = true;
 

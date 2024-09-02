@@ -109,7 +109,7 @@ export default defineComponent({
 
           } else {
             //this is a fastforward display
-            buttonStatus.endQeustion();
+            buttonStatus.endQuestion();
             _checkSessionEnd();
           };
         };
