@@ -64,6 +64,6 @@ export default defineComponent({
 <style>
 .dropdown {
   margin-right: 1rem;
-  margin-top : 2.5rem;
+  margin-top : 1rem;
 }
 </style>
