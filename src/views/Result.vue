@@ -6,7 +6,7 @@
     style="max-width: 450px"
   >
     <DropDown />
-    <h3 class="pb-2 text-md-center">
+    <h3 class="pb-2 text-center">
         <i :class="{
           'text-correct': totalScore >= 300,
           'text-normal': 300 > totalScore && totalScore >= 150,
@@ -40,8 +40,8 @@ export default defineComponent({
     const user = useUserStore();
     const res = useResultStore();
     const router = useRouter();
-    const totalScore = ref(0);
-    const dataUpdated = ref(false);
+    const totalScore = ref<number>(0);
+    const dataUpdated = ref<boolean>(false);
 
     for (let i = 0; i < res.dataList.length; i++){
       totalScore.value += res.getRes(i).point;
