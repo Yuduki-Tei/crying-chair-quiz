@@ -1,5 +1,5 @@
 <template>
-  <div class="dropdown m-5 position-fixed top-0 end-0 z-3">
+  <div class="dropdown position-fixed top-0 end-0 z-3">
     <button
       class="btn btn-secondary dropdown-toggle"
       type="button"
@@ -60,3 +60,10 @@ export default defineComponent({
   },
 });
 </script>
+
+<style>
+.dropdown {
+  margin-right: 1rem;
+  margin-top : 2.5rem;
+}
+</style>

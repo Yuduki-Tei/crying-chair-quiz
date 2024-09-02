@@ -88,18 +88,15 @@ export default defineComponent({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Enter") {
+        event.preventDefault();
         if (startOK.value) {
           displayNextQuestion();
         } else if (stopOK.value) {
           pauseQuestion();
-        } else if (answerOK.value) {
-          if (isMac) {
-            if (event.metaKey || event.ctrlKey) {
-              checkAnswer();
-            };
-          } else {
-            checkAnswer();
-          };
+        } else if (answerOK.value && !isMac) {
+          checkAnswer();
+        } else if (answerOK.value && isMac && (event.metaKey|| event.ctrlKey)){
+          checkAnswer();
         } else if (nextOK.value) {
           displayNextQuestion();
         };
