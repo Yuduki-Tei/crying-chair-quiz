@@ -18,7 +18,7 @@
               </button>
               <ul class="dropdown-menu w-100">
                 <li v-for="(_, cat) in cats" :key="cat">
-                  <a class="dropdown-item" href="#" @click="selectCategory(cat as string)">{{ cat }}</a>
+                  <a class="dropdown-item" @click="selectCategory(cat as string)">{{ cat }}</a>
                 </li>
               </ul>
             </div>
@@ -39,7 +39,7 @@
               </button>
               <ul class="dropdown-menu w-100">
                 <li v-for="subcat in subCats" :key="subcat">
-                  <a class="dropdown-item" href="#" @click="selectSubcategory(subcat)">{{ subcat }}</a>
+                  <a class="dropdown-item" @click="selectSubcategory(subcat)">{{ subcat }}</a>
                 </li>
               </ul>
             </div>
@@ -196,8 +196,6 @@ export default defineComponent({
               }
             });
         };
-
-        console.log(qText.value)
 
         return {
         cats,

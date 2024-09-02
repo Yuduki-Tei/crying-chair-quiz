@@ -29,7 +29,7 @@ export default defineComponent({
   name: "Modal",
   props: {
     showModal: {
-      type: boolean,
+      type: Boolean,
       default: true,
     },
     modalTitle: {

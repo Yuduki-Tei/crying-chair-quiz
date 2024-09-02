@@ -126,6 +126,7 @@ a:visited {
 
 a:hover,
 a:active {
+  cursor: pointer;
   background-color: var(--mygray-dark) !important;
   color: var(--mylinkblue-light) !important;
   text-decoration: none;
