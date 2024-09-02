@@ -15,7 +15,7 @@
               class="btn btn-primary"
               data-bs-dismiss="modal"
             >
-              好喔
+              {{ confirmText }}
             </button>
           </div>
         </div>
@@ -29,12 +29,16 @@ export default defineComponent({
   name: "Modal",
   props: {
     showModal: {
-      type: Boolean,
+      type: boolean,
       default: true,
     },
     modalTitle: {
       type: String,
       default: "最新公告"
+    },
+    confirmText:{
+      type: String,
+      default: "好喔"
     }
   },
   setup() {

@@ -1,5 +1,5 @@
 <template>
-  <Modal modalTitle = "最新公告" :showModal = "showModal">
+  <Modal modalTitle = "最新公告" confimText = "好喔" :showModal = "showModal">
     <p class="mb-1">這是一個開發中的Web App，正在努力做使用者投稿問題的部分。</p>
       <p class = "mt-2 mb-0">2024/08/25</p>
       <li>新增100題，已經沒有庫存題目了</li>
@@ -24,7 +24,8 @@ export default defineComponent({
   components:{ Modal },
   setup() {
     const helloID = "20240901"
-    const showModal = ref<Boolean>();
+    const showModal = ref<boolean>(true);
+
     if (!localStorage.getItem("helloID") || localStorage.getItem("helloID") !== helloID) {
       showModal.value = true;
       localStorage.setItem("helloID", helloID);
