@@ -8,6 +8,7 @@ import UserProfile from "../views/UserProfile.vue";
 import Result from "../views/Result.vue";
 import Cat_10 from "../views/Cat_10.vue";
 import Contribution from "../views/Contribution.vue";
+import Principle from "../views/Principle.vue";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 
 // route for local development
@@ -23,6 +24,7 @@ import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 //   { path: "/leaderboard", component: Menu },
 //   { path: "/result", component: Result },
 //   { path: "/contribution", component: Contribution },
+//   { path: "/contribution/principle", component: Principle },
 // ];
 
 // route for production environment
@@ -37,6 +39,8 @@ const routes = [
   { path: "/user-data", component: UserProfile, meta: { requiresAuth: true } },
   { path: "/leaderboard", component: Menu, meta: { requiresAuth: true } },
   { path: "/result", component: Result, meta: { requiresAuth: true } },
+  { path: "/contribution", component: Contribution, meta: { requiresAuth: true } },
+  { path: "/contribution/principle", component: Principle },
 ];
 
 const router = createRouter({

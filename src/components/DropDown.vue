@@ -26,7 +26,7 @@
       </li>
       <li v-if="user"><hr class="dropdown-divider" /></li>
       <li v-if="user">
-        <a class="dropdown-item" id="text-danger" href="#" @click="logOut"
+        <a class="dropdown-item" id="text-danger" @click="logOut"
           ><i class="bi bi-box-arrow-right"></i> 帳號登出</a
         >
       </li>
@@ -64,6 +64,6 @@ export default defineComponent({
 <style>
 .dropdown {
   margin-right: 1rem;
-  margin-top : 2.5rem;
+  margin-top : 1rem;
 }
 </style>

@@ -38,7 +38,7 @@
           <p>
             還沒有帳號嗎?
             <router-link to="/register" replace>點此註冊</router-link> 或
-            <a href="#" @click="loginWithGoogle"
+            <a @click="loginWithGoogle"
               ><i class="bi bi-google"></i>登入</a
             >
           </p>
