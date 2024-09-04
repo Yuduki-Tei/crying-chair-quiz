@@ -1,10 +1,10 @@
 <template>
   <Loading v-if = "loading"/>
   <Agreement />
-  <DropDown />
+  <DropDown v-if = "!loading" />
   <div class="container d-block justify-content-center pt-4" style="max-width: 450px">
       <h2 class="fw-normal">題目投稿</h2>
-    <form @submit.prevent= "submitForm">
+    <form v-if = "!loading" @submit.prevent= "submitForm">
       <div class="row mb-3">
         <!-- Main Category Dropdown -->
         <div class="col">
@@ -221,7 +221,7 @@ export default defineComponent({
         const submitForm = () => {
           loading.value = true;
           const formData = new FormData();
-          formData.append("entry.2118350034", user.dataList.user_mail);
+          formData.append("entry.2118350034", user.dataList.uid);
           formData.append("entry.1527881372", selectedCat.value);
           formData.append("entry.1316067929", selectedSubcat.value);
           formData.append("entry.511086283", qText.value);

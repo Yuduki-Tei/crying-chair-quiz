@@ -1,6 +1,6 @@
 <template>
     <Modal modalTitle = "投稿須知(ver. 2024/09/02)" confirmText = "我已閱讀並同意上述內容" :reject = true rejectText = "拒絕條款並返回主畫面">
-    <p>在此由衷感謝您願意貢獻自己的腦力與時間，<router-link to="/" tag="a" target="_blank">這裡</router-link>有格式、標點等原則與標準供參。<br>
+    <p>在此由衷感謝您願意貢獻自己的腦力與時間，<router-link to="/contribution/principle" tag="a" target="_blank">這裡</router-link>有出題格式、標點等原則與標準供參。<br>
     本頁面僅提供單筆投稿功能，若您欲提供大量題目，請由問題回報表單留下您的聯絡方式，本站會盡速與您接洽。</p>
 
     <p class = "text-danger fs-4">投稿前請務必閱讀以下須知與聲明：</p>

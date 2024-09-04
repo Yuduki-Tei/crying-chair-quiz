@@ -68,7 +68,7 @@
         </div>
         <div>
           <h3 class="fs-3 text-body-emphasis">投稿十題</h3>
-          <p>開玩笑的 一題也可以</p>
+          <p>開玩笑的 一題也歡迎</p>
           <button
             @click="goToPage('contribution')"
             type="button"
