@@ -77,6 +77,17 @@ export default defineComponent({
     var countDownInterval: any = 0;
     var questionInterval: any = 0;
 
+    const _throttle = (func: Function, limit: number=100) => {
+      let inThrottle: boolean;
+      return (...args: any[]) => {
+        if (!inThrottle) {
+          func.apply(this, args);
+          inThrottle = true;
+          setTimeout(() => (inThrottle = false), limit);
+        }
+      };
+    }
+
     const _displayTextByCharacter = (
       t: string,
       index: number,
@@ -164,7 +175,7 @@ export default defineComponent({
       };
     };
 
-    const buttonStop = () =>{
+    const buttonStop = _throttle(() =>{
       //when user push the pause button
       answerOK.value = true; // allow to answer
       _changeLabelText();
@@ -172,9 +183,10 @@ export default defineComponent({
       if (barLength.value === 100){
         _startCountDown();
       };
-    };
+    });
 
-    const startDisplayingText = () => {
+    const startDisplayingText = _throttle(() => {
+      displayedText.value = "";
       buttonStatus.displayQuestion();
       curInd.value++; //current local question index
 
@@ -186,9 +198,9 @@ export default defineComponent({
         qStore.getQuestion(curInd.value).q_text,
         displaySpeed
       );
-    };
+    });
 
-    const checkAnswer = () => {
+    const checkAnswer = _throttle(() => {
       buttonStatus.submitAnswer();
       clearInterval(countDownInterval);
 
@@ -199,7 +211,7 @@ export default defineComponent({
         qStore.getQuestion(curInd.value).q_text,
         fastForwardSpeed
       ); //quickly show the text remained
-    };
+    });
 
     watch(answerOK, async (newValue) => {
       if (newValue) {

@@ -1,6 +1,6 @@
 <template>
   <ResultGrid :act="currentIdx" />
-  <div id="questionCarousel" class="carousel slide" data-bs-ride="carousel">
+  <div id="questionCarousel" class="carousel slide" data-interval="false">
     <div class="carousel-indicators mb-0 mt-0">
       <button
         v-for="(item, index) in resultQText"
