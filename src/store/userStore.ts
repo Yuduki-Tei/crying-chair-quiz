@@ -103,7 +103,7 @@ export const useUserStore = defineStore("userData", {
       }
       const userDocRef = doc(db, "users", user.uid);
       const updates = {
-        last_active_time: Date.now(),
+        last_active_time: new Date().toISOString(),
       };
       await updateDoc(userDocRef, updates);
     },
