@@ -54,6 +54,7 @@ export default defineComponent({
     onMounted(async () => {
       await user.updateResToDatabase();
       await user.updateStatsToDatabase();
+      await user.updateLastActiveTime();
       user.snapShoot();
       dataUpdated.value = true;
     });
