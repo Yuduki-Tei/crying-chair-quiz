@@ -4,7 +4,7 @@
       type="button"
       class="btn btn-danger"
       :disabled="!stopOK"
-      v-if="stopOK"
+      v-show="stopOK"
       @click="pauseQuestion"
     >
       我知道 !
@@ -13,16 +13,16 @@
       type="button"
       class="btn btn-primary"
       :disabled="!startOK"
-      v-if="startOK"
+      v-show="startOK"
       @click.once ="displayNextQuestion"
     >
       開始
     </button>
     <button
-      type="submit"
+      type="button"
       class="btn btn-primary"
       :disabled="!answerOK"
-      v-if="answerOK"
+      v-show="answerOK"
       @click ="checkAnswer"
     >
       回答
@@ -33,7 +33,7 @@
       type="button"
       class="btn btn-primary"
       :disabled="!nextOK"
-      v-if="nextOK"
+      v-show="nextOK"
       @click="displayNextQuestion"
     >
       <i class="bi bi-arrow-right"></i>

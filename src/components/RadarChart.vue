@@ -1,0 +1,97 @@
+<template>
+  <Radar :data="data" :options="option"/>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import type { ChartData, ChartOptions } from 'chart.js';
+import { Radar } from 'vue-chartjs';
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  RadialLinearScale,
+  Filler,
+  LineElement,
+} from 'chart.js'
+ChartJS.register(CategoryScale, LinearScale, BarElement,PointElement ,RadialLinearScale, LineElement, Filler, Title, Tooltip, Legend)
+ChartJS.defaults.font.family = "Inter, system-ui, Avenir, Helvetica, Arial, sans-serif";
+export default defineComponent({
+    name: "RadarChart",
+    components:{ Radar },
+    setup(){
+      const data:ChartData<'radar'> = {
+        labels: [
+          '文學',
+          '理科',
+          '地理',
+          '社會',
+          '生活',
+          '歷史',
+          '語言',
+          '運動',
+          '文化',
+          '娛樂'
+        ],
+        datasets: [
+          {
+            label: '正解率',
+            backgroundColor: 'rgba(3, 147, 147, 0.1)',
+            borderColor: '#039393',
+            pointBackgroundColor: '#039393',
+            data: [65, 59, 90, 81, 56, 55, 40, 40 ,33 ,22]
+          },
+        ]
+      }
+      const option:ChartOptions<'radar'> = {
+        devicePixelRatio: 4,
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+          r: {        
+            suggestedMax: 100,
+            grid: {
+              color: '#156160'
+            },
+            angleLines:{
+              color: '#156160',
+            },
+            pointLabels:{
+              color: 'rgba(255, 255, 255, 0.87)',
+              font: {
+                size: 16
+              },
+            },
+            ticks:{
+              stepSize: 25,
+              color: 'rgba(255, 255, 255, 0.87)',
+              backdropColor: 'rgba(0, 0, 0, 0)',
+              font: {
+                size: 12
+              },
+            },
+          },
+        },
+        plugins:{
+          legend:{
+            display:false,
+          },
+          title: {
+            color: 'rgba(255, 255, 255, 0.87)',
+            display: true,
+            text: "正解率",
+            font: {
+              size: 20
+            },
+          },
+        },
+      };
+      return {data, option}
+  },
+});
+</script>
