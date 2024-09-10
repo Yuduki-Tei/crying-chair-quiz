@@ -15,7 +15,6 @@
       >
         <input
           ref = "answerInput"
-          type="answer"
           :disabled="!answerOK"
           class="form-control"
           id="answer"
@@ -76,6 +75,7 @@ export default defineComponent({
     //local var
     var countDownInterval: any = 0;
     var questionInterval: any = 0;
+    var isCountingDown:boolean = false;
 
     const _throttle = (func: Function, limit: number=100) => {
       let inThrottle: boolean;
@@ -96,7 +96,7 @@ export default defineComponent({
     ) => {
       let char = index; //character index
       let curText = t; //displayed full text
-      answerOK.value = false; //not allow to answer when tex displaying
+      answerOK.value = false; //not allow to answer when text displaying
       questionInterval = setInterval(() => {
         if (char < text.length) {
           curText += text[char];
@@ -143,6 +143,8 @@ export default defineComponent({
     }
 
     const _startCountDown = () => {
+      if (isCountingDown) return
+      isCountingDown = true; 
       let adjustedCountDownTime = _getAdjustTime();
 
       var start = new Date().getTime();
@@ -154,6 +156,7 @@ export default defineComponent({
         );
         if (curTime > adjustedCountDownTime * 1010) {
           // 1.01x tolerance
+          isCountingDown = false;
           clearInterval(countDownInterval);
           checkAnswer();
         };
@@ -161,6 +164,7 @@ export default defineComponent({
     };
 
     const _stopDisplayingText = () => {
+      isCountingDown = false;
       res.setRes(curInd.value, { interval: displayedText.value.length }); //store the stop point
       clearInterval(questionInterval); //stop the question
     };
@@ -180,14 +184,11 @@ export default defineComponent({
       answerOK.value = true; // allow to answer
       _changeLabelText();
       _stopDisplayingText();
-      if (barLength.value === 100){
-        _startCountDown();
-      };
+      _startCountDown();
     });
 
-    const startDisplayingText = _throttle(() => {
+    const startDisplayingText = _throttle(() => { // start/next button
       displayedText.value = "";
-      buttonStatus.displayQuestion();
       curInd.value++; //current local question index
 
       barLength.value = 100;
@@ -197,7 +198,7 @@ export default defineComponent({
         0,
         qStore.getQuestion(curInd.value).q_text,
         displaySpeed
-      );
+      );//start display text from index 0 with normal displayspeed
     });
 
     const checkAnswer = _throttle(() => {
