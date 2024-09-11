@@ -204,6 +204,7 @@ export default defineComponent({
     const checkAnswer = _throttle(() => {
       buttonStatus.submitAnswer();
       clearInterval(countDownInterval);
+      isCountingDown = false;
 
       useCheckAnswer(curInd.value, answer.value); //check if the answer is right and write the result to store
       _displayTextByCharacter(
