@@ -1,15 +1,6 @@
 <template>
   <ResultGrid class ="grid" :act="currentIdx" @select-grid="gotoSlide" />
   <div id="questionCarousel" class="carousel slide" data-interval="false">
-    <!-- <div class="carousel-indicators mb-0 mt-0">
-      <button
-        v-for="(item, index) in resultQText"
-        :key="index"
-        :data-bs-target="'#questionCarousel'"
-        :data-bs-slide-to="index"
-        :class="{ active: index === 0 }"
-      ></button>
-    </div> -->
     <div class="carousel-inner">
       <div
         v-for="(item, idx) in resultQText"
@@ -18,33 +9,17 @@
       >
         <div
           class="row border m-auto"
-          style="min-width: 280px; min-height: 180px"
+          style="min-width: 280px; min-height: 200px"
         >
           <p class="mt-1">{{ item }}</p>
-          <div class ="m-auto text-buttom">
-            <p class="text-center p-0 mb-0">
-              你的答案: {{ userAns[idx] }}  預設答案: {{ resultAText[idx] }}
+          <div class ="m-auto text-buttom p-0 mb-1">
+            <p class="text-center p-0 m-0">
+              你的答案: {{ userAns[idx] }}  <br> 預設答案: {{ resultAText[idx] }}
             </p>
           </div>
         </div>
       </div>
     </div>
-    <!-- <button
-      class="carousel-control-prev h-25"
-      type="button"
-      data-bs-target="#questionCarousel"
-      data-bs-slide="prev"
-    >
-      <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button
-      class="carousel-control-next h-25"
-      type="button"
-      data-bs-target="#questionCarousel"
-      data-bs-slide="next"
-    >
-      <span class="carousel-control-next-icon"></span>
-    </button> -->
   </div>
 </template>
 
