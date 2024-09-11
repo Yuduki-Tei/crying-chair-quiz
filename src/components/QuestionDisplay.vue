@@ -156,15 +156,14 @@ export default defineComponent({
         );
         if (curTime > adjustedCountDownTime * 1010) {
           // 1.01x tolerance
-          isCountingDown = false;
           clearInterval(countDownInterval);
+          isCountingDown = false;
           checkAnswer();
         };
       }, countDownTime * 10); //the refresh rate of cout down times/ miliseconds, can be any.
     };
 
     const _stopDisplayingText = () => {
-      isCountingDown = false;
       res.setRes(curInd.value, { interval: displayedText.value.length }); //store the stop point
       clearInterval(questionInterval); //stop the question
     };
