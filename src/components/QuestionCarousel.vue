@@ -1,7 +1,7 @@
 <template>
-  <ResultGrid :act="currentIdx" />
+  <ResultGrid class ="grid" :act="currentIdx" @select-grid="gotoSlide" />
   <div id="questionCarousel" class="carousel slide" data-interval="false">
-    <div class="carousel-indicators mb-0 mt-0">
+    <!-- <div class="carousel-indicators mb-0 mt-0">
       <button
         v-for="(item, index) in resultQText"
         :key="index"
@@ -9,7 +9,7 @@
         :data-bs-slide-to="index"
         :class="{ active: index === 0 }"
       ></button>
-    </div>
+    </div> -->
     <div class="carousel-inner">
       <div
         v-for="(item, idx) in resultQText"
@@ -29,7 +29,7 @@
         </div>
       </div>
     </div>
-    <button
+    <!-- <button
       class="carousel-control-prev h-25"
       type="button"
       data-bs-target="#questionCarousel"
@@ -44,7 +44,7 @@
       data-bs-slide="next"
     >
       <span class="carousel-control-next-icon"></span>
-    </button>
+    </button> -->
   </div>
 </template>
 
@@ -63,6 +63,7 @@ export default defineComponent({
     const qStore = useOnlineQuestionStore();
     const res = useResultStore();
     const currentIdx = ref(0);
+    let carouselInstance = null;
 
     for (let i = 0; i < 10; i++) {
       let qTxt = qStore.getQuestion(i).q_text;
@@ -77,6 +78,9 @@ export default defineComponent({
     }
     onMounted(() => {
       const carouselElement = document.querySelector("#questionCarousel");
+      carouselInstance = new bootstrap.Carousel(carouselElement, {
+        interval: false,
+      });
 
       const handleSlide = (event) => {
         currentIdx.value = event.to;
@@ -88,19 +92,29 @@ export default defineComponent({
         carouselElement.removeEventListener("slide.bs.carousel", handleSlide);
       });
     });
+
+    const gotoSlide = (index) => {
+      carouselInstance.to(index);
+      currentIdx.value = index;
+    };
+
     return {
       currentIdx,
       resultQText,
       resultAText,
       userAns,
+      gotoSlide,
     };
   },
 });
 </script>
 
 <style scoped>
-.carousel-control-prev,
+/* .carousel-control-prev,
 .carousel-control-next {
   margin-top: 8rem;
+} */
+.grid {
+  cursor: pointer;
 }
 </style>
