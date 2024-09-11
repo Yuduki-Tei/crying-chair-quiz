@@ -202,6 +202,9 @@ export default defineComponent({
 
     const checkAnswer = _throttle(() => {
       buttonStatus.submitAnswer();
+      if (res.getRes(curInd.value).interval === 0){
+        res.setRes(curInd.value, { interval: displayedText.value.length });
+      }
       clearInterval(countDownInterval);
       isCountingDown = false;
 
