@@ -24,7 +24,10 @@ ChartJS.defaults.font.family = "Inter, system-ui, Avenir, Helvetica, Arial, sans
 export default defineComponent({
     name: "RadarChart",
     components:{ Radar },
-    setup(){
+    props:{
+      correctRates: {type: Array<number>, default: [0,0,0,0,0,0,0,0,0,0]},
+    },
+    setup(props){
       const data:ChartData<'radar'> = {
         labels: [
           '文學',
@@ -44,7 +47,7 @@ export default defineComponent({
             backgroundColor: 'rgba(3, 147, 147, 0.1)',
             borderColor: '#039393',
             pointBackgroundColor: '#039393',
-            data: [65, 59, 90, 81, 56, 55, 40, 40 ,33 ,22]
+            data: props.correctRates,
           },
         ]
       }
