@@ -42,7 +42,7 @@ import CountdownBar from "./CountdownBar.vue";
 import { useCheckAnswer } from "../composables";
 import {
   useResultStore,
-  useQuestionStore,
+  useOnlineQuestionStore,
   useButtonStatusStore,
 } from "../store";
 
@@ -61,7 +61,7 @@ export default defineComponent({
     const res = useResultStore();
     const buttonStatus = useButtonStatusStore();
     buttonStatus.reset();
-    const qStore = useQuestionStore();
+    const qStore = useOnlineQuestionStore();
 
     // data for ref
     const curInd = ref<number>(-1); //zero indexed

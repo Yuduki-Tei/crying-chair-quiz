@@ -50,7 +50,7 @@
 
 <script>
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
-import { useQuestionStore, useResultStore } from "../store";
+import { useOnlineQuestionStore, useResultStore } from "../store";
 import ResultGrid from "./ResultGrid.vue";
 
 export default defineComponent({
@@ -60,7 +60,7 @@ export default defineComponent({
     const resultQText = new Array();
     const resultAText = new Array();
     const userAns = new Array();
-    const qStore = useQuestionStore();
+    const qStore = useOnlineQuestionStore();
     const res = useResultStore();
     const currentIdx = ref(0);
 

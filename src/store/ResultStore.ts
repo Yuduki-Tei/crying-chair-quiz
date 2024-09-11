@@ -8,7 +8,7 @@ interface resData {
   done: boolean;
 }
 
-export const useResultStore = defineStore("result", {
+export const useResultStore = defineStore("Result", {
   state: () => ({
     isWeekly: false,
     dataList: [] as resData[],

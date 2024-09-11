@@ -27,7 +27,7 @@ interface Questions {
   q_answer: string[];
 }
 
-export const useQuestionStore = defineStore("question", {
+export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
   state: () => ({
     questions: [] as Questions[],
     stats: [] as Stats[],
