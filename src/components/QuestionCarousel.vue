@@ -1,15 +1,6 @@
 <template>
-  <ResultGrid :act="currentIdx" />
+  <ResultGrid class ="grid" :act="currentIdx" @select-grid="gotoSlide" />
   <div id="questionCarousel" class="carousel slide" data-interval="false">
-    <div class="carousel-indicators mb-0 mt-0">
-      <button
-        v-for="(item, index) in resultQText"
-        :key="index"
-        :data-bs-target="'#questionCarousel'"
-        :data-bs-slide-to="index"
-        :class="{ active: index === 0 }"
-      ></button>
-    </div>
     <div class="carousel-inner">
       <div
         v-for="(item, idx) in resultQText"
@@ -18,12 +9,12 @@
       >
         <div
           class="row border m-auto"
-          style="min-width: 280px; min-height: 180px"
+          style="min-width: 280px; min-height: 200px"
         >
           <p class="mt-1">{{ item }}</p>
-          <div class ="m-auto text-buttom">
-            <p class="text-center p-0 mb-0">
-              你的答案: {{ userAns[idx] }}  預設答案: {{ resultAText[idx] }}
+          <div class ="m-auto text-buttom p-0 mb-1">
+            <p class="text-center p-0 m-0">
+              你的答案: {{ userAns[idx] }}  <br> 預設答案: {{ resultAText[idx] }}
             </p>
           </div>
         </div>
@@ -50,7 +41,7 @@
 
 <script>
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
-import { useQuestionStore, useResultStore } from "../store";
+import { useOnlineQuestionStore, useResultStore } from "../store";
 import ResultGrid from "./ResultGrid.vue";
 
 export default defineComponent({
@@ -60,9 +51,10 @@ export default defineComponent({
     const resultQText = new Array();
     const resultAText = new Array();
     const userAns = new Array();
-    const qStore = useQuestionStore();
+    const qStore = useOnlineQuestionStore();
     const res = useResultStore();
     const currentIdx = ref(0);
+    let carouselInstance = null;
 
     for (let i = 0; i < 10; i++) {
       let qTxt = qStore.getQuestion(i).q_text;
@@ -77,6 +69,9 @@ export default defineComponent({
     }
     onMounted(() => {
       const carouselElement = document.querySelector("#questionCarousel");
+      carouselInstance = new bootstrap.Carousel(carouselElement, {
+        interval: false,
+      });
 
       const handleSlide = (event) => {
         currentIdx.value = event.to;
@@ -88,11 +83,18 @@ export default defineComponent({
         carouselElement.removeEventListener("slide.bs.carousel", handleSlide);
       });
     });
+
+    const gotoSlide = (index) => {
+      carouselInstance.to(index);
+      currentIdx.value = index;
+    };
+
     return {
       currentIdx,
       resultQText,
       resultAText,
       userAns,
+      gotoSlide,
     };
   },
 });
@@ -101,6 +103,9 @@ export default defineComponent({
 <style scoped>
 .carousel-control-prev,
 .carousel-control-next {
-  margin-top: 8rem;
+  margin-top: 9rem;
+}
+.grid {
+  cursor: pointer;
 }
 </style>

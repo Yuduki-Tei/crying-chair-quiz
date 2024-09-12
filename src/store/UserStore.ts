@@ -23,7 +23,7 @@ interface userData {
   rate_history: string;
 }
 
-export const useUserStore = defineStore("userData", {
+export const useUserStore = defineStore("User", {
   state: () => ({
     snapShot: {} as userData,
     dataList: {} as userData,

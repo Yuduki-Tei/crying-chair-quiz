@@ -42,7 +42,7 @@ import CountdownBar from "./CountdownBar.vue";
 import { useCheckAnswer } from "../composables";
 import {
   useResultStore,
-  useQuestionStore,
+  useOnlineQuestionStore,
   useButtonStatusStore,
 } from "../store";
 
@@ -61,7 +61,7 @@ export default defineComponent({
     const res = useResultStore();
     const buttonStatus = useButtonStatusStore();
     buttonStatus.reset();
-    const qStore = useQuestionStore();
+    const qStore = useOnlineQuestionStore();
 
     // data for ref
     const curInd = ref<number>(-1); //zero indexed
@@ -156,15 +156,14 @@ export default defineComponent({
         );
         if (curTime > adjustedCountDownTime * 1010) {
           // 1.01x tolerance
-          isCountingDown = false;
           clearInterval(countDownInterval);
+          isCountingDown = false;
           checkAnswer();
         };
       }, countDownTime * 10); //the refresh rate of cout down times/ miliseconds, can be any.
     };
 
     const _stopDisplayingText = () => {
-      isCountingDown = false;
       res.setRes(curInd.value, { interval: displayedText.value.length }); //store the stop point
       clearInterval(questionInterval); //stop the question
     };
@@ -203,6 +202,9 @@ export default defineComponent({
 
     const checkAnswer = _throttle(() => {
       buttonStatus.submitAnswer();
+      if (res.getRes(curInd.value).interval === 0){
+        res.setRes(curInd.value, { interval: displayedText.value.length });
+      }
       clearInterval(countDownInterval);
       isCountingDown = false;
 

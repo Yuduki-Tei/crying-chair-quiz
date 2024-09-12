@@ -2,7 +2,7 @@
   <Loading v-if="!dataUpdated" />
   <div
     v-if="dataUpdated"
-    class="container px-1 py-1 d-block justify-content-center pt-5"
+    class="container px-1 d-block justify-content-center pt-5"
     style="max-width: 450px"
   >
     <DropDown />

@@ -3,6 +3,7 @@
     <div
       v-for="(item, index) in results"
       class="col m-0 p-0 ratio ratio-1x1 grid-item"
+      @click="$emit('select-grid', index)"
     >
       <span
         class="font-monospace fs-2 fw-bold d-flex align-items-center justify-content-center"
@@ -12,7 +13,8 @@
           active: index === act,
         }"
       >
-        <i class = "d-flex align-items-center justify-content-center"
+        <i
+          class="d-flex align-items-center justify-content-center"
           v-if="item.done"
           :class="{
             'bi bi-circle': item.correct,

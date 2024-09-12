@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted, ref } from "vue";
-import { useResultStore, useQuestionStore } from "../store";
+import { useResultStore, useOnlineQuestionStore } from "../store";
 import QuestionDisplay from "./QuestionDisplay.vue";
 import Loading from "./Loading.vue";
 
@@ -22,7 +22,7 @@ export default defineComponent({
   setup(props) {
     //initialize the result and question list
     const res = useResultStore();
-    const qStatus = useQuestionStore();
+    const qStatus = useOnlineQuestionStore();
     const dataLoaded = ref(false);
 
     res.clearDataList();
