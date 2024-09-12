@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useLocalQuestionStore } from "./";
 import {
   getFirestore,
   collection,
@@ -6,9 +7,9 @@ import {
   orderBy,
   limit,
   getDocs,
-  where,
   doc,
   getDoc,
+  QueryDocumentSnapshot,
 } from "firebase/firestore";
 
 interface Stats {
@@ -33,77 +34,10 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
     stats: [] as Stats[],
   }),
   actions: {
-    async fetchDataFromDatabase(type: string) {
-      const db = getFirestore();
-      const questions: Questions[] = [];
-      const stats: Stats[] = [];
-
-      let querySnapshot: any;
-
-      if (type === "weekly") {
-        // Fetch 10 questions with largest qids
-        const q = query(
-          collection(db, "Questions"),
-          orderBy("qid", "desc"),
-          limit(10)
-        );
-        querySnapshot = await getDocs(q);
-      } else {
-        const maxQid = (await this.getMaxQid()) - 10;
-        var qids = new Set<number>();
-
-        if (type === "random") {
-          // Fetch 10 random questions from qid below maxQid-10
-          while (qids.size < 10) {
-            const randomQid = Math.floor(Math.random() * maxQid) + 1; // 1 indexed
-            if (!qids.has(randomQid)) {
-              qids.add(randomQid);
-            }
-          }
-        } else {
-          // Fetch 10 random questions from certain category
-          const docRef = doc(db, "Category", type);
-          const docSnapshot = await getDoc(docRef);
-          if (docSnapshot.exists()) {
-            let all_qids = docSnapshot.data().qids;
-            while (qids.size < 10) {
-              const randomQid = Math.floor(Math.random() * all_qids.length);
-              if (
-                !qids.has(all_qids[randomQid]) &&
-                all_qids[randomQid] <= maxQid
-              ) {
-                qids.add(all_qids[randomQid]);
-              }
-            }
-          } else {
-            console.error(`No qids found for category: ${type}`);
-            return;
-          }
-        }
-        const q = query(
-          collection(db, "Questions"),
-          where("qid", "in", [...qids])
-        );
-        querySnapshot = await getDocs(q);
-      }
-      // Fetch questions and their stats
-      for (const docSnapshot of querySnapshot.docs) {
-        const questionData = docSnapshot.data() as Questions;
-        questions.push(questionData);
-
-        const statsDocRef = doc(db, `Stats/${docSnapshot.id}`);
-        const statsSnapshot = await getDoc(statsDocRef);
-
-        const statsData = statsSnapshot.data() as Stats;
-        stats.push(statsData);
-      }
-      this.questions = questions;
-      this.stats = stats;
-    },
-
-    async getMaxQid() {
+    async _getMaxQid() {
       const db = getFirestore();
       const mq = query(
+        //get the document with maximum id from database
         collection(db, "Questions"),
         orderBy("qid", "desc"),
         limit(1)
@@ -114,6 +48,123 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
         maxQid = doc.data().qid;
       });
       return maxQid;
+    },
+
+    _getRandomQids(
+      maxQid: number,
+      count: number,
+      from: Set<number> = new Set()
+    ): Set<number> {
+      const qids: Set<number> = new Set<number>();
+      while (qids.size < count) {
+        //generate random qids until count
+        const randomQid = Math.floor(Math.random() * maxQid) + 1; // 1 indexed
+        if (from.size > 0 && !from.has(randomQid)) {
+          continue;
+        }
+        qids.add(randomQid);
+      }
+      return qids;
+    },
+
+    async _fetchQuestionsByQids(qids: Set<number>) {
+      const localStore = useLocalQuestionStore();
+
+      const localQuestions: Questions[] = [];
+      const qidsToFetch: Set<number> = new Set();
+
+      qids.forEach((qid) => {
+        const localQuestion = localStore.getQuestion(qid); //check local store
+        if (localQuestion) {
+          localQuestions.push(localQuestion);
+        } else {
+          qidsToFetch.add(qid);
+        }
+      });
+
+      let fetchedQuestions: Questions[] = [];
+      if (qidsToFetch.size > 0) {
+        const db = getFirestore();
+        const questionsCollection = collection(db, "Questions");
+
+        const questionPromises = [...qidsToFetch].map((qid) =>
+          getDoc(doc(questionsCollection, qid.toString()))
+        );
+
+        const questionSnapshots = await Promise.all(questionPromises);
+
+        fetchedQuestions = questionSnapshots
+          .filter((snap) => snap.exists())
+          .map((snap) => snap.data() as Questions);
+      }
+
+      return [...localQuestions, ...fetchedQuestions];
+    },
+
+    async _fetchStatsForQids(qids: number[]): Promise<Stats[]> {
+      const db = getFirestore();
+      const statsCollection = collection(db, "Stats");
+
+      const statsPromises = qids.map((qid) =>
+        getDoc(doc(statsCollection, qid.toString()))
+      );
+
+      const statsSnapshots = await Promise.all(statsPromises);
+
+      return statsSnapshots
+        .filter((snap) => snap.exists())
+        .map((snap) => snap.data() as Stats);
+    },
+    async fetchDataFromDatabase(type: string) {
+      const db = getFirestore();
+      let querySnapshot: any;
+      let qids = new Set<number>();
+
+      if (type === "weekly") {
+        // Fetch 10 questions with largest qids
+        const q = query(
+          collection(db, "Questions"),
+          orderBy("qid", "desc"),
+          limit(10)
+        );
+        querySnapshot = await getDocs(q);
+
+        // Process the results
+        const fetchedQuestions = querySnapshot.docs.map(
+          (doc: QueryDocumentSnapshot) => doc.data() as Questions
+        );
+        this.questions = fetchedQuestions;
+      } else {
+        const maxQid = (await this._getMaxQid()) - 10; //all questions except weekly
+
+        if (type === "random") {
+          qids = this._getRandomQids(maxQid, 10);
+        } else {
+          let qidArray = new Array<number>();
+          const localStore = useLocalQuestionStore();
+
+          if (!localStore.Cats[type] || localStore.Cats[type].size <= 0) {
+            //check if cat qids exist in local store
+            const docRef = doc(db, "Category", type);
+            const docSnapshot = await getDoc(docRef);
+            if (docSnapshot.exists()) {
+              qidArray = docSnapshot.data().qids;
+              localStore.updateCat(type, qidArray);
+            } else {
+              console.error(`No qids found for category: ${type}`);
+              return;
+            }
+          }
+          let qidSet: Set<number> = localStore.Cats[type];
+          qids = this._getRandomQids(maxQid, 10, qidSet);
+        }
+        // we have correct qids now
+
+        const combinedQuestions = await this._fetchQuestionsByQids(qids);
+        this.questions = combinedQuestions;
+      }
+
+      this.stats = await this._fetchStatsForQids(Array.from(qids));
     },
 
     getQuestion(index: number) {
