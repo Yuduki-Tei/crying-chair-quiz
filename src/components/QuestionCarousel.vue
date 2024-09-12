@@ -20,6 +20,22 @@
         </div>
       </div>
     </div>
+    <button
+      class="carousel-control-prev h-25"
+      type="button"
+      data-bs-target="#questionCarousel"
+      data-bs-slide="prev"
+    >
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button
+      class="carousel-control-next h-25"
+      type="button"
+      data-bs-target="#questionCarousel"
+      data-bs-slide="next"
+    >
+      <span class="carousel-control-next-icon"></span>
+    </button>
   </div>
 </template>
 
@@ -85,10 +101,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* .carousel-control-prev,
+.carousel-control-prev,
 .carousel-control-next {
-  margin-top: 8rem;
-} */
+  margin-top: 9rem;
+}
 .grid {
   cursor: pointer;
 }
