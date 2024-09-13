@@ -101,20 +101,27 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
       return [...localQuestions, ...fetchedQuestions];
     },
 
-    async _fetchStatsForQids(qids: number[]): Promise<Stats[]> {
+    async fetchCategoryQids(type: string): Promise<number[]> {
       const db = getFirestore();
-      const statsCollection = collection(db, "Stats");
+      const localStore = useLocalQuestionStore();
 
-      const statsPromises = qids.map((qid) =>
-        getDoc(doc(statsCollection, qid.toString()))
-      );
+      if (localStore.Cats[type] && localStore.Cats[type].length > 0) {
+        return localStore.Cats[type];
+      }
 
-      const statsSnapshots = await Promise.all(statsPromises);
+      const docRef = doc(db, "Category", type);
+      const docSnapshot = await getDoc(docRef);
 
-      return statsSnapshots
-        .filter((snap) => snap.exists())
-        .map((snap) => snap.data() as Stats);
+      if (docSnapshot.exists()) {
+        const qidArray = docSnapshot.data().qids;
+        localStore.updateCat(type, qidArray);
+        return localStore.Cats[type];
+      } else {
+        console.error(`No qids found for category: ${type}`);
+        return [];
+      }
     },
+
     async fetchDataFromDatabase(type: string) {
       const db = getFirestore();
       let querySnapshot: any;
@@ -135,36 +142,36 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
         );
         this.questions = fetchedQuestions;
       } else {
-        const maxQid = (await this._getMaxQid()) - 10; //all questions except weekly
+        const maxQid = (await this._getMaxQid()) - 10; // all questions except weekly
 
         if (type === "random") {
           qids = this._getRandomQids(maxQid, 10);
         } else {
-          let qidArray = new Array<number>();
-          const localStore = useLocalQuestionStore();
-
-          if (!localStore.Cats[type] || localStore.Cats[type].size <= 0) {
-            //check if cat qids exist in local store
-            const docRef = doc(db, "Category", type);
-            const docSnapshot = await getDoc(docRef);
-            if (docSnapshot.exists()) {
-              qidArray = docSnapshot.data().qids;
-              localStore.updateCat(type, qidArray);
-            } else {
-              console.error(`No qids found for category: ${type}`);
-              return;
-            }
-          }
-          let qidSet: Set<number> = localStore.Cats[type];
+          const qidSet = new Set(await this.fetchCategoryQids(type));
           qids = this._getRandomQids(maxQid, 10, qidSet);
         }
-        // we have correct qids now
 
+        // We have correct qids now
         const combinedQuestions = await this._fetchQuestionsByQids(qids);
         this.questions = combinedQuestions;
       }
 
       this.stats = await this._fetchStatsForQids(Array.from(qids));
+    },
+
+    async _fetchStatsForQids(qids: number[]): Promise<Stats[]> {
+      const db = getFirestore();
+      const statsCollection = collection(db, "Stats");
+
+      const statsPromises = qids.map((qid) =>
+        getDoc(doc(statsCollection, qid.toString()))
+      );
+
+      const statsSnapshots = await Promise.all(statsPromises);
+
+      return statsSnapshots
+        .filter((snap) => snap.exists())
+        .map((snap) => snap.data() as Stats);
     },
 
     getQuestion(index: number) {
