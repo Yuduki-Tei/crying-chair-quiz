@@ -10,31 +10,28 @@ interface Questions {
 
 export const useLocalQuestionStore = defineStore("LocalQuestion", {
   state: () => ({
-    Cats: {} as { [key: string]: Set<number> },
+    Cats: {} as { [key: string]: number[] },
     questions: [] as Questions[],
   }),
   actions: {
-    updateCat(cat: string, newData: Array<number>) {
+    updateCat(cat: string, newData: number[]) {
       if (!this.Cats[cat]) {
-        this.Cats[cat] = new Set();
+        this.Cats[cat] = [];
       }
 
-      const currentSet = this.Cats[cat];
+      const currentArray = this.Cats[cat];
 
       for (let i = newData.length - 1; i >= 0; i--) {
-        if (currentSet.has(newData[i])) {
+        if (currentArray.includes(newData[i])) {
           break;
         }
-        currentSet.add(newData[i]);
+        currentArray.push(newData[i]);
       }
       console.log("update", this.Cats[cat]);
     },
+
     getCat(cat: string) {
-      if (cat in this.Cats) {
-        return this.Cats[cat];
-      } else {
-        console.error("cat not found");
-      }
+      return this.Cats[cat] || null;
     },
 
     updateQuestion(question: Questions) {

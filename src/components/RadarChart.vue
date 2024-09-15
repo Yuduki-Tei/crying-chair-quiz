@@ -53,7 +53,7 @@ export default defineComponent({
       }
       const option:ChartOptions<'radar'> = {
         devicePixelRatio: 4,
-        responsive: true,
+        responsive:  true,
         maintainAspectRatio: true,
         scales: {
           r: {        
@@ -80,6 +80,10 @@ export default defineComponent({
             },
           },
         },
+        interaction: {
+          mode: 'nearest',
+          intersect: false,
+        },
         plugins:{
           legend:{
             display:false,
@@ -87,14 +91,28 @@ export default defineComponent({
           title: {
             color: 'rgba(255, 255, 255, 0.87)',
             display: true,
-            text: "正解率",
+            text: "分類正解率",
             font: {
               size: 20
             },
           },
+          
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            titleColor: 'rgba(255, 255, 255, 0.87)',
+            bodyColor: 'rgba(255, 255, 255, 0.87)',
+            position: 'nearest',
+            callbacks: {
+                label: function(context) {
+                const label = context.dataset.label || '';
+                const value = context.raw;
+                return `${label}: ${value}`;
+              },
+            },
+          },
         },
       };
-      return {data, option}
+    return {data, option}
   },
 });
 </script>

@@ -19,7 +19,7 @@ export function setBit(bitArray: Uint8Array, index: number, value: number) {
 
 export function getBit(bitArray: Uint8Array, index: number): number {
   if (index >= bitArray.length * 8) {
-    return 0; // or throw error
+    bitArray = expand(bitArray, index + 1);
   }
 
   const byteIndex = index >> 3;
