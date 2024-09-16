@@ -96,13 +96,16 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
         fetchedQuestions = questionSnapshots
           .filter((snap) => snap.exists())
           .map((snap) => snap.data() as Questions);
+
+        fetchedQuestions.forEach((question) => {
+          localStore.updateQuestion(question);
+        });
       }
 
       return [...localQuestions, ...fetchedQuestions];
     },
 
     async fetchCategoryQids(type: string): Promise<number[]> {
-      console.log('called');
       const db = getFirestore();
       const localStore = useLocalQuestionStore();
 
