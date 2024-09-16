@@ -9,15 +9,15 @@
   <div class = "row justify-content-center text-center">
     <h3 class="m-3 text-center">使用者資料</h3>
     <label for="bar">平均正解率 : {{ correctRating }} %</label>
-    <CountdownBar id="bar" :barLength="correctRating" style="height: 8px"/>
+    <CountdownBar id="bar" :barLength="correctRating" style=" height: 8px; max-width: 250px" />
     <p>信箱 : {{ mail }} </p>
   </div>
-  <div
-    class="container d-flex justify-content-center align-items-center"
-    style="max-width: 300px"
+</div>
+<div
+    class="container d-block justify-content-center align-items-center"
+    style="max-width: 450px"
   >
     <RadarChart v-if="!loading" :correctRates= "catCorrects"/>
-  </div>
 </div>
 </template>
 
