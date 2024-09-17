@@ -9,12 +9,12 @@
   >
     <div class="row d-flex justify-content-center text-center flex-grow-1">
       <div class="d-flex justify-content-center text-center">
-        <p v-if="!isEditing">
+        <p v-if="!isEditing" class="fw-medium">
           {{ name }}
           <span @click ="enableEditing" class="text-secondary text-end" >
             <i class="bi bi-pencil text-end"></i>
         </span>
-        <p v-if="errorMessage" class="alert justify-content-center text-center alert-danger p-1 m-1">
+        <p v-if="errorMessage" class="alert justify-content-center text-center alert-danger p-1 m-1 fw-normal">
             {{ errorMessage }}
         </p>
         </p>
@@ -105,21 +105,27 @@ export default defineComponent({
     };
 
     const updateName = async () => {
+      let last = localStorage.getItem('lastUpdateUserName');
+
       if (editName.value.length < 1){
-        console.log('in short')
         errorMessage.value = "請輸入使用者名稱";
         cancelEdit();
         return
       }
       else if(editName.value.length > 15){
-        console.log('in long')
         errorMessage.value = "使用者名稱必須小15個字";
+        cancelEdit();
+        return
+      }
+      else if(last && !(new Date().getTime() - new Date(last).getTime() >= 1000 * 60 * 60 * 24)){
+        errorMessage.value = "兩次名稱更新間隔不可低於24小時";
         cancelEdit();
         return
       }
       else errorMessage.value = "";
       try {
         await user.updateUserName(editName.value);
+        localStorage.setItem('lastUpdateUserName', new Date().toISOString());
         name.value = editName.value;
         data.user_name = editName.value;
         isEditing.value = false;
