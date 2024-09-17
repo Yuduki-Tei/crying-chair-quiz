@@ -16,7 +16,7 @@
       </li>
       <li>
         <router-link to="/user-data" replace class="dropdown-item">
-          <i class="bi bi-person"></i> 使用者資料(沒做)
+          <i class="bi bi-person"></i> 使用者資料(實驗性)
         </router-link>
       </li>
       <li>

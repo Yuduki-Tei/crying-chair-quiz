@@ -15,19 +15,16 @@ export const useLocalQuestionStore = defineStore("LocalQuestion", {
   }),
   actions: {
     updateCat(cat: string, newData: number[]) {
-      if (!this.Cats[cat]) {
+      if (!this.Cats[cat] || !Array.isArray(this.Cats[cat])) {
         this.Cats[cat] = [];
       }
 
-      const currentArray = this.Cats[cat];
-
       for (let i = newData.length - 1; i >= 0; i--) {
-        if (currentArray.includes(newData[i])) {
+        if (this.Cats[cat].includes(newData[i])) {
           break;
         }
-        currentArray.push(newData[i]);
+        this.Cats[cat].push(newData[i]);
       }
-      console.log("update", this.Cats[cat]);
     },
 
     getCat(cat: string) {
