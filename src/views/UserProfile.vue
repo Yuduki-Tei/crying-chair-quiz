@@ -1,24 +1,40 @@
 <template>
-  <Loading v-if="loading" />
   <DropDown />
+  <Loading v-if="loading" />
   <div
     v-if="!loading"
-    class="container d-flex justify-content-center align-items-center pt-5"
-    style="max-width: 450px"
+    class="container d-flex flex-column flex-md-row justify-content-center align-items-center pt-5"
+    style="max-width: 600px"
+    v-on:mousedown = "handleContainerClick"
   >
-  <div class = "row justify-content-center text-center">
-    <h3 class="m-3 text-center">使用者資料</h3>
-    <label for="bar">平均正解率 : {{ correctRating }} %</label>
-    <CountdownBar id="bar" :barLength="correctRating" style=" height: 8px; max-width: 250px" />
-    <p>信箱 : {{ mail }} </p>
+    <div class="row d-flex justify-content-center text-center flex-grow-1">
+      <div class="d-flex justify-content-center text-center">
+        <p v-if="!isEditing">
+          {{ name }}
+          <span @click ="enableEditing" class="text-secondary text-end" >
+            <i class="bi bi-pencil text-end"></i>
+        </span>
+        <p v-if="errorMessage" class="alert justify-content-center text-center alert-danger p-1 m-1">
+            {{ errorMessage }}
+        </p>
+        </p>
+        <div v-if="isEditing" class="d-flex align-items-center mb-2" ref="editContainer">
+          <input type="text" v-model="editName" class="form-control me-2" />
+          <div>
+            <i @click="updateName" class="bi bi-upload"></i>
+          </div>
+        </div>
+      </div>
+      <label for="bar">平均正解率 : {{ correctRating }} %</label>
+      <CountdownBar id="bar" :barLength="correctRating" style="height: 8px; max-width: 240px" />
+    </div>
+    <div
+      class="d-flex align-items-center mt-3 mt-md-0"
+      style="max-width: 300px; flex-shrink: 1;"
+    >
+      <RadarChart v-if="!loading" :correctRates="catCorrects"/>
+    </div>
   </div>
-</div>
-<div
-    class="container d-block justify-content-center align-items-center"
-    style="max-width: 450px"
-  >
-    <RadarChart v-if="!loading" :correctRates= "catCorrects"/>
-</div>
 </template>
 
 <script lang="ts">
@@ -34,11 +50,14 @@ export default defineComponent({
   name: "UserProfile",
   components: { DropDown, Loading, RadarChart, CountdownBar },
   setup() {
+    const errorMessage = ref("");
     const loading = ref(true);
     const catCorrects =  ref<number[]>([]);
     const user = useUserStore();
     const data = user.dataList;
-    const mail = data.user_mail;
+    const name = ref(data.user_name || "尚未設定名稱");
+    const editName = ref(data.user_name);
+    const isEditing = ref(false);
     const online = useOnlineQuestionStore();
     const allCats = [
           '文學',
@@ -76,6 +95,51 @@ export default defineComponent({
       catCorrects.value.push(Math.floor((cor_cnt / ans_cnt || 0) * 10000) / 100);
     }
 
+    const enableEditing = () => {
+      isEditing.value = true;
+    };
+
+    const cancelEdit = () => {
+      editName.value = "";
+      isEditing.value = false;
+    };
+
+    const updateName = async () => {
+      if (editName.value.length < 1){
+        console.log('in short')
+        errorMessage.value = "請輸入使用者名稱";
+        cancelEdit();
+        return
+      }
+      else if(editName.value.length > 15){
+        console.log('in long')
+        errorMessage.value = "使用者名稱必須小15個字";
+        cancelEdit();
+        return
+      }
+      else errorMessage.value = "";
+      try {
+        await user.updateUserName(editName.value);
+        name.value = editName.value;
+        data.user_name = editName.value;
+        isEditing.value = false;
+      } catch (error) {
+        console.error('failed to change name name', error);
+        alert('failed to change name name');
+      }
+    };
+
+    const handleContainerClick = (event: MouseEvent) => {
+      var element = event.target as HTMLElement;
+      if (!isEditing.value || element.tagName.toUpperCase() === 'INPUT') {
+        return;
+      }
+      else if (element.tagName.toUpperCase() === 'I'){
+        enableEditing();
+      }
+      else cancelEdit();
+    };
+
     onMounted(async() => {
       if (!data.correct_history || !data.answer_history) {
         await user.checkUserAccount();
@@ -86,11 +150,24 @@ export default defineComponent({
       loading.value = false;
     })
     return {
-      mail,
+      name,
       loading,
       correctRating,
       catCorrects,
+      editName,
+      isEditing,
+      errorMessage,
+      enableEditing,
+      cancelEdit,
+      updateName,
+      handleContainerClick,
     };
   },
 });
 </script>
+
+<style scoped>
+i{
+  cursor: pointer;
+}
+</style>
