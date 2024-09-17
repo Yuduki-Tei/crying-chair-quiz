@@ -1,5 +1,5 @@
 <template>
-    <div v-if="showModal && buttonShowModal" class="modal position-fixed d-block p-4 py-md-5">
+    <div v-if="showModal && buttonShowModal" class="modal position-fixed d-block" style="height:100vh; overflow-y: hidden;">
       <div class="modal-dialog" role="document">
         <div class="modal-content shadow">
           <div class="modal-header">
