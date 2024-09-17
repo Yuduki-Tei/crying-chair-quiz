@@ -100,7 +100,7 @@ export default defineComponent({
     };
 
     const cancelEdit = () => {
-      editName.value = "";
+      editName.value = name;
       isEditing.value = false;
     };
 
@@ -114,6 +114,11 @@ export default defineComponent({
       }
       else if(editName.value.length > 15){
         errorMessage.value = "使用者名稱必須小15個字";
+        cancelEdit();
+        return
+      }
+      else if(editName.value === name){
+        errorMessage.value = "名稱無變更";
         cancelEdit();
         return
       }
