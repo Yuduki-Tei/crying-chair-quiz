@@ -100,7 +100,7 @@ export default defineComponent({
     };
 
     const cancelEdit = () => {
-      editName.value = name;
+      editName.value = name.value;
       isEditing.value = false;
     };
 
@@ -117,7 +117,7 @@ export default defineComponent({
         cancelEdit();
         return
       }
-      else if(editName.value === name){
+      else if(editName.value === name.value){
         errorMessage.value = "名稱無變更";
         cancelEdit();
         return
