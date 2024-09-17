@@ -1,6 +1,6 @@
 <template>
   <div
-    class="container px-1 py-1 d-block justify-content-center pt-3"
+    class="container px-1 py-1 justify-content-center pt-3"
     style="max-width: 450px"
   >
   <h3 class = "text-center border-top border-bottom mb-4">關於題目</h3>
@@ -29,7 +29,7 @@
     系統會將第一個填入的作為依據顯示字數提示，建議將認知度最為廣的答案作為預設答案。
     </p>
   <h3 class = "text-center border-top border-bottom ">關於參考資料</h3>
-    <p class = "mb-4">本站僅供娛樂用，考證時維基百科有雙語以上頁面足矣。若無維基百科頁面可供佐證，附上新聞、企業網站等法人頁面亦可。</p>
+    <p class = "mb-4">本站僅供娛樂用，考證時維基百科有雙語以上頁面足矣。若無維基百科頁面可供佐證，政府資訊或新聞、企業網站等法人頁面亦可。</p>
   <h6 class = "text-center border-top border-bottom ">給覺得很麻煩的你</h6>
     <p class = "mb-4">如果覺得限制太多，不知道自己的題目到底有沒有符合原則，就直接送出吧。所有題目我們都會審題、考證、修改，讓我們來幫你判斷！</p>
 </div>

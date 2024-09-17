@@ -107,6 +107,20 @@ export const useUserStore = defineStore("User", {
       };
       await updateDoc(userDocRef, updates);
     },
+
+    async updateUserName(name: string) {
+      const db = getFirestore();
+      const user = getAuth().currentUser;
+      if (!user) {
+        return;
+      }
+      const userDocRef = doc(db, "users", user.uid);
+      const updates = {
+        user_name: name,
+      };
+      await updateDoc(userDocRef, updates);
+    },
+
     async updateResToDatabase() {
       let ans_comp =
         this.dataList.answer_history === this.snapShot.answer_history;

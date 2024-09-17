@@ -1,9 +1,7 @@
 :root {
-  zoom: 180%;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -48,6 +46,8 @@
   --bs-text-primary-emphasis: var(--mywhite);
   --bs-primary: var(--mytheme);
   --bs-primary-bg-subtle: var(--mytheme-light);
+
+  background-color: var(--myblack) !important;
 }
 
 .alert-primary {
@@ -197,13 +197,25 @@ input:-webkit-autofill:focus {
   color: var(--myorange) !important;
 }
 
+/* scaling */
+#app {
+  transform: scale(1.8);
+  transform-origin: 0 0;
+  width: calc(100% / 1.8);
+  height: calc(100% / 1.8);
+}
+
 @media screen and (max-width: 450px) {
-  :root {
-    zoom: 100%;
+  #app {
+    transform: scale(1);
+    width: 100%;
+    height: 100%;
   }
 }
 @media screen and (max-width: 1024px) {
-  :root {
-    zoom: 130%;
+  #app {
+    transform: scale(1.3);
+    width: calc(100% / 1.3);
+    height: calc(100% / 1.3);
   }
 }

@@ -14,7 +14,7 @@
         </div>
         <div>
           <h3 class="fs-3 text-body-emphasis">每週十題</h3>
-          <p>登入後挑戰每週最新題目</p>
+          <p>每週日23:00(JST)左右更新</p>
           <button
             @click="goToPage('weekly-10')"
             type="button"
