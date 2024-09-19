@@ -50,7 +50,6 @@ export const useLocalQuestionStore = defineStore("LocalQuestion", {
         ),
         encoded: true,
       };
-      console.log("encoded", encodedQuestion);
 
       this.questions.push(encodedQuestion);
     },
