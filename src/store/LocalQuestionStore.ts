@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { fromBase64, toBase64 } from "../composables";
 
 interface Questions {
   qid: number;
@@ -6,6 +7,7 @@ interface Questions {
   sub_cat: string;
   q_text: string;
   q_answer: string[];
+  encoded?: boolean;
 }
 
 export const useLocalQuestionStore = defineStore("LocalQuestion", {
@@ -39,11 +41,46 @@ export const useLocalQuestionStore = defineStore("LocalQuestion", {
       if (existingIndex !== -1) {
         this.questions.splice(existingIndex, 1);
       }
-      this.questions.push(question);
+
+      const encodedQuestion = {
+        ...question,
+        q_text: toBase64(new TextEncoder().encode(question.q_text)),
+        q_answer: question.q_answer.map((answer) =>
+          toBase64(new TextEncoder().encode(answer))
+        ),
+        encoded: true,
+      };
+      console.log("encoded", encodedQuestion);
+
+      this.questions.push(encodedQuestion);
     },
 
     getQuestion(qid: number) {
-      return this.questions.find((q) => q.qid === qid) || null;
+      const question = this.questions.find((q) => q.qid === qid);
+      if (!question) return null;
+
+      if (!question.encoded) {
+        const decodedQuestion = {
+          ...question,
+          q_text: question.q_text,
+          q_answer: question.q_answer,
+          encoded: true,
+        };
+
+        this.updateQuestion(decodedQuestion);
+
+        return decodedQuestion;
+      }
+
+      const decodedQuestion = {
+        ...question,
+        q_text: new TextDecoder().decode(fromBase64(question.q_text)),
+        q_answer: question.q_answer.map((answer) =>
+          new TextDecoder().decode(fromBase64(answer))
+        ),
+      };
+
+      return decodedQuestion;
     },
   },
   persist: true,
