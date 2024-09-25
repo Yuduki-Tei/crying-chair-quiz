@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted, ref } from "vue";
-import { useResultStore, useOnlineQuestionStore } from "../store";
+import { useResultStore, useOnlineQuestionStore, useButtonStatusStore } from "../store";
 import QuestionDisplay from "./QuestionDisplay.vue";
 import Loading from "./Loading.vue";
 
@@ -23,11 +23,14 @@ export default defineComponent({
     //initialize the result and question list
     const res = useResultStore();
     const qStatus = useOnlineQuestionStore();
+    const button = useButtonStatusStore();
     const dataLoaded = ref(false);
 
     res.clearDataList();
     res.setType(props.qType);
     res.initDataList();
+
+    button.setType(props.qType);
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       //prevent user from leaving current page

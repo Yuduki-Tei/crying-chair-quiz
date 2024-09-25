@@ -3,75 +3,100 @@
     class="container px-1 py-1 d-block justify-content-center"
     style="max-width: 450px"
   >
-  <div class="col text-center">
-    <button
-      type="button"
-      class="btn btn-danger"
-      :disabled="!stopOK"
-      v-show="stopOK"
-      @click="pauseQuestion"
-    >
-      我知道 !
-    </button>
-    <button
-      type="button"
-      class="btn btn-primary"
-      :disabled="!startOK"
-      v-show="startOK"
-      @click.once ="displayNextQuestion"
-    >
-      開始
-    </button>
-    <button
-      type="button"
-      class="btn btn-primary"
-      :disabled="!answerOK"
-      v-show="answerOK"
-      @click ="checkAnswer"
-    >
-      回答
-    </button>
-  </div>
-  <div class="col text-end">
-    <button
-      type="button"
-      class="btn btn-primary"
-      :disabled="!nextOK"
-      v-show="nextOK"
-      @click="displayNextQuestion"
-    >
-      <i class="bi bi-arrow-right"></i>
-    </button>
-    </div>
-    <button
+    <div class="col text-center">
+      <button
         type="button"
-        class="btn btn-primary"
-        :disabled="!hintOK"
-        v-show="hintOK && answerOK"
-        @click.once ="getOneWord"
+        class="btn btn-danger"
+        :disabled="!stopOK"
+        v-show="stopOK"
+        @click="pauseQuestion"
       >
-        <span class="icon-stack">
-          <i class="bi bi-search icon-stack-main"></i>
-          <i class="icon-stack-sub fw-bold">1</i>
-        </span>
+        我知道 !
       </button>
       <button
         type="button"
         class="btn btn-primary"
-        :disabled="!plusOK"
-        v-show="plusOK && answerOK"
-        @click.once ="plusTime"
+        :disabled="!startOK"
+        v-show="startOK"
+        @click.once="displayNextQuestion"
       >
-        <span class="icon-stack fw-bold">
-          <i class="bi bi-clock icon-stack-main"></i>
-          <i class="icon-stack-sub fw-bold ms-1">+</i>
-        </span>
+        開始
       </button>
     </div>
+
+    <div class="col text-end">
+      <button
+        type="button"
+        class="btn btn-primary"
+        :disabled="!nextOK"
+        v-show="nextOK"
+        @click="displayNextQuestion"
+      >
+        <i class="bi bi-arrow-right"></i>
+      </button>
+    </div>
+
+    <div
+      class="d-flex"
+      :class="{
+        'justify-content-between': funcsOK,
+        'justify-content-center': !funcsOK
+      }"
+    >
+      <div v-show="funcsOK" class="d-flex align-items-center">
+        <button
+          type="button"
+          class="btn btn-danger me-2"
+          :disabled="!hintOK"
+          v-show="funcsOK"
+          @click.once="getOneWord"
+        >
+          <span class="icon-stack">
+            <i class="bi bi-search icon-stack-main"></i>
+            <i class="icon-stack-sub fw-bold">1</i>
+          </span>
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger me-2"
+          :disabled="!plusTimeOK"
+          v-show="funcsOK"
+          @click.once="plusTime"
+        >
+          <span class="icon-stack fw-bold">
+            <i class="bi bi-hourglass-split icon-stack-main"></i>
+            <i class="icon-stack-sub fw-bold ms-1">+</i>
+          </span>
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger me-2"
+          :disabled="!plusTextOK"
+          v-show="funcsOK"
+          @click.once="plusText"
+        >
+          <span class="icon-stack fw-bold">
+            <i class="bi bi-eye icon-stack-main"></i>
+            <i class="icon-stack-sub fw-bold ms-1">+</i>
+          </span>
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        :disabled="!answerOK"
+        v-show="answerOK"
+        @click="checkAnswer"
+      >
+        回答
+      </button>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType, onMounted, onBeforeUnmount, ref } from "vue";
+import { defineComponent, computed, PropType, onMounted, onBeforeUnmount } from "vue";
 import { useButtonStatusStore } from "../store";
 
 export default defineComponent({
@@ -93,10 +118,14 @@ export default defineComponent({
       type: Function as PropType<() => void>,
       default: null,
     },
-    onPlustime:{
+    onPlusTime:{
       type: Function as PropType<() => void>,
       default: null,
     },
+    onPlusText:{
+      type: Function as PropType<() => void>,
+      default: null,
+    }
   },
   setup(props) {
     const buttonStatus = useButtonStatusStore();
@@ -105,8 +134,10 @@ export default defineComponent({
     const nextOK = computed(() => buttonStatus.nextOK);
     const stopOK = computed(() => buttonStatus.stopOK);
     const startOK = computed(() => buttonStatus.startOK);
-    const hintOK = ref(true);
-    const plusOK = ref(true);
+    const hintOK = computed(() => buttonStatus.hintOK && !buttonStatus.isWeekly);
+    const plusTimeOK = computed(() => buttonStatus.plusTimeOK && !buttonStatus.isWeekly);
+    const plusTextOK = computed(() => buttonStatus.plusTextOK && !buttonStatus.isWeekly);
+    const funcsOK = computed(() => !buttonStatus.isWeekly && buttonStatus.answerOK);
 
     const pauseQuestion = () => {
       buttonStatus.pauseQuestion();
@@ -124,13 +155,18 @@ export default defineComponent({
     };
 
     const getOneWord = () => {
-      hintOK.value = false;
+      buttonStatus.hintOK = false;
       props.onHint && props.onHint();
     };
 
     const plusTime = () => {
-      plusOK.value = false;
-      props.onPlustime && props.onPlustime();
+      buttonStatus.plusTimeOK = false;
+      props.onPlusTime && props.onPlusTime();
+    };
+
+    const plusText = () => {
+      buttonStatus.plusTextOK = false;
+      props.onPlusText && props.onPlusText();
     };
 
     const isMac = navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
@@ -160,17 +196,20 @@ export default defineComponent({
       window.removeEventListener("keydown", handleKeyDown);
     });
     return {
+      funcsOK,
       answerOK,
       nextOK,
       stopOK,
       startOK,
       hintOK,
-      plusOK,
+      plusTimeOK,
+      plusTextOK,
       pauseQuestion,
       displayNextQuestion,
       checkAnswer,
       getOneWord,
       plusTime,
+      plusText,
     };
   },
 });
@@ -180,8 +219,8 @@ export default defineComponent({
 .icon-stack {
   position: relative;
   display: inline-block;
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1rem;
+  height: 1rem;
   line-height: 2rem;
 }
 .icon-stack-main,
@@ -190,13 +229,13 @@ export default defineComponent({
 }
 .icon-stack-main {
   left: 50%;
-  top: 70%; 
+  top: 80%; 
   transform: translate(-50%, -50%);
   font-size: 1.5rem;
 }
 .icon-stack-sub {
   left: 100%;
-  top: 10%;
+  top: -10%;
   transform: translate(-50%, -50%);
 }
 </style>
