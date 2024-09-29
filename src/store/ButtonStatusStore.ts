@@ -2,12 +2,19 @@ import { defineStore } from "pinia";
 
 export const useButtonStatusStore = defineStore("ButtonStatus", {
   state: () => ({
+    isWeekly: true,
     answerOK: false,
     nextOK: false,
     startOK: true,
     stopOK: false,
+    hintOK: false,
+    plusTimeOK: false,
+    plusTextOK: false,
   }),
   actions: {
+    setType(type: string){
+      this.isWeekly = type === "weekly";
+    },
     displayQuestion() {
       // when push the start button
       this.stopOK = true;
@@ -52,6 +59,10 @@ export const useButtonStatusStore = defineStore("ButtonStatus", {
       this.answerOK = false;
       this.nextOK = false;
       this.stopOK = false;
+
+      this.hintOK = (!this.isWeekly);
+      this.plusTimeOK = (!this.isWeekly);
+      this.plusTextOK = (!this.isWeekly);
     },
   },
 });

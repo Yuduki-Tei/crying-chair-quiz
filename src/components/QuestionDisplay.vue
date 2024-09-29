@@ -31,7 +31,8 @@
       :onNext="startDisplayingText"
       :onAnswer="checkAnswer"
       :onHint = "buttonHint"
-      :onPlustime ="buttonPlusTime"
+      :onPlusTime ="buttonPlusTime"
+      :onPlusText = "buttonPlusText"
     />
 </template>
 
@@ -147,7 +148,6 @@ export default defineComponent({
 
     const _startCountDown = () => {
       if (isCountingDown) return
-      console.log("start count down");
       isCountingDown = true; 
       adjustedCountDownTime = _getAdjustTime();
 
@@ -189,6 +189,14 @@ export default defineComponent({
 
     const buttonPlusTime = _throttle(() =>{
       adjustedCountDownTime += countDownTime * 2;
+    });
+
+    const buttonPlusText = _throttle(() =>{
+      let curLen = displayedText.value.length;
+      let qt = qStore.getQuestion(curInd.value).q_text;
+      let allLen = qt.length;
+      let p = Math.max(Math.ceil(allLen/10), 5);
+      displayedText.value = qt.slice(0, Math.min(curLen + p, allLen));
     });
 
     const buttonStop = _throttle(() =>{
@@ -243,6 +251,7 @@ export default defineComponent({
       buttonStop,
       buttonHint,
       buttonPlusTime,
+      buttonPlusText,
       labelText,
       answerInput,
       curInd,

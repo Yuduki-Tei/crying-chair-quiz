@@ -61,45 +61,51 @@ h2 {
 }
 
 /* color of buttons */
-.btn-primary {
-  background-color: var(--mytheme) !important;
-  border-color: var(--mytheme) !important;
+.btn.btn-primary {
+  background-color: var(--mytheme);
+  border-color: var(--mytheme);
 }
 
-.btn-primary:hover,
-.btn-primary:active,
-.btn-primary.active,
+.btn.btn-primary:hover,
+.btn.btn-primary:active,
+.btn.btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
-  background-color: var(--mytheme-light) !important;
-  border-color: var(--mytheme-light) !important;
+  background-color: var(--mytheme-light);
+  border-color: var(--mytheme-light);
 }
 
-.btn-secondary {
-  background-color: var(--mygray-dark) !important;
-  border-color: var(--mygray-dark) !important;
+.btn.btn-secondary {
+  background-color: var(--mygray-dark);
+  border-color: var(--mygray-dark);
 }
-.btn-secondary:hover,
-.btn-secondary:active,
-.btn-secondary.active,
+.btn.btn-secondary:hover,
+.btn.btn-secondary:active,
+.btn.btn-secondary.active,
 .open > .dropdown-toggle.btn-secondary {
-  background-color: var(--mygray) !important;
-  border-color: var(--mygray) !important;
+  background-color: var(--mygray);
+  border-color: var(--mygray);
 }
 
-.btn-danger {
+.btn.btn-danger {
   background-color: var(--myorange);
   border-color: var(--myorange);
 }
-.btn-danger:hover,
-.btn-danger:active,
-.btn-danger.active,
+.btn.btn-danger:hover,
+.btn.btn-danger:active,
+.btn.btn-danger.active,
 .open > .dropdown-toggle.btn-danger {
-  background-color: var(--myorange-light) !important;
-  border-color: var(--myorange-light) !important;
+  background-color: var(--myorange-light);
+  border-color: var(--myorange-light);
+}
+
+.btn.btn-danger:disabled{
+  background-color: var(--myorange-dark);
+  border-color: var(--myorange-dark);
 }
 .text-danger {
   color: var(--bs-danger) !important;
 }
+
 
 input,
 label {
