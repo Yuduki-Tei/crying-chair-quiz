@@ -25,12 +25,14 @@
         <label for="answer">{{ labelText }}</label>
       </div>
     </div>
-    <QuestionButtons
+  </div>
+  <QuestionButtons
       :onPause="buttonStop"
       :onNext="startDisplayingText"
       :onAnswer="checkAnswer"
+      :onHint = "buttonHint"
+      :onPlustime ="buttonPlusTime"
     />
-  </div>
 </template>
 
 <script lang="ts">
@@ -76,6 +78,7 @@ export default defineComponent({
     var countDownInterval: any = 0;
     var questionInterval: any = 0;
     var isCountingDown:boolean = false;
+    var adjustedCountDownTime:number = 0;
 
     const _throttle = (func: Function, limit: number=100) => {
       let inThrottle: boolean;
@@ -144,8 +147,9 @@ export default defineComponent({
 
     const _startCountDown = () => {
       if (isCountingDown) return
+      console.log("start count down");
       isCountingDown = true; 
-      let adjustedCountDownTime = _getAdjustTime();
+      adjustedCountDownTime = _getAdjustTime();
 
       var start = new Date().getTime();
 
@@ -177,6 +181,15 @@ export default defineComponent({
         }, 3000); //wait 3 sec, show result
       };
     };
+
+    const buttonHint = _throttle(() =>{
+      let firstWord = qStore.getOneWordOfAnswer(curInd.value);
+      answer.value = firstWord;
+    });
+
+    const buttonPlusTime = _throttle(() =>{
+      adjustedCountDownTime += countDownTime * 2;
+    });
 
     const buttonStop = _throttle(() =>{
       //when user push the pause button
@@ -228,6 +241,8 @@ export default defineComponent({
       checkAnswer,
       startDisplayingText,
       buttonStop,
+      buttonHint,
+      buttonPlusTime,
       labelText,
       answerInput,
       curInd,

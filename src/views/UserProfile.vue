@@ -8,20 +8,22 @@
     v-on:mousedown = "handleContainerClick"
   >
     <div class="row d-flex justify-content-center text-center flex-grow-1">
-      <div class="d-flex justify-content-center text-center">
+      <div class="d-block justify-content-center text-center">
+        <div>
+          <p v-if="errorMessage" class="alert justify-content-center text-center alert-danger p-1 m-1 fw-normal">
+              {{ errorMessage }}
+          </p>
+        </div>
         <p v-if="!isEditing" class="fw-medium">
           {{ name }}
           <span @click ="enableEditing" class="text-secondary text-end" >
             <i class="bi bi-pencil text-end"></i>
         </span>
-        <p v-if="errorMessage" class="alert justify-content-center text-center alert-danger p-1 m-1 fw-normal">
-            {{ errorMessage }}
-        </p>
         </p>
         <div v-if="isEditing" class="d-flex align-items-center mb-2" ref="editContainer">
           <input type="text" v-model="editName" class="form-control me-2" />
           <div>
-            <i @click="updateName" class="bi bi-upload"></i>
+            <i @click="updateName" class="bi bi-check-lg fs-4"></i>
           </div>
         </div>
       </div>
@@ -96,17 +98,22 @@ export default defineComponent({
     }
 
     const enableEditing = () => {
-      isEditing.value = true;
+      let last = localStorage.getItem('lastUpdateUserName');
+      if(last && !(new Date().getTime() - new Date(last).getTime() >= 1000 * 60 * 60 * 24)){
+        errorMessage.value = "兩次名稱更新間隔不可低於24小時";
+        return
+      }
+      else{
+        isEditing.value = true;
+      }
     };
 
     const cancelEdit = () => {
-      editName.value = "";
+      editName.value = name.value;
       isEditing.value = false;
     };
 
     const updateName = async () => {
-      let last = localStorage.getItem('lastUpdateUserName');
-
       if (editName.value.length < 1){
         errorMessage.value = "請輸入使用者名稱";
         cancelEdit();
@@ -117,8 +124,8 @@ export default defineComponent({
         cancelEdit();
         return
       }
-      else if(last && !(new Date().getTime() - new Date(last).getTime() >= 1000 * 60 * 60 * 24)){
-        errorMessage.value = "兩次名稱更新間隔不可低於24小時";
+      else if(editName.value === name.value){
+        errorMessage.value = "名稱無變更";
         cancelEdit();
         return
       }

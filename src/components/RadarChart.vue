@@ -57,7 +57,8 @@ export default defineComponent({
         maintainAspectRatio: true,
         scales: {
           r: {        
-            suggestedMax: 100,
+            suggestedMin: 0,
+            suggestedMax: Math.floor(Math.max(...props.correctRates)/10)*10,
             grid: {
               color: '#156160'
             },

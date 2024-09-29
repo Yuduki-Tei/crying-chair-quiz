@@ -116,7 +116,7 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
       lastSunday.setDate(now.getDate() - dayOfWeek);
       lastSunday.setHours(23, 0, 0, 0);
 
-      if (!lastCatUpdate || new Date(lastCatUpdate) < lastSunday){ 
+      if (!lastCatUpdate || new Date(lastCatUpdate) < lastSunday) {
         // old local store version or last update before weekly upload, update local store
         localStorage.setItem(`${type}LastCatUpdate`, new Date().toISOString());
         const docRef = doc(db, "Category", type);
@@ -129,16 +129,15 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
           console.error(`No online qids found for category: ${type}`);
           return [];
         }
-      };
+      }
 
       if (localStore.Cats[type] && localStore.Cats[type].length > 0) {
         // get data from local store
         return localStore.Cats[type];
-      }
-      else{
-        console.error('No available local data');
+      } else {
+        console.error("No available local data");
         return [];
-      };
+      }
     },
 
     async fetchDataFromDatabase(type: string) {
@@ -236,6 +235,14 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
     getRating(index: number) {
       if (index >= 0 && index < this.stats.length) {
         return this.stats[index].rating;
+      } else {
+        throw new Error("index exceed");
+      }
+    },
+
+    getOneWordOfAnswer(index: number) {
+      if (index >= 0 && index < this.stats.length) {
+        return this.questions[index].q_answer[0][0];
       } else {
         throw new Error("index exceed");
       }
