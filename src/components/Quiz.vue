@@ -1,20 +1,21 @@
 <template>
   <div v-if="dataLoaded">
-    <h3 class="m-3 text-center">{{ pageTitle }}</h3>
+    <h3 class="m-3 text-center">{{ pageTitle }} <i class = "fs-5"> 總分 : <NumberIncrement :total = total /></i> </h3>
   </div>
   <Loading v-if="!dataLoaded" />
   <QuestionDisplay v-if="dataLoaded" />
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, onMounted, ref } from "vue";
+import { defineComponent, onBeforeUnmount, onMounted, ref, computed } from "vue";
 import { useResultStore, useOnlineQuestionStore, useButtonStatusStore } from "../store";
 import QuestionDisplay from "./QuestionDisplay.vue";
 import Loading from "./Loading.vue";
+import NumberIncrement from "./NumberIncrement.vue";
 
 export default defineComponent({
   name: "Quiz",
-  components: { QuestionDisplay, Loading },
+  components: { QuestionDisplay, Loading, NumberIncrement },
   props: {
     pageTitle: { type: String },
     qType: { type: String, required: true, default: "" },
@@ -25,6 +26,7 @@ export default defineComponent({
     const qStatus = useOnlineQuestionStore();
     const button = useButtonStatusStore();
     const dataLoaded = ref(false);
+    const total = computed(() => res.total);
 
     res.clearDataList();
     res.setType(props.qType);
@@ -47,7 +49,7 @@ export default defineComponent({
     onBeforeUnmount(() => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     });
-    return { dataLoaded };
+    return { dataLoaded, total };
   },
 });
 </script>
