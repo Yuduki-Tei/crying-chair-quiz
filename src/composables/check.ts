@@ -9,15 +9,11 @@ export function useCheckAnswer(qInd: number, ans: string) {
   updateResultStore(qInd, qStore, ans, res);
   updateLocalBit(qInd, qid, res);
   if (res.getRes(qInd).correct) {
-    let point =
-      Math.floor(
-        (1 -
-          res.getRes(qInd).interval / qStore.getQuestion(qInd).q_text.length) *
-          10
-      ) *
-        10 +
-      30;
-    res.setRes(qInd, { point: point });
+    let base = 60;
+    let x = res.getRes(qInd).interval / qStore.getQuestion(qInd).q_text.length;
+    let bonus = [60, 50, 40, 20, 0][Math.min(4, Math.floor(x / 0.2))];
+    res.setRes(qInd, { point: base + bonus });
+    res.total += base + bonus;
   }
 }
 

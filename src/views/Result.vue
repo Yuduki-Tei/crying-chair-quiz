@@ -8,10 +8,10 @@
     <DropDown />
     <h3 class="pb-2 text-center">
         <i :class="{
-          'text-correct': totalScore >= 300,
-          'text-normal': 300 > totalScore && totalScore >= 150,
-          'text-incorrect': 150 > totalScore && totalScore >= 50,
-          'text-low': totalScore < 50}">
+          'text-correct': totalScore >= 800,
+          'text-normal': 800 > totalScore && totalScore >= 400,
+          'text-incorrect': 400 > totalScore && totalScore >= 200,
+          'text-low': totalScore < 200}">
           總分 : {{ totalScore }}
         </i>
       </h3>
