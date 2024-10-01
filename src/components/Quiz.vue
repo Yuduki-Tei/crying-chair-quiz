@@ -2,7 +2,7 @@
   <div v-if="dataLoaded">
     <h3 class="m-3 text-center">{{ pageTitle }} <i class = "fs-5"> 總分 : <NumberIncrement :total = total /></i> </h3>
   </div>
-  <Loading v-if="!dataLoaded" />
+  <Loading v-if="!dataLoaded" message = "題目載入中..."/>
   <QuestionDisplay v-if="dataLoaded" />
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <DropDown />
-  <Loading v-if="loading" />
+  <Loading v-if="loading" message = "使用者資料載入中..." />
   <div
     v-if="!loading"
     class="container d-flex flex-column flex-md-row justify-content-center align-items-center pt-5"
