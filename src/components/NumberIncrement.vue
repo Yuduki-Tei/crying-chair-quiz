@@ -7,13 +7,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, watch } from 'vue';
+import { defineComponent, computed, ref, watch, onMounted } from 'vue';
 
 export default defineComponent({
     name: "NumberIncrement",
     props:{
         total: { type: Number, default: 0 },
         duration: { type: Number, default: 3000 },
+        reset: { type: Boolean, default: false },
     },
     setup(props) {
         const total = computed(() => props.total)
@@ -27,15 +28,22 @@ export default defineComponent({
             const updateCounter = () => {
                 count += increment;
                 if (count < total.value) {
-                displayPoint.value = Math.floor(count);
-                requestAnimationFrame(updateCounter);
+                    displayPoint.value = Math.floor(count);
+                    requestAnimationFrame(updateCounter);
                 } else {
-                displayPoint.value = total.value; // 確保顯示最終值
+                    displayPoint.value = total.value;
                 }
             };
 
             updateCounter();
         };
+
+        onMounted(() =>{
+            if (props.reset) {
+                displayPoint.value = 0;
+            };
+            startCounting(props.total);
+        })
 
         watch(total, (newValue: any) => {
             startCounting(newValue);
