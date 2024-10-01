@@ -34,7 +34,7 @@
       class="d-flex align-items-center mt-3 mt-md-0"
       style="max-width: 300px; flex-shrink: 1;"
     >
-      <RadarChart v-if="!loading" :correctRates="catCorrects"/>
+      <RadarChart v-if="!loading" :correctRates="catCorrects" :questionCounts ="questionCounts"/>
     </div>
   </div>
 </template>
@@ -55,6 +55,7 @@ export default defineComponent({
     const errorMessage = ref("");
     const loading = ref(true);
     const catCorrects =  ref<number[]>([]);
+    const questionCounts = ref<string[]>([]);
     const user = useUserStore();
     const data = user.dataList;
     const name = ref(data.user_name || "尚未設定名稱");
@@ -95,6 +96,7 @@ export default defineComponent({
       });
 
       catCorrects.value.push(Math.floor((cor_cnt / ans_cnt || 0) * 10000) / 100);
+      questionCounts.value.push(`${cor_cnt}/${ans_cnt}`)
     }
 
     const enableEditing = () => {
@@ -167,6 +169,7 @@ export default defineComponent({
       loading,
       correctRating,
       catCorrects,
+      questionCounts,
       editName,
       isEditing,
       errorMessage,
