@@ -1,5 +1,5 @@
 <template>
-  <Loading v-if="isLoading" message= "test"/>
+  <Loading v-if="isLoading" message= "分類載入中..."/>
   <DropDown v-if="!catSelected &&! isLoading"/>
   <Quiz v-if="catSelected &&! isLoading" :pageTitle="`${selectedCategory}十題`" :qType="selectedCategory" />
   <div
