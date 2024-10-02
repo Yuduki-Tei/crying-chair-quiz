@@ -27,7 +27,7 @@ export default defineComponent({
     props:{
       correctRates: {type: Array<number>, default: [0,0,0,0,0,0,0,0,0,0]},
       questionCounts: {type: Array<string>,
-        default: () => (['0/0', '1/0', '2/0', '3/0', '4/0', '5/0', '6/0', '7/0', '8/0', '9/0'])},
+        default: () => (['0/0', '0/0', '0/0', '0/0', '0/0', '0/0', '0/0', '0/0', '0/0', '0/0'])},
     },
     setup(props){
       const data:ChartData<'radar'> = {
@@ -60,7 +60,7 @@ export default defineComponent({
         scales: {
           r: {        
             suggestedMin: 0,
-            suggestedMax: Math.floor(Math.max(...props.correctRates)/10)*10,
+            suggestedMax: Math.max(Math.floor(Math.max(...props.correctRates)/10)*10, 50),
             grid: {
               color: '#156160'
             },
