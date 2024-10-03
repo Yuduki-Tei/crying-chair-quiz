@@ -102,6 +102,32 @@ h2 {
   background-color: var(--myorange-dark);
   border-color: var(--myorange-dark);
 }
+.btn.btn-outline-light{
+  border-color: var(--mytheme-lighter);
+  color: var(--mytheme-lighter);
+}
+.btn.btn-outline-light:hover,
+.btn.btn-outline-light:active,
+.btn.btn-outline-light.active,
+.open > .dropdown-toggle.btn-outline-light {
+  border-color: var(--mytheme-shine);
+  background-color: var(--mytheme);
+  color: var(--mytheme-shine);
+}
+
+.btn.btn-outline-danger{
+  border-color: var(--myorange);
+  color: var(--myorange);
+}
+.btn.btn-outline-danger:hover,
+.btn.btn-outline-danger:active,
+.btn.btn-outline-danger.active,
+.open > .dropdown-toggle.btn-outline-danger {
+  border-color: var(--myorange-light);
+  background-color: var(--myorange-dark);
+  color: var(--myorange-light);
+}
+
 .text-danger {
   color: var(--bs-danger) !important;
 }
