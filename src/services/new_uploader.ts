@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import * as serviceAccount from './crying-chair-firebase-adminsdk-chqay-8460731472.json';
+import * as serviceAccount from './path_of_api_key.json';
 import * as fs from 'fs';
 
 const questionsData = JSON.parse(fs.readFileSync('./output.json', 'utf-8'));
