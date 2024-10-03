@@ -27,12 +27,15 @@
     </div>
   </div>
   <QuestionButtons
+      :curInd = "curInd"
       :onPause="buttonStop"
       :onNext="startDisplayingText"
       :onAnswer="checkAnswer"
       :onHint = "buttonHint"
       :onPlusTime ="buttonPlusTime"
       :onPlusText = "buttonPlusText"
+      :onGood = "buttonGood"
+      :onBad = "buttonBad"
     />
 </template>
 
@@ -42,7 +45,7 @@ import { useRouter } from "vue-router";
 import QuestionButtons from "./QuestionButtons.vue";
 import ResultGrid from "./ResultGrid.vue";
 import CountdownBar from "./CountdownBar.vue";
-import { useCheckAnswer } from "../composables";
+import { useCheckAnswer, buttonBad, buttonGood } from "../composables";
 import {
   useResultStore,
   useOnlineQuestionStore,
@@ -115,7 +118,6 @@ export default defineComponent({
           } else {
             //this is a fastforward display
             buttonStatus.endQuestion();
-            _checkSessionEnd();
           };
         };
       }, speed);
@@ -171,16 +173,6 @@ export default defineComponent({
       res.setRes(curInd.value, { interval: displayedText.value.length }); //store the stop point
       clearInterval(questionInterval); //stop the question
     };
-    
-    const _checkSessionEnd = () =>{
-      if (curInd.value >= totalQuestionCount) {
-        //reach the end of the session
-        buttonStatus.endSession();
-        setTimeout(() => {
-          router.replace("/result");
-        }, 3000); //wait 3 sec, show result
-      };
-    };
 
     const buttonHint = _throttle(() =>{
       let firstWord = qStore.getOneWordOfAnswer(curInd.value);
@@ -210,6 +202,11 @@ export default defineComponent({
     const startDisplayingText = _throttle(() => { // start/next button
       displayedText.value = "";
       curInd.value++; //current local question index
+
+      if (curInd.value > totalQuestionCount){
+        router.replace("/result");
+        return
+      }//to result page when the session ends
 
       barLength.value = 100;
       answer.value = ""; //init countdown bar and answer value
@@ -252,6 +249,8 @@ export default defineComponent({
       buttonHint,
       buttonPlusTime,
       buttonPlusText,
+      buttonBad,
+      buttonGood,
       labelText,
       answerInput,
       curInd,

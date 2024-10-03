@@ -24,16 +24,38 @@
       </button>
     </div>
 
-    <div class="col text-end">
-      <button
-        type="button"
-        class="btn btn-primary"
-        :disabled="!nextOK"
-        v-show="nextOK"
-        @click="displayNextQuestion"
-      >
-        <i class="bi bi-arrow-right"></i>
-      </button>
+    <div class="d-flex justify-content-between align-items-center mt-2">
+      <div class="col text-start">
+        <button
+          type="button"
+          class="btn btn-outline-light me-2"
+          v-show="nextOK"
+          :disabled="!nextOK"
+          @click="giveGood"
+        >
+        <i :class="userRating === 'good' ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'"></i>
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-danger"
+          v-show="nextOK"
+          :disabled="!nextOK"
+          @click="giveBad"
+        >
+        <i :class="userRating === 'bad' ? 'bi bi-hand-thumbs-down-fill' : 'bi bi-hand-thumbs-down'"></i>
+        </button>
+      </div>
+      <div class="col text-end">
+        <button
+          type="button"
+          class="btn btn-primary"
+          v-show="nextOK"
+          :disabled="!nextOK"
+          @click="displayNextQuestion"
+        >
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
     </div>
 
     <div
@@ -46,7 +68,7 @@
       <div v-show="funcsOK" class="d-flex align-items-center">
         <button
           type="button"
-          class="btn btn-danger me-2"
+          class="btn btn-outline-light me-2"
           :disabled="!hintOK"
           v-show="funcsOK"
           @click.once="getOneWord"
@@ -58,7 +80,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-danger me-2"
+          class="btn btn-outline-light me-2"
           :disabled="!plusTimeOK"
           v-show="funcsOK"
           @click.once="plusTime"
@@ -70,7 +92,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-danger me-2"
+          class="btn btn-outline-light me-2"
           :disabled="!plusTextOK"
           v-show="funcsOK"
           @click.once="plusText"
@@ -97,11 +119,12 @@
 
 <script lang="ts">
 import { defineComponent, computed, PropType, onMounted, onBeforeUnmount } from "vue";
-import { useButtonStatusStore } from "../store";
+import { useButtonStatusStore, useUserStore } from "../store";
 
 export default defineComponent({
   name: "QuestionButtons",
   props: {
+    curInd: {type: Number, default: 0},
     onPause: {
       type: Function as PropType<() => void>,
       default: null,
@@ -125,11 +148,21 @@ export default defineComponent({
     onPlusText:{
       type: Function as PropType<() => void>,
       default: null,
-    }
+    },
+    onGood:{
+      type: Function as PropType<(arg0: number) => void>,
+      default: null,
+    },
+    onBad:{
+      type: Function as PropType<(arg0: number) => void>,
+      default: null,
+    },
   },
   setup(props) {
     const buttonStatus = useButtonStatusStore();
+    const user = useUserStore();
 
+    const userRating = computed(() =>user.getUserRate(Math.min(Math.max(props.curInd, 0), 9)));
     const answerOK = computed(() => buttonStatus.answerOK);
     const nextOK = computed(() => buttonStatus.nextOK);
     const stopOK = computed(() => buttonStatus.stopOK);
@@ -169,6 +202,14 @@ export default defineComponent({
       props.onPlusText && props.onPlusText();
     };
 
+    const giveGood = () => {
+      props.onGood && props.onGood(props.curInd);
+    };
+
+    const giveBad = () => {
+      props.onBad && props.onBad(props.curInd);
+    };
+
     const isMac = navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -204,12 +245,15 @@ export default defineComponent({
       hintOK,
       plusTimeOK,
       plusTextOK,
+      userRating,
       pauseQuestion,
       displayNextQuestion,
       checkAnswer,
       getOneWord,
       plusTime,
       plusText,
+      giveGood,
+      giveBad
     };
   },
 });

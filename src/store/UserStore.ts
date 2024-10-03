@@ -12,7 +12,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { User, getAuth } from "firebase/auth";
-import { getBit, fromBase64, compareBitArrays } from "../composables";
+import { getBit, fromBase64, compareBitArrays, getQid } from "../composables";
 
 interface userData {
   uid: string;
@@ -21,6 +21,7 @@ interface userData {
   answer_history: string;
   correct_history: string;
   rate_history: string;
+  good_history: string;
 }
 
 export const useUserStore = defineStore("User", {
@@ -41,6 +42,7 @@ export const useUserStore = defineStore("User", {
           answer_history: "",
           correct_history: "",
           rate_history: "",
+          good_history: "",
         };
       }
       this.snapShoot();
@@ -59,12 +61,33 @@ export const useUserStore = defineStore("User", {
         answer_history: this.dataList.answer_history,
         correct_history: this.dataList.correct_history,
         rate_history: this.dataList.rate_history,
+        good_history: this.dataList.good_history,
       };
+    },
+
+    getUserRate(qInd:number){
+      if (qInd >= 10 || qInd < 0) return ""
+      const qid = getQid(qInd);
+      const rate_history = fromBase64(this.dataList.rate_history)
+      const good_history = fromBase64(this.dataList.good_history)
+      const rate_bit = getBit(rate_history, qid)
+      const good_bit = getBit(good_history, qid)
+      var rate = ""
+      if (rate_bit && good_bit){ //both bits are 1, means good
+        rate = "good"
+      }
+      else{ //0,0 or 1,0
+        if(rate_bit === 1){ //only rate bit is 1, means bad
+          rate = "bad"
+        }
+      }
+      return rate
     },
 
     async checkUserAccount() {
       const user = getAuth().currentUser;
       if (!user) {
+        console.error("no user found")
         return;
       }
       if (!this.isInitialized) {
@@ -81,16 +104,18 @@ export const useUserStore = defineStore("User", {
           answer_history: "",
           correct_history: "",
           rate_history: "",
+          good_history: "",
         });
       } else {
         const data = userDoc.data();
         this.dataList = {
           uid: data.uid,
-          user_name: data.user_name,
-          user_mail: data.user_mail,
-          answer_history: data.answer_history,
-          correct_history: data.correct_history,
-          rate_history: data.rate_history,
+          user_name: data.user_name || "",
+          user_mail: data.user_mail || "",
+          answer_history: data.answer_history || "",
+          correct_history: data.correct_history || "",
+          rate_history: data.rate_history || "",
+          good_history: data.good_history || "",
         };
       }
       this.snapShoot();
@@ -99,6 +124,7 @@ export const useUserStore = defineStore("User", {
       const db = getFirestore();
       const user = getAuth().currentUser;
       if (!user) {
+        console.error("no user found")
         return;
       }
       const userDocRef = doc(db, "users", user.uid);
@@ -112,6 +138,7 @@ export const useUserStore = defineStore("User", {
       const db = getFirestore();
       const user = getAuth().currentUser;
       if (!user) {
+        console.error("no user found")
         return;
       }
       const userDocRef = doc(db, "users", user.uid);
@@ -122,27 +149,24 @@ export const useUserStore = defineStore("User", {
     },
 
     async updateResToDatabase() {
-      let ans_comp =
-        this.dataList.answer_history === this.snapShot.answer_history;
-      let rate_comp = this.dataList.rate_history === this.snapShot.rate_history;
-
-      if (!ans_comp && !rate_comp) {
+      let ans_diff = this.dataList.answer_history !== this.snapShot.answer_history;
+      let rate_diff = this.dataList.rate_history !== this.snapShot.rate_history;
+      if (!ans_diff && !rate_diff) {
         return;
       } else {
-        const db = getFirestore();
         const user = getAuth().currentUser;
         if (!user) {
+          console.error("no user found")
           return;
-        }
+        };
+
+        const db = getFirestore();
         const userDocRef = doc(db, "users", user.uid);
 
         const updatedData = {
-          ...this.dataList,
-          answer_history: this.dataList.answer_history,
-          correct_history: this.dataList.correct_history,
-          rate_history: this.dataList.rate_history,
-        };
-
+          ...this.dataList
+        }
+        
         await setDoc(userDocRef, updatedData);
       }
     },
@@ -164,6 +188,35 @@ export const useUserStore = defineStore("User", {
         } else {
           updates = {
             attempt_count: increment(1),
+          };
+        }
+
+        const q = query(collection(db, "Stats"), where("qid", "==", index));
+        const querySnapshot = await getDocs(q);
+
+        for (const doc of querySnapshot.docs) {
+          await updateDoc(doc.ref, updates);
+        }
+      }
+    },
+    async updateRatingToDatabase() {
+      const db = getFirestore();
+      let inds = compareBitArrays(
+        fromBase64(this.snapShot.rate_history),
+        fromBase64(this.dataList.rate_history)
+      );
+
+      for (let index of inds) {
+        let updates = {};
+        let bit = fromBase64(this.dataList.good_history);
+        if (getBit(bit, index) === 1) {
+          updates = {
+            rated_player_count: increment(1),
+            rating: increment(1),
+          };
+        } else {
+          updates = {
+            rated_player_count: increment(1),
           };
         }
 
