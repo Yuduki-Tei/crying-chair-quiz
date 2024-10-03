@@ -98,11 +98,11 @@ h2 {
   border-color: var(--myorange-light);
 }
 
-.btn.btn-danger:disabled{
+.btn.btn-danger:disabled {
   background-color: var(--myorange-dark);
   border-color: var(--myorange-dark);
 }
-.btn.btn-outline-light{
+.btn.btn-outline-light {
   border-color: var(--mytheme-lighter);
   color: var(--mytheme-lighter);
 }
@@ -115,7 +115,7 @@ h2 {
   color: var(--mytheme-shine);
 }
 
-.btn.btn-outline-danger{
+.btn.btn-outline-danger {
   border-color: var(--myorange);
   color: var(--myorange);
 }
@@ -131,7 +131,6 @@ h2 {
 .text-danger {
   color: var(--bs-danger) !important;
 }
-
 
 input,
 label {

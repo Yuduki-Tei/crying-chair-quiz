@@ -33,7 +33,13 @@
           :disabled="!nextOK"
           @click="giveGood"
         >
-        <i :class="userRating === 'good' ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'"></i>
+          <i
+            :class="
+              userRating === 'good'
+                ? 'bi bi-hand-thumbs-up-fill'
+                : 'bi bi-hand-thumbs-up'
+            "
+          ></i>
         </button>
         <button
           type="button"
@@ -42,7 +48,13 @@
           :disabled="!nextOK"
           @click="giveBad"
         >
-        <i :class="userRating === 'bad' ? 'bi bi-hand-thumbs-down-fill' : 'bi bi-hand-thumbs-down'"></i>
+          <i
+            :class="
+              userRating === 'bad'
+                ? 'bi bi-hand-thumbs-down-fill'
+                : 'bi bi-hand-thumbs-down'
+            "
+          ></i>
         </button>
       </div>
       <div class="col text-end">
@@ -62,7 +74,7 @@
       class="d-flex"
       :class="{
         'justify-content-between': funcsOK,
-        'justify-content-center': !funcsOK
+        'justify-content-center': !funcsOK,
       }"
     >
       <div v-show="funcsOK" class="d-flex align-items-center">
@@ -118,13 +130,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType, onMounted, onBeforeUnmount } from "vue";
+import {
+  defineComponent,
+  computed,
+  PropType,
+  onMounted,
+  onBeforeUnmount,
+} from "vue";
 import { useButtonStatusStore, useUserStore } from "../store";
 
 export default defineComponent({
   name: "QuestionButtons",
   props: {
-    curInd: {type: Number, default: 0},
+    curInd: { type: Number, default: 0 },
     onPause: {
       type: Function as PropType<() => void>,
       default: null,
@@ -137,23 +155,23 @@ export default defineComponent({
       type: Function as PropType<() => void>,
       default: null,
     },
-    onHint:{
+    onHint: {
       type: Function as PropType<() => void>,
       default: null,
     },
-    onPlusTime:{
+    onPlusTime: {
       type: Function as PropType<() => void>,
       default: null,
     },
-    onPlusText:{
+    onPlusText: {
       type: Function as PropType<() => void>,
       default: null,
     },
-    onGood:{
+    onGood: {
       type: Function as PropType<(arg0: number) => void>,
       default: null,
     },
-    onBad:{
+    onBad: {
       type: Function as PropType<(arg0: number) => void>,
       default: null,
     },
@@ -162,15 +180,25 @@ export default defineComponent({
     const buttonStatus = useButtonStatusStore();
     const user = useUserStore();
 
-    const userRating = computed(() =>user.getUserRate(Math.min(Math.max(props.curInd, 0), 9)));
+    const userRating = computed(() =>
+      user.getUserRate(Math.min(Math.max(props.curInd, 0), 9))
+    );
     const answerOK = computed(() => buttonStatus.answerOK);
     const nextOK = computed(() => buttonStatus.nextOK);
     const stopOK = computed(() => buttonStatus.stopOK);
     const startOK = computed(() => buttonStatus.startOK);
-    const hintOK = computed(() => buttonStatus.hintOK && !buttonStatus.isWeekly);
-    const plusTimeOK = computed(() => buttonStatus.plusTimeOK && !buttonStatus.isWeekly);
-    const plusTextOK = computed(() => buttonStatus.plusTextOK && !buttonStatus.isWeekly);
-    const funcsOK = computed(() => !buttonStatus.isWeekly && buttonStatus.answerOK);
+    const hintOK = computed(
+      () => buttonStatus.hintOK && !buttonStatus.isWeekly
+    );
+    const plusTimeOK = computed(
+      () => buttonStatus.plusTimeOK && !buttonStatus.isWeekly
+    );
+    const plusTextOK = computed(
+      () => buttonStatus.plusTextOK && !buttonStatus.isWeekly
+    );
+    const funcsOK = computed(
+      () => !buttonStatus.isWeekly && buttonStatus.answerOK
+    );
 
     const pauseQuestion = () => {
       buttonStatus.pauseQuestion();
@@ -210,7 +238,7 @@ export default defineComponent({
       props.onBad && props.onBad(props.curInd);
     };
 
-    const isMac = navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
+    const isMac = navigator.userAgent.toUpperCase().indexOf("MAC") >= 0;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Enter") {
@@ -221,12 +249,16 @@ export default defineComponent({
           pauseQuestion();
         } else if (answerOK.value && !isMac) {
           checkAnswer();
-        } else if (answerOK.value && isMac && (event.metaKey|| event.ctrlKey)){
+        } else if (
+          answerOK.value &&
+          isMac &&
+          (event.metaKey || event.ctrlKey)
+        ) {
           checkAnswer();
         } else if (nextOK.value) {
           displayNextQuestion();
-        };
-      };
+        }
+      }
     };
 
     onMounted(() => {
@@ -253,7 +285,7 @@ export default defineComponent({
       plusTime,
       plusText,
       giveGood,
-      giveBad
+      giveBad,
     };
   },
 });
@@ -273,7 +305,7 @@ export default defineComponent({
 }
 .icon-stack-main {
   left: 50%;
-  top: 80%; 
+  top: 80%;
   transform: translate(-50%, -50%);
   font-size: 1.5rem;
 }
