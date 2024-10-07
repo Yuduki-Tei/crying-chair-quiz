@@ -35,18 +35,27 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
   }),
   actions: {
     async _getMaxQid() {
-      const db = getFirestore();
-      const mq = query(
-        //get the document with maximum id from database
-        collection(db, "Questions"),
-        orderBy("qid", "desc"),
-        limit(1)
-      );
+      const lastmaxQidUpdate = localStorage.getItem("maxQidLastCatUpdate");
       let maxQid = 0;
-      const maxSnapshot = await getDocs(mq);
-      maxSnapshot.forEach((doc: any) => {
-        maxQid = doc.data().qid;
-      });
+      if (
+        !lastmaxQidUpdate ||
+        new Date(lastmaxQidUpdate) < this._getLastSunday()
+      ) {
+        const db = getFirestore();
+        const mq = query(
+          //get the document with maximum id from database
+          collection(db, "Questions"),
+          orderBy("qid", "desc"),
+          limit(1)
+        );
+        const maxSnapshot = await getDocs(mq);
+        maxSnapshot.forEach((doc: any) => {
+          maxQid = doc.data().qid;
+          localStorage.setItem("maxQidLastCatUpdate", new Date().toISOString());
+          localStorage.setItem("maxQid", maxQid.toString());
+        });
+      }
+      maxQid = parseInt(localStorage.getItem("maxQid") || "0");
       return maxQid;
     },
 
@@ -65,6 +74,15 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
         qids.add(randomQid);
       }
       return qids;
+    },
+
+    _getLastSunday() {
+      const now = new Date();
+      const lastSunday = new Date(now);
+      const dayOfWeek = now.getUTCDay();
+      lastSunday.setUTCDate(now.getUTCDate() - dayOfWeek);
+      lastSunday.setUTCHours(14, 0, 0, 0);
+      return lastSunday;
     },
 
     async _fetchQuestionsByQids(qids: Set<number>) {
@@ -110,13 +128,8 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
       const localStore = useLocalQuestionStore();
 
       const lastCatUpdate = localStorage.getItem(`${type}LastCatUpdate`);
-      const now = new Date();
-      const lastSunday = new Date(now);
-      const dayOfWeek = now.getDay();
-      lastSunday.setDate(now.getDate() - dayOfWeek);
-      lastSunday.setHours(23, 0, 0, 0);
 
-      if (!lastCatUpdate || new Date(lastCatUpdate) < lastSunday) {
+      if (!lastCatUpdate || new Date(lastCatUpdate) < this._getLastSunday()) {
         // old local store version or last update before weekly upload, update local store
         localStorage.setItem(`${type}LastCatUpdate`, new Date().toISOString());
         const docRef = doc(db, "Category", type);
