@@ -3,6 +3,8 @@
     <p class="mb-1">
       這是一個開發中的Web App，有任何問題都可以從意見表單反映。
     </p>
+    <p class="mt-2 mb-0">2024/10/06</p>
+    <li>更新了每週問題，本週是主題式題組</li>
     <p class="mt-2 mb-0">2024/10/03</p>
     <h6>・新增了讚 / 爛按鈕系統，爛題目無所遁形！</h6>
     <li>・修改了計分邏輯與分數顯示方式。</li>
@@ -38,7 +40,7 @@ export default defineComponent({
   name: "HelloBanner",
   components: { Modal },
   setup() {
-    const helloID = "20241003";
+    const helloID = "20241006";
     const showModal = ref<boolean>(true);
 
     if (
