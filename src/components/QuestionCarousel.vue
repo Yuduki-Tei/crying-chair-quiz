@@ -37,24 +37,35 @@
       <span class="carousel-control-next-icon"></span>
     </button>
   </div>
+  <QuestionButtons 
+  :curInd = "currentIdx"
+  :onGood = "buttonGood"
+  :onBad = "buttonBad"
+  />
 </template>
 
 <script>
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
-import { useOnlineQuestionStore, useResultStore } from "../store";
+import { useOnlineQuestionStore, useResultStore, useButtonStatusStore } from "../store";
+import { buttonGood, buttonBad } from "../composables";
 import ResultGrid from "./ResultGrid.vue";
+import QuestionButtons from "./QuestionButtons.vue";
 
 export default defineComponent({
   name: "QuestionCarousel",
-  components: { ResultGrid },
+  components: { ResultGrid, QuestionButtons },
   setup() {
     const resultQText = new Array();
     const resultAText = new Array();
     const userAns = new Array();
     const qStore = useOnlineQuestionStore();
     const res = useResultStore();
+    const button = useButtonStatusStore();
     const currentIdx = ref(0);
     let carouselInstance = null;
+    
+    button.disableAll();
+    button.rateOK = true;
 
     for (let i = 0; i < 10; i++) {
       let qTxt = qStore.getQuestion(i).q_text;
@@ -95,6 +106,8 @@ export default defineComponent({
       resultAText,
       userAns,
       gotoSlide,
+      buttonGood,
+      buttonBad,
     };
   },
 });
