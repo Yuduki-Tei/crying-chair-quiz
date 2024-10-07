@@ -29,8 +29,8 @@
         <button
           type="button"
           class="btn btn-outline-light me-2"
-          v-show="nextOK"
-          :disabled="!nextOK"
+          v-show="rateOK"
+          :disabled="!rateOK"
           @click="giveGood"
         >
           <i
@@ -44,8 +44,8 @@
         <button
           type="button"
           class="btn btn-outline-danger"
-          v-show="nextOK"
-          :disabled="!nextOK"
+          v-show="rateOK"
+          :disabled="!rateOK"
           @click="giveBad"
         >
           <i
@@ -187,6 +187,7 @@ export default defineComponent({
     const nextOK = computed(() => buttonStatus.nextOK);
     const stopOK = computed(() => buttonStatus.stopOK);
     const startOK = computed(() => buttonStatus.startOK);
+    const rateOK = computed(() => buttonStatus.rateOK);
     const hintOK = computed(
       () => buttonStatus.hintOK && !buttonStatus.isWeekly
     );
@@ -272,6 +273,7 @@ export default defineComponent({
       funcsOK,
       answerOK,
       nextOK,
+      rateOK,
       stopOK,
       startOK,
       hintOK,
