@@ -65,29 +65,31 @@ export const useUserStore = defineStore("User", {
       };
     },
 
-    getUserRate(qInd:number){
-      if (qInd >= 10 || qInd < 0) return ""
+    getUserRate(qInd: number) {
+      if (qInd >= 10 || qInd < 0) return "";
       const qid = getQid(qInd);
-      const rate_history = fromBase64(this.dataList.rate_history)
-      const good_history = fromBase64(this.dataList.good_history)
-      const rate_bit = getBit(rate_history, qid)
-      const good_bit = getBit(good_history, qid)
-      var rate = ""
-      if (rate_bit && good_bit){ //both bits are 1, means good
-        rate = "good"
-      }
-      else{ //0,0 or 1,0
-        if(rate_bit === 1){ //only rate bit is 1, means bad
-          rate = "bad"
+      const rate_history = fromBase64(this.dataList.rate_history);
+      const good_history = fromBase64(this.dataList.good_history);
+      const rate_bit = getBit(rate_history, qid);
+      const good_bit = getBit(good_history, qid);
+      var rate = "";
+      if (rate_bit && good_bit) {
+        //both bits are 1, means good
+        rate = "good";
+      } else {
+        //0,0 or 1,0
+        if (rate_bit === 1) {
+          //only rate bit is 1, means bad
+          rate = "bad";
         }
       }
-      return rate
+      return rate;
     },
 
     async checkUserAccount() {
       const user = getAuth().currentUser;
       if (!user) {
-        console.error("no user found")
+        console.error("no user found");
         return;
       }
       if (!this.isInitialized) {
@@ -124,7 +126,7 @@ export const useUserStore = defineStore("User", {
       const db = getFirestore();
       const user = getAuth().currentUser;
       if (!user) {
-        console.error("no user found")
+        console.error("no user found");
         return;
       }
       const userDocRef = doc(db, "users", user.uid);
@@ -138,7 +140,7 @@ export const useUserStore = defineStore("User", {
       const db = getFirestore();
       const user = getAuth().currentUser;
       if (!user) {
-        console.error("no user found")
+        console.error("no user found");
         return;
       }
       const userDocRef = doc(db, "users", user.uid);
@@ -149,25 +151,26 @@ export const useUserStore = defineStore("User", {
     },
 
     async updateResToDatabase() {
-      let ans_diff = this.dataList.answer_history !== this.snapShot.answer_history;
+      let ans_diff =
+        this.dataList.answer_history !== this.snapShot.answer_history;
       let rate_diff = this.dataList.rate_history !== this.snapShot.rate_history;
       if (!ans_diff && !rate_diff) {
         return;
       } else {
         const user = getAuth().currentUser;
         if (!user) {
-          console.error("no user found")
+          console.error("no user found");
           return;
-        };
+        }
 
         const db = getFirestore();
         const userDocRef = doc(db, "users", user.uid);
 
         const updatedData = {
-          ...this.dataList
-        }
-        
-        await setDoc(userDocRef, updatedData);
+          ...this.dataList,
+        };
+
+        await updateDoc(userDocRef, updatedData);
       }
     },
     async updateStatsToDatabase() {
