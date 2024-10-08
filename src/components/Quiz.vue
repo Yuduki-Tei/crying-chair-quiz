@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted, ref, computed } from "vue";
-import { useResultStore, useOnlineQuestionStore, useButtonStatusStore } from "../store";
+import { useResultStore, useOnlineQuestionStore, useButtonStatusStore, useUserStore } from "../store";
 import QuestionDisplay from "./QuestionDisplay.vue";
 import Loading from "./Loading.vue";
 import NumberIncrement from "./NumberIncrement.vue";
@@ -25,6 +25,7 @@ export default defineComponent({
     const res = useResultStore();
     const qStatus = useOnlineQuestionStore();
     const button = useButtonStatusStore();
+    const user = useUserStore();
     const dataLoaded = ref(false);
     const total = computed(() => res.total);
 
@@ -41,6 +42,7 @@ export default defineComponent({
 
     onMounted(async () => {
       await qStatus.fetchDataFromDatabase(props.qType);
+      await user.checkUserAccount();
       dataLoaded.value = true;
 
       window.addEventListener('beforeunload', handleBeforeUnload);
