@@ -1,5 +1,5 @@
 <template>
-  <Loading v-if="!dataUpdated" />
+  <Loading v-if="!dataUpdated" message = "結果統計中..."/>
   <div
     v-if="dataUpdated"
     class="container px-1 d-block justify-content-center pt-5"

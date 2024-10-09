@@ -1,5 +1,5 @@
 <template>
-  <Loading v-if="loading" />
+  <Loading v-if="loading" message = "帳號資訊處理中..."/>
   <div
     class="container d-flex justify-content-center align-items-center pt-5"
     style="max-width: 450px"

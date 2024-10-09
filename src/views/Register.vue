@@ -1,7 +1,7 @@
 <template>
   <Loading 
     v-if="!buttonActivate" 
-    :message= "successMessage || 'Now Loading... '"
+    :message= "successMessage || '帳號資訊處理中... '"
   />
   <div
     class="container d-flex justify-content-center align-items-center pt-5"
