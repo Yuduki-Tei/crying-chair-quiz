@@ -154,11 +154,7 @@ export default defineComponent({
       }
       else cancelEdit();
     };
-
     onMounted(async() => {
-      if (!data.correct_history || !data.answer_history) {
-        await user.checkUserAccount();
-      };
       for (const cat of allCats) {
         await calculateCatCorrect(cat);
       };
