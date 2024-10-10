@@ -20,7 +20,7 @@
         </router-link>
       </li>
       <li>
-        <a class="dropdown-item" href="https://forms.gle/ET5t7LZUfCLfAXqk8"
+        <a class="dropdown-item" href="https://forms.gle/pjemqobqFgbZLSjY7"
           ><i class="bi bi-send"></i> 問題回報</a
         >
       </li>
