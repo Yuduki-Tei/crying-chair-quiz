@@ -7,4 +7,5 @@ export {
   fromBase64,
   toBase64,
   compareBitArrays,
+  orBitArrays,
 } from "./useBit.ts";
