@@ -47,7 +47,6 @@ export default defineComponent({
       await user.updateStatsToDatabase();
       await user.updateRatingToDatabase();
       await user.updateLastActiveTime();
-      user.snapShoot();
       dataUpdated.value = true;
     });
 
