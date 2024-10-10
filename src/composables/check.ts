@@ -17,26 +17,21 @@ export function useCheckAnswer(qInd: number, ans: string) {
   }
 }
 
-export function buttonGood(qInd: number){
+export function buttonGood(qInd: number) {
   updateLocalRatingBit(qInd, 1);
 }
 
-export function buttonBad(qInd: number){
+export function buttonBad(qInd: number) {
   updateLocalRatingBit(qInd, 0);
 }
 
-export function getQid(qInd: number){
+export function getQid(qInd: number) {
   const qStore = useOnlineQuestionStore();
   const qid = qStore.getQuestion(qInd).qid;
-  return qid
+  return qid;
 }
 
-function updateResultStore(
-  qInd: number,
-  qStore: any,
-  ans: string,
-  res: any
-) {
+function updateResultStore(qInd: number, qStore: any, ans: string, res: any) {
   if (ans.length === 0) {
     res.setRes(qInd, { answer: "未回答" });
   } else {
@@ -72,9 +67,20 @@ function updateLocalRatingBit(qInd: number, rate: number) {
   let rate_bit = fromBase64(userData.rate_history);
   let good_bit = fromBase64(userData.good_history);
 
+  // let cur_rate_bit = getBit(rate_bit, qid);
+  // let cur_good_bit = getBit(good_bit, qid);
+
+  // if (cur_rate_bit && cur_good_bit === rate) {
+  //   rate_bit = setBit(rate_bit, qid, 0);
+  //   userData.rate_history = toBase64(rate_bit);
+
+  //   good_bit = setBit(good_bit, qid, 0);
+  //   userData.good_history = toBase64(good_bit);
+  // } else {
   rate_bit = setBit(rate_bit, qid, 1);
   userData.rate_history = toBase64(rate_bit);
 
   good_bit = setBit(good_bit, qid, rate);
   userData.good_history = toBase64(good_bit);
+  // }
 }
