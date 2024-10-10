@@ -12,7 +12,14 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { User, getAuth } from "firebase/auth";
-import { getBit, fromBase64, compareBitArrays, getQid } from "../composables";
+import {
+  getBit,
+  fromBase64,
+  compareBitArrays,
+  getQid,
+  orBitArrays,
+  toBase64,
+} from "../composables";
 
 interface userData {
   uid: string;
@@ -45,24 +52,11 @@ export const useUserStore = defineStore("User", {
           good_history: "",
         };
       }
-      this.snapShoot();
       this.isInitialized = true;
     },
 
     resetStore() {
       this.$reset();
-    },
-
-    snapShoot() {
-      this.snapShot = {
-        uid: this.dataList.uid,
-        user_name: this.dataList.user_name,
-        user_mail: this.dataList.user_mail,
-        answer_history: this.dataList.answer_history,
-        correct_history: this.dataList.correct_history,
-        rate_history: this.dataList.rate_history,
-        good_history: this.dataList.good_history,
-      };
     },
 
     getUserRate(qInd: number) {
@@ -84,6 +78,31 @@ export const useUserStore = defineStore("User", {
         }
       }
       return rate;
+    },
+
+    async _getDatbaseSnapshot() {
+      const user = getAuth().currentUser;
+      if (!user) {
+        console.error("no user found");
+        return;
+      }
+      const db = getFirestore();
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+      if (!userDoc.exists()) {
+        console.error("no user data found");
+        return;
+      }
+      const data = userDoc.data();
+      this.snapShot = {
+        uid: data.uid,
+        user_name: data.user_name || "",
+        user_mail: data.user_mail || "",
+        answer_history: data.answer_history || "",
+        correct_history: data.correct_history || "",
+        rate_history: data.rate_history || "",
+        good_history: data.good_history || "",
+      };
     },
 
     async checkUserAccount() {
@@ -120,7 +139,6 @@ export const useUserStore = defineStore("User", {
           good_history: data.good_history || "",
         };
       }
-      this.snapShoot();
     },
     async updateLastActiveTime() {
       const db = getFirestore();
@@ -163,11 +181,39 @@ export const useUserStore = defineStore("User", {
           return;
         }
 
+        await this._getDatbaseSnapshot();
+
+        let old_ans = fromBase64(this.dataList.answer_history);
+        let new_ans = fromBase64(this.snapShot.answer_history);
+        const combined_answer_history = toBase64(orBitArrays(old_ans, new_ans));
+
+        let old_cor = fromBase64(this.dataList.correct_history);
+        let new_cor = fromBase64(this.snapShot.correct_history);
+        const combined_correct_history = toBase64(
+          orBitArrays(old_cor, new_cor)
+        );
+
+        let old_rate = fromBase64(this.dataList.rate_history);
+        let new_rate = fromBase64(this.snapShot.rate_history);
+        const combined_rate_history = toBase64(orBitArrays(old_rate, new_rate));
+
+        let old_good = fromBase64(this.dataList.good_history);
+        let new_good = fromBase64(this.snapShot.good_history);
+        const combined_good_history = toBase64(orBitArrays(old_good, new_good));
+
+        this.dataList.rate_history = combined_answer_history;
+        this.dataList.correct_history = combined_correct_history;
+        this.dataList.rate_history = combined_rate_history;
+        this.dataList.good_history = combined_good_history;
+
         const db = getFirestore();
         const userDocRef = doc(db, "users", user.uid);
 
         const updatedData = {
-          ...this.dataList,
+          answer_history: this.dataList.answer_history,
+          correct_history: this.dataList.correct_history,
+          rate_history: this.dataList.rate_history,
+          good_history: this.dataList.good_history,
         };
 
         await updateDoc(userDocRef, updatedData);
