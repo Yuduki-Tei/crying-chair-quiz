@@ -2,16 +2,16 @@ import { createWebHistory, createRouter } from "vue-router";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { useUserStore } from "../store";
 
-const Login = () => import("../views/Login.vue");
-const Menu = () => import("../views/Menu.vue");
-const Register = () => import("../views/Register.vue");
-const Weekly_10 = () => import("../views/Weekly_10.vue");
-const Random_10 = () => import("../views/Random_10.vue");
-const UserProfile = () => import("../views/UserProfile.vue");
-const Result = () => import("../views/Result.vue");
-const Cat_10 = () => import("../views/Cat_10.vue");
-const Contribution = () => import("../views/Contribution.vue");
-const Principle = () => import("../views/Principle.vue");
+import Login from "../views/Login.vue";
+import Menu from "../views/Menu.vue";
+import Register from "../views/Register.vue";
+import Weekly_10 from "../views/Weekly_10.vue";
+import Random_10 from "../views/Random_10.vue";
+import UserProfile from "../views/UserProfile.vue";
+import Result from "../views/Result.vue";
+import Cat_10 from "../views/Cat_10.vue";
+import Contribution from "../views/Contribution.vue";
+import Principle from "../views/Principle.vue";
 
 // route for local development
 // const routes = [
