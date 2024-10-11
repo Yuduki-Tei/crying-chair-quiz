@@ -4,29 +4,34 @@ import { getBit, setBit, fromBase64, toBase64 } from "./index";
 export function useCheckAnswer(qInd: number, ans: string) {
   const res = useResultStore();
   const qStore = useOnlineQuestionStore();
-  const qid = qStore.getQuestion(qInd).qid;
+  const qData = qStore.getQuestion(qInd);
 
   updateResultStore(qInd, qStore, ans, res);
-  updateLocalBit(qInd, qid, res);
+  updateLocalAnswerBit(qInd, qData.qid, res);
   if (res.getRes(qInd).correct) {
-    let point =
-      Math.floor(
-        (1 -
-          res.getRes(qInd).interval / qStore.getQuestion(qInd).q_text.length) *
-          10
-      ) *
-        10 +
-      30;
-    res.setRes(qInd, { point: point });
+    let base = 60;
+    let x = res.getRes(qInd).interval / qData.q_text.length;
+    let bonus = [60, 50, 40, 20, 0][Math.min(4, Math.floor(x / 0.2))];
+    res.setRes(qInd, { point: base + bonus });
+    res.total += base + bonus;
   }
 }
 
-export function updateResultStore(
-  qInd: number,
-  qStore: any,
-  ans: string,
-  res: any
-) {
+export function buttonGood(qInd: number) {
+  updateLocalRatingBit(qInd, 1);
+}
+
+export function buttonBad(qInd: number) {
+  updateLocalRatingBit(qInd, 0);
+}
+
+export function getQid(qInd: number) {
+  const qStore = useOnlineQuestionStore();
+  const qid = qStore.getQuestion(qInd).qid;
+  return qid;
+}
+
+function updateResultStore(qInd: number, qStore: any, ans: string, res: any) {
   if (ans.length === 0) {
     res.setRes(qInd, { answer: "未回答" });
   } else {
@@ -41,16 +46,32 @@ export function updateResultStore(
   res.setRes(qInd, { correct: isMatch });
 }
 
-export function updateLocalBit(qInd: number, qid: number, res: any) {
+function updateLocalAnswerBit(qInd: number, qid: number, res: any) {
   const user = useUserStore();
   const userData = user.dataList;
   let ans_bit = fromBase64(userData.answer_history);
   let cor_bit = fromBase64(userData.correct_history);
-  if (getBit(ans_bit, qid) === 0) {
-    ans_bit = setBit(ans_bit, qid, 1);
-    userData.answer_history = toBase64(ans_bit);
 
-    cor_bit = setBit(cor_bit, qid, +res.getRes(qInd).correct); //[+bool] becomes a number
-    userData.correct_history = toBase64(cor_bit);
+  ans_bit = setBit(ans_bit, qid, 1);
+  userData.answer_history = toBase64(ans_bit);
+  cor_bit = setBit(cor_bit, qid, +res.getRes(qInd).correct); //[+bool] becomes a number
+  userData.correct_history = toBase64(cor_bit);
+}
+
+function updateLocalRatingBit(qInd: number, rate: number) {
+  const qid = getQid(qInd);
+  const user = useUserStore();
+  const userData = user.dataList;
+  let bad_bit = fromBase64(userData.bad_history);
+  let good_bit = fromBase64(userData.good_history);
+
+  if (rate === 1) {
+    good_bit = setBit(good_bit, qid, +!getBit(good_bit, qid)); // set 1 if old record is not good(means init or old record is bad), else means cancel so set 0
+    bad_bit = setBit(bad_bit, qid, 0);
+  } else if (rate === 0) {
+    bad_bit = setBit(bad_bit, qid, +!getBit(bad_bit, qid)); // when rate is bad
+    good_bit = setBit(good_bit, qid, 0);
   }
+  userData.good_history = toBase64(good_bit);
+  userData.bad_history = toBase64(bad_bit);
 }

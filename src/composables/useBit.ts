@@ -49,6 +49,19 @@ export function sumBits(bitArray: Uint8Array): number {
   return sum;
 }
 
+export function orBitArrays(arr1: Uint8Array, arr2: Uint8Array): Uint8Array {
+  const length = Math.max(arr1.length, arr2.length);
+  const newArray = new Uint8Array(length);
+
+  for (let i = 0; i < length; i++) {
+    const bit1 = i < arr1.length ? arr1[i] : 0;
+    const bit2 = i < arr2.length ? arr2[i] : 0;
+    newArray[i] = bit1 | bit2;
+  }
+
+  return newArray;
+}
+
 export function compareBitArrays(a: Uint8Array, b: Uint8Array): number[] {
   const result: number[] = [];
 

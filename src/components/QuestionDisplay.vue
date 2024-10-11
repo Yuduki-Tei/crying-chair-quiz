@@ -3,18 +3,15 @@
     class="container px-1 py-1 d-block justify-content-center"
     style="max-width: 450px"
   >
-    <CountdownBar :barLength = "barLength"/>
+    <CountdownBar :barLength="barLength" />
     <ResultGrid :act="curInd" />
     <div class="row border m-auto" style="min-width: 280px; min-height: 180px">
       <p class="mt-1">{{ displayedText }}</p>
     </div>
     <div class="mt-2 mb-2">
-      <div
-        class="form-floating inputbox"
-        :class="{ invisible: !answerOK }"
-      >
+      <div class="form-floating inputbox" :class="{ invisible: !answerOK }">
         <input
-          ref = "answerInput"
+          ref="answerInput"
           :disabled="!answerOK"
           class="form-control"
           id="answer"
@@ -27,13 +24,16 @@
     </div>
   </div>
   <QuestionButtons
-      :onPause="buttonStop"
-      :onNext="startDisplayingText"
-      :onAnswer="checkAnswer"
-      :onHint = "buttonHint"
-      :onPlusTime ="buttonPlusTime"
-      :onPlusText = "buttonPlusText"
-    />
+    :curInd="curInd"
+    :onPause="buttonStop"
+    :onNext="startDisplayingText"
+    :onAnswer="checkAnswer"
+    :onHint="buttonHint"
+    :onPlusTime="buttonPlusTime"
+    :onPlusText="buttonPlusText"
+    :onGood="buttonGood"
+    :onBad="buttonBad"
+  />
 </template>
 
 <script lang="ts">
@@ -42,7 +42,7 @@ import { useRouter } from "vue-router";
 import QuestionButtons from "./QuestionButtons.vue";
 import ResultGrid from "./ResultGrid.vue";
 import CountdownBar from "./CountdownBar.vue";
-import { useCheckAnswer } from "../composables";
+import { useCheckAnswer, buttonBad, buttonGood } from "../composables";
 import {
   useResultStore,
   useOnlineQuestionStore,
@@ -74,14 +74,14 @@ export default defineComponent({
     const answer = ref<string>("");
     const labelText = ref<string>("先按鈴 再回答!");
     const answerInput = ref<HTMLInputElement | null>(null);
-    
+
     //local var
     var countDownInterval: any = 0;
     var questionInterval: any = 0;
-    var isCountingDown:boolean = false;
-    var adjustedCountDownTime:number = 0;
+    var isCountingDown: boolean = false;
+    var adjustedCountDownTime: number = 0;
 
-    const _throttle = (func: Function, limit: number=100) => {
+    const _throttle = (func: Function, limit: number = 100) => {
       let inThrottle: boolean;
       return (...args: any[]) => {
         if (!inThrottle) {
@@ -90,7 +90,7 @@ export default defineComponent({
           setTimeout(() => (inThrottle = false), limit);
         }
       };
-    }
+    };
 
     const _displayTextByCharacter = (
       t: string,
@@ -111,13 +111,11 @@ export default defineComponent({
           if (speed === displaySpeed) {
             //this is a normal display
             _startCountDown();
-
           } else {
             //this is a fastforward display
             buttonStatus.endQuestion();
-            _checkSessionEnd();
-          };
-        };
+          }
+        }
       }, speed);
     };
 
@@ -127,28 +125,26 @@ export default defineComponent({
         labelText.value = `最佳答案 : 中文${len}字`;
       } else {
         labelText.value = `最佳答案 : 非中文${-len}詞`;
-      };
+      }
     };
 
-    const _getAdjustTime =() => {
+    const _getAdjustTime = () => {
       let len = qStore.checkAnswerLength(curInd.value);
       let adjustedCountDownTime = countDownTime;
 
       if (len >= 4) {
-        adjustedCountDownTime = countDownTime * 1.4
+        adjustedCountDownTime = countDownTime * 1.4;
+      } else if (len <= 2 && len > 0) {
+        adjustedCountDownTime = countDownTime * 0.8;
+      } else if (len < 0 && Math.abs(len) >= 2) {
+        adjustedCountDownTime = countDownTime * 1.4;
       }
-      else if(len <= 2 && len > 0){
-        adjustedCountDownTime = countDownTime * 0.8
-      }
-      else if(len < 0 && Math.abs(len) >= 2){
-        adjustedCountDownTime = countDownTime * 1.4
-      };
-      return adjustedCountDownTime
-    }
+      return adjustedCountDownTime;
+    };
 
     const _startCountDown = () => {
-      if (isCountingDown) return
-      isCountingDown = true; 
+      if (isCountingDown) return;
+      isCountingDown = true;
       adjustedCountDownTime = _getAdjustTime();
 
       var start = new Date().getTime();
@@ -163,43 +159,33 @@ export default defineComponent({
           clearInterval(countDownInterval);
           isCountingDown = false;
           checkAnswer();
-        };
-      }, countDownTime * 10); //the refresh rate of cout down times/ miliseconds, can be any.
+        }
+      }, countDownTime * 5); //the refresh rate of cout down times/ miliseconds, can be any.
     };
 
     const _stopDisplayingText = () => {
       res.setRes(curInd.value, { interval: displayedText.value.length }); //store the stop point
       clearInterval(questionInterval); //stop the question
     };
-    
-    const _checkSessionEnd = () =>{
-      if (curInd.value >= totalQuestionCount) {
-        //reach the end of the session
-        buttonStatus.endSession();
-        setTimeout(() => {
-          router.replace("/result");
-        }, 3000); //wait 3 sec, show result
-      };
-    };
 
-    const buttonHint = _throttle(() =>{
+    const buttonHint = _throttle(() => {
       let firstWord = qStore.getOneWordOfAnswer(curInd.value);
       answer.value = firstWord;
     });
 
-    const buttonPlusTime = _throttle(() =>{
+    const buttonPlusTime = _throttle(() => {
       adjustedCountDownTime += countDownTime * 2;
     });
 
-    const buttonPlusText = _throttle(() =>{
+    const buttonPlusText = _throttle(() => {
       let curLen = displayedText.value.length;
       let qt = qStore.getQuestion(curInd.value).q_text;
       let allLen = qt.length;
-      let p = Math.max(Math.ceil(allLen/10), 5);
+      let p = Math.max(Math.ceil(allLen / 10), 5);
       displayedText.value = qt.slice(0, Math.min(curLen + p, allLen));
     });
 
-    const buttonStop = _throttle(() =>{
+    const buttonStop = _throttle(() => {
       //when user push the pause button
       answerOK.value = true; // allow to answer
       _changeLabelText();
@@ -207,9 +193,15 @@ export default defineComponent({
       _startCountDown();
     });
 
-    const startDisplayingText = _throttle(() => { // start/next button
+    const startDisplayingText = _throttle(() => {
+      // start/next button
       displayedText.value = "";
       curInd.value++; //current local question index
+
+      if (curInd.value > totalQuestionCount) {
+        router.replace("/result");
+        return;
+      } //to result page when the session ends
 
       barLength.value = 100;
       answer.value = ""; //init countdown bar and answer value
@@ -218,12 +210,12 @@ export default defineComponent({
         0,
         qStore.getQuestion(curInd.value).q_text,
         displaySpeed
-      );//start display text from index 0 with normal displayspeed
+      ); //start display text from index 0 with normal displayspeed
     });
 
     const checkAnswer = _throttle(() => {
       buttonStatus.submitAnswer();
-      if (res.getRes(curInd.value).interval === 0){
+      if (res.getRes(curInd.value).interval === 0) {
         res.setRes(curInd.value, { interval: displayedText.value.length });
       }
       clearInterval(countDownInterval);
@@ -242,7 +234,7 @@ export default defineComponent({
       if (newValue) {
         await nextTick();
         answerInput.value?.focus();
-      };
+      }
     });
 
     return {
@@ -252,6 +244,8 @@ export default defineComponent({
       buttonHint,
       buttonPlusTime,
       buttonPlusText,
+      buttonBad,
+      buttonGood,
       labelText,
       answerInput,
       curInd,

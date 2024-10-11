@@ -1,5 +1,5 @@
 <template>
-  <Loading v-if = "loading"/>
+  <Loading v-if = "loading" message = "表格載入中..."/>
   <Agreement />
   <DropDown v-if = "!loading" />
   <div class="container d-block justify-content-center pt-4" style="max-width: 450px">

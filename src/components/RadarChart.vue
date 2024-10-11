@@ -26,6 +26,8 @@ export default defineComponent({
     components:{ Radar },
     props:{
       correctRates: {type: Array<number>, default: [0,0,0,0,0,0,0,0,0,0]},
+      questionCounts: {type: Array<string>,
+        default: () => (['0/0', '0/0', '0/0', '0/0', '0/0', '0/0', '0/0', '0/0', '0/0', '0/0'])},
     },
     setup(props){
       const data:ChartData<'radar'> = {
@@ -58,7 +60,7 @@ export default defineComponent({
         scales: {
           r: {        
             suggestedMin: 0,
-            suggestedMax: Math.floor(Math.max(...props.correctRates)/10)*10,
+            suggestedMax: Math.max(Math.floor(Math.max(...props.correctRates)/10)*10, 50),
             grid: {
               color: '#156160'
             },
@@ -103,11 +105,16 @@ export default defineComponent({
             titleColor: 'rgba(255, 255, 255, 0.87)',
             bodyColor: 'rgba(255, 255, 255, 0.87)',
             position: 'nearest',
+            displayColors: false,
             callbacks: {
-                label: function(context) {
-                const label = context.dataset.label || '';
-                const value = context.raw;
-                return `${label}: ${value}`;
+              title: function(context) {
+                const value = context[0].raw;
+                return `正解率：${value} %`;
+              },
+              label: function(context) {
+                const index = context.dataIndex;
+                const title = props.questionCounts[index];
+                return `正解/已答：${title || ''}`;
               },
             },
           },

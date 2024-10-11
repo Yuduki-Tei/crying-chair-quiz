@@ -1,5 +1,5 @@
 <template>
-  <Loading v-if="!dataUpdated" />
+  <Loading v-if="!dataUpdated" message = "結果統計中..."/>
   <div
     v-if="dataUpdated"
     class="container px-1 d-block justify-content-center pt-5"
@@ -7,14 +7,8 @@
   >
     <DropDown />
     <h3 class="pb-2 text-center">
-        <i :class="{
-          'text-correct': totalScore >= 300,
-          'text-normal': 300 > totalScore && totalScore >= 150,
-          'text-incorrect': 150 > totalScore && totalScore >= 50,
-          'text-low': totalScore < 50}">
-          總分 : {{ totalScore }}
-        </i>
-      </h3>
+      總分 : <NumberIncrement :total = totalScore :reset = true />
+    </h3>
     <QuestionCarousel />
     <div class="col text-center mt-4">
       <button type="button" class="btn btn-primary" @click="redirectToMenu">
@@ -25,39 +19,36 @@
 </template>
 
 <script lang="ts">
+import { useRouter } from "vue-router";
 import { defineComponent, ref, onMounted } from "vue";
 import { useUserStore, useResultStore } from "../store";
 import Loading from "../components/Loading.vue";
 import DropDown from "../components/DropDown.vue";
 import ResultGrid from "../components/ResultGrid.vue";
 import QuestionCarousel from "../components/QuestionCarousel.vue";
-import { useRouter } from "vue-router";
+import NumberIncrement from "../components/NumberIncrement.vue";
 
 export default defineComponent({
   name: "Result",
-  components: { ResultGrid, QuestionCarousel, DropDown, Loading },
+  components: { ResultGrid, QuestionCarousel, DropDown, Loading, NumberIncrement },
   setup() {
     const user = useUserStore();
     const res = useResultStore();
     const router = useRouter();
-    const totalScore = ref<number>(0);
+    const totalScore = res.total;
     const dataUpdated = ref<boolean>(false);
 
-    for (let i = 0; i < res.dataList.length; i++){
-      totalScore.value += res.getRes(i).point;
-    };
-
-    const redirectToMenu = async () => {
+    const redirectToMenu = () => {
       router.replace("/menu");
     };
-
+    
     onMounted(async () => {
       await user.updateResToDatabase();
       await user.updateStatsToDatabase();
-      await user.updateLastActiveTime();
-      user.snapShoot();
+      await user.updateRatingToDatabase();
       dataUpdated.value = true;
     });
+
     return {
       totalScore,
       dataUpdated,

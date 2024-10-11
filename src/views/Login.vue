@@ -1,11 +1,11 @@
 <template>
-  <Loading v-if="loading" />
+  <Loading v-if="loading" message = "帳號資訊處理中..."/>
   <div
     class="container d-flex justify-content-center align-items-center pt-5"
     style="max-width: 450px"
   >
     <div class="col form-signin m-auto p-auto w-100">
-      <form v-if="notLogedin && !loading" @submit.prevent="handleLogin">
+      <form v-if="!loading" @submit.prevent="handleLogin">
         <h1 class="h3 mb-3 fw-normal">登入</h1>
         <div v-if="errorMessage" class="alert alert-danger pt-1 pb-1">
           {{ errorMessage }}
@@ -52,42 +52,37 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { useUserStore } from "../store";
+import { defineComponent, ref } from "vue";
+import { useRouter } from "vue-router";
 import Loading from "../components/Loading.vue";
 import {
   getAuth,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
-  onAuthStateChanged,
 } from "firebase/auth";
 
 export default defineComponent({
   name: "Login",
   components: { Loading },
   setup() {
-    const errorMessage = ref("");
-    const notLogedin = ref(false);
-    const loading = ref(true);
-    const email = ref("");
-    const password = ref("");
-    const router = useRouter();
-    const route = useRoute();
-    const auth = getAuth();
-    const userData = useUserStore();
+    const redirectToMenu =() => {
+      router.replace("/menu");
+    };
 
-    onMounted(() => {
-      onAuthStateChanged(auth, (user) => {
-        if (user && user.emailVerified && (route.path === "/login" || route.path === "/")) {
-          redirectToMenu();
-        } else {
-          notLogedin.value = true;
-          loading.value = false;
-        }
-      });
-    });
+    const loading = ref(true); //to control pgae display
+    const router = useRouter();
+    const auth = getAuth();
+
+    if (auth.currentUser && auth.currentUser.emailVerified) { //already logged in and email verified
+        redirectToMenu();
+    } else {
+        loading.value = false;
+    }
+
+    const errorMessage = ref("");
+    const email = ref("");
+    const password = ref(""); // init display
 
     const handleLogin = async () => {
       errorMessage.value = "";
@@ -124,16 +119,10 @@ export default defineComponent({
       }
     };
 
-    const redirectToMenu = async () => {
-      await userData.checkUserAccount();
-      router.replace("/menu");
-    };
-
     return {
       email,
       password,
       loading,
-      notLogedin,
       handleLogin,
       errorMessage,
       loginWithGoogle,

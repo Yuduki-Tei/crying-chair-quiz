@@ -4,13 +4,13 @@ interface resData {
   point: number;
   answer: string;
   correct: boolean;
-  rate: boolean;
   done: boolean;
 }
 
 export const useResultStore = defineStore("Result", {
   state: () => ({
     isWeekly: false,
+    total: 0,
     dataList: [] as resData[],
     length: 0,
   }),
@@ -23,7 +23,6 @@ export const useResultStore = defineStore("Result", {
         answer: "",
         interval: 0,
         correct: false,
-        rate: false,
         point: 0,
         done: false,
       }));
@@ -31,6 +30,7 @@ export const useResultStore = defineStore("Result", {
       this.length = this.dataList.length;
     },
     clearDataList() {
+      this.total = 0;
       this.dataList = [];
       this.length = this.dataList.length;
       this.isWeekly = false;

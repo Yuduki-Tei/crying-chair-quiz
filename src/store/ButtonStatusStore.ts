@@ -10,9 +10,10 @@ export const useButtonStatusStore = defineStore("ButtonStatus", {
     hintOK: false,
     plusTimeOK: false,
     plusTextOK: false,
+    rateOK: false,
   }),
   actions: {
-    setType(type: string){
+    setType(type: string) {
       this.isWeekly = type === "weekly";
     },
     displayQuestion() {
@@ -21,6 +22,7 @@ export const useButtonStatusStore = defineStore("ButtonStatus", {
 
       this.answerOK = false;
       this.nextOK = false;
+      this.rateOK = false;
       this.startOK = false;
     },
     pauseQuestion() {
@@ -28,6 +30,7 @@ export const useButtonStatusStore = defineStore("ButtonStatus", {
       this.answerOK = true;
 
       this.nextOK = false;
+      this.rateOK = false;
       this.startOK = false;
       this.stopOK = false;
     },
@@ -35,6 +38,7 @@ export const useButtonStatusStore = defineStore("ButtonStatus", {
       // when push the answer button
       this.answerOK = false;
       this.nextOK = false;
+      this.rateOK = false;
       this.startOK = false;
       this.stopOK = false;
     },
@@ -47,6 +51,7 @@ export const useButtonStatusStore = defineStore("ButtonStatus", {
     endQuestion() {
       // when the displaying text reaches it's end
       this.nextOK = true;
+      this.rateOK = true;
 
       this.answerOK = false;
       this.startOK = false;
@@ -58,11 +63,12 @@ export const useButtonStatusStore = defineStore("ButtonStatus", {
 
       this.answerOK = false;
       this.nextOK = false;
+      this.rateOK = false;
       this.stopOK = false;
 
-      this.hintOK = (!this.isWeekly);
-      this.plusTimeOK = (!this.isWeekly);
-      this.plusTextOK = (!this.isWeekly);
+      this.hintOK = !this.isWeekly;
+      this.plusTimeOK = !this.isWeekly;
+      this.plusTextOK = !this.isWeekly;
     },
   },
 });

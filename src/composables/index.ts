@@ -1,4 +1,4 @@
-export { useCheckAnswer } from "./check.ts";
+export { useCheckAnswer, buttonGood, buttonBad, getQid } from "./check.ts";
 export {
   setBit,
   getBit,
@@ -7,4 +7,5 @@ export {
   fromBase64,
   toBase64,
   compareBitArrays,
+  orBitArrays,
 } from "./useBit.ts";
