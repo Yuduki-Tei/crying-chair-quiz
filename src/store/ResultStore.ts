@@ -4,7 +4,6 @@ interface resData {
   point: number;
   answer: string;
   correct: boolean;
-  rate: boolean;
   done: boolean;
 }
 
@@ -24,7 +23,6 @@ export const useResultStore = defineStore("Result", {
         answer: "",
         interval: 0,
         correct: false,
-        rate: false,
         point: 0,
         done: false,
       }));
