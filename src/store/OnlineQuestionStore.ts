@@ -16,8 +16,8 @@ interface Stats {
   qid: number;
   attempt_count: number;
   correct_count: number;
-  rating: number;
-  rated_player_count: number;
+  good_count: number;
+  bad_count: number;
 }
 
 interface Questions {
@@ -247,7 +247,10 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
 
     getRating(index: number) {
       if (index >= 0 && index < this.stats.length) {
-        return this.stats[index].rating;
+        return (
+          this.stats[index].good_count /
+          (this.stats[index].good_count + this.stats[index].bad_count)
+        );
       } else {
         throw new Error("index exceed");
       }
