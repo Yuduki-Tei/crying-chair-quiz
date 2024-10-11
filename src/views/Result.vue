@@ -38,15 +38,14 @@ export default defineComponent({
     const totalScore = res.total;
     const dataUpdated = ref<boolean>(false);
 
-    const redirectToMenu = async () => {
+    const redirectToMenu = () => {
       router.replace("/menu");
     };
-
+    
     onMounted(async () => {
       await user.updateResToDatabase();
       await user.updateStatsToDatabase();
       await user.updateRatingToDatabase();
-      await user.updateLastActiveTime();
       dataUpdated.value = true;
     });
 

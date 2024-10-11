@@ -51,36 +51,27 @@ function updateLocalAnswerBit(qInd: number, qid: number, res: any) {
   const userData = user.dataList;
   let ans_bit = fromBase64(userData.answer_history);
   let cor_bit = fromBase64(userData.correct_history);
-  if (getBit(ans_bit, qid) === 0) {
-    ans_bit = setBit(ans_bit, qid, 1);
-    userData.answer_history = toBase64(ans_bit);
 
-    cor_bit = setBit(cor_bit, qid, +res.getRes(qInd).correct); //[+bool] becomes a number
-    userData.correct_history = toBase64(cor_bit);
-  }
+  ans_bit = setBit(ans_bit, qid, 1);
+  userData.answer_history = toBase64(ans_bit);
+  cor_bit = setBit(cor_bit, qid, +res.getRes(qInd).correct); //[+bool] becomes a number
+  userData.correct_history = toBase64(cor_bit);
 }
 
 function updateLocalRatingBit(qInd: number, rate: number) {
   const qid = getQid(qInd);
   const user = useUserStore();
   const userData = user.dataList;
-  let rate_bit = fromBase64(userData.rate_history);
+  let bad_bit = fromBase64(userData.bad_history);
   let good_bit = fromBase64(userData.good_history);
 
-  // let cur_rate_bit = getBit(rate_bit, qid);
-  // let cur_good_bit = getBit(good_bit, qid);
-
-  // if (cur_rate_bit && cur_good_bit === rate) {
-  //   rate_bit = setBit(rate_bit, qid, 0);
-  //   userData.rate_history = toBase64(rate_bit);
-
-  //   good_bit = setBit(good_bit, qid, 0);
-  //   userData.good_history = toBase64(good_bit);
-  // } else {
-  rate_bit = setBit(rate_bit, qid, 1);
-  userData.rate_history = toBase64(rate_bit);
-
-  good_bit = setBit(good_bit, qid, rate);
+  if (rate === 1) {
+    good_bit = setBit(good_bit, qid, +!getBit(good_bit, qid)); // set 1 if old record is not good(means init or old record is bad), else means cancel so set 0
+    bad_bit = setBit(bad_bit, qid, 0);
+  } else if (rate === 0) {
+    bad_bit = setBit(bad_bit, qid, +!getBit(bad_bit, qid)); // when rate is bad
+    good_bit = setBit(good_bit, qid, 0);
+  }
   userData.good_history = toBase64(good_bit);
-  // }
+  userData.bad_history = toBase64(bad_bit);
 }

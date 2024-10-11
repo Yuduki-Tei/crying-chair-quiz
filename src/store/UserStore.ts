@@ -5,21 +5,11 @@ import {
   getDoc,
   setDoc,
   increment,
-  query,
-  collection,
-  where,
-  getDocs,
   updateDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { User, getAuth } from "firebase/auth";
-import {
-  getBit,
-  fromBase64,
-  compareBitArrays,
-  getQid,
-  orBitArrays,
-  toBase64,
-} from "../composables";
+import { getBit, fromBase64, compareBitArrays, getQid } from "../composables";
 
 interface userData {
   uid: string;
@@ -27,8 +17,9 @@ interface userData {
   user_mail: string;
   answer_history: string;
   correct_history: string;
-  rate_history: string;
+  bad_history: string;
   good_history: string;
+  last_active_time: string;
 }
 
 export const useUserStore = defineStore("User", {
@@ -48,8 +39,9 @@ export const useUserStore = defineStore("User", {
           user_mail: user.email || "",
           answer_history: "",
           correct_history: "",
-          rate_history: "",
+          bad_history: "",
           good_history: "",
+          last_active_time: "",
         };
       }
       this.isInitialized = true;
@@ -62,32 +54,22 @@ export const useUserStore = defineStore("User", {
     getUserRate(qInd: number) {
       if (qInd >= 10 || qInd < 0) return "";
       const qid = getQid(qInd);
-      const rate_history = fromBase64(this.dataList.rate_history);
+      const bad_history = fromBase64(this.dataList.bad_history);
       const good_history = fromBase64(this.dataList.good_history);
-      const rate_bit = getBit(rate_history, qid);
+      const bad_bit = getBit(bad_history, qid);
       const good_bit = getBit(good_history, qid);
       var rate = "";
-      if (rate_bit && good_bit) {
-        //both bits are 1, means good
+      if (good_bit === 1) {
         rate = "good";
-      } else {
-        //0,0 or 1,0
-        if (rate_bit === 1) {
-          //only rate bit is 1, means bad
-          rate = "bad";
-        }
+      } else if (bad_bit === 1) {
+        rate = "bad";
       }
       return rate;
     },
 
-    async _getDatbaseSnapshot() {
-      const user = getAuth().currentUser;
-      if (!user) {
-        console.error("no user found");
-        return;
-      }
+    async _getDatabaseSnapshot() {
       const db = getFirestore();
-      const userDocRef = doc(db, "users", user.uid);
+      const userDocRef = doc(db, "users", this.dataList.uid);
       const userDoc = await getDoc(userDocRef);
       if (!userDoc.exists()) {
         console.error("no user data found");
@@ -100,8 +82,9 @@ export const useUserStore = defineStore("User", {
         user_mail: data.user_mail || "",
         answer_history: data.answer_history || "",
         correct_history: data.correct_history || "",
-        rate_history: data.rate_history || "",
+        bad_history: data.bad_history || "",
         good_history: data.good_history || "",
+        last_active_time: data.last_active_time || "",
       };
     },
 
@@ -124,8 +107,9 @@ export const useUserStore = defineStore("User", {
           user_mail: user.email || "",
           answer_history: "",
           correct_history: "",
-          rate_history: "",
+          bad_history: "",
           good_history: "",
+          last_active_time: "",
         });
       } else {
         const data = userDoc.data();
@@ -135,23 +119,12 @@ export const useUserStore = defineStore("User", {
           user_mail: data.user_mail || "",
           answer_history: data.answer_history || "",
           correct_history: data.correct_history || "",
-          rate_history: data.rate_history || "",
+          bad_history: data.bad_history || "",
           good_history: data.good_history || "",
+          last_active_time: data.last_active_time || "",
         };
+        this.snapShot = this.dataList;
       }
-    },
-    async updateLastActiveTime() {
-      const db = getFirestore();
-      const user = getAuth().currentUser;
-      if (!user) {
-        console.error("no user found");
-        return;
-      }
-      const userDocRef = doc(db, "users", user.uid);
-      const updates = {
-        last_active_time: new Date().toISOString(),
-      };
-      await updateDoc(userDocRef, updates);
     },
 
     async updateUserName(name: string) {
@@ -169,51 +142,36 @@ export const useUserStore = defineStore("User", {
     },
 
     async updateResToDatabase() {
+      await this._getDatabaseSnapshot();
+
+      if (
+        this.snapShot.last_active_time &&
+        this.dataList.last_active_time &&
+        this.snapShot.last_active_time.trim() !=
+          this.dataList.last_active_time.trim()
+      ) {
+        console.error("data version mismatch, roll back to online data");
+        this.dataList = this.snapShot;
+        return;
+      }
+
       let ans_diff =
         this.dataList.answer_history !== this.snapShot.answer_history;
-      let rate_diff = this.dataList.rate_history !== this.snapShot.rate_history;
+      let rate_diff =
+        this.dataList.bad_history !== this.snapShot.bad_history ||
+        this.dataList.good_history !== this.snapShot.good_history;
       if (!ans_diff && !rate_diff) {
         return;
       } else {
-        const user = getAuth().currentUser;
-        if (!user) {
-          console.error("no user found");
-          return;
-        }
-
-        await this._getDatbaseSnapshot();
-
-        let old_ans = fromBase64(this.dataList.answer_history);
-        let new_ans = fromBase64(this.snapShot.answer_history);
-        const combined_answer_history = toBase64(orBitArrays(old_ans, new_ans));
-
-        let old_cor = fromBase64(this.dataList.correct_history);
-        let new_cor = fromBase64(this.snapShot.correct_history);
-        const combined_correct_history = toBase64(
-          orBitArrays(old_cor, new_cor)
-        );
-
-        let old_rate = fromBase64(this.dataList.rate_history);
-        let new_rate = fromBase64(this.snapShot.rate_history);
-        const combined_rate_history = toBase64(orBitArrays(old_rate, new_rate));
-
-        let old_good = fromBase64(this.dataList.good_history);
-        let new_good = fromBase64(this.snapShot.good_history);
-        const combined_good_history = toBase64(orBitArrays(old_good, new_good));
-
-        this.dataList.rate_history = combined_answer_history;
-        this.dataList.correct_history = combined_correct_history;
-        this.dataList.rate_history = combined_rate_history;
-        this.dataList.good_history = combined_good_history;
-
         const db = getFirestore();
-        const userDocRef = doc(db, "users", user.uid);
+        const userDocRef = doc(db, "users", this.dataList.uid);
 
         const updatedData = {
           answer_history: this.dataList.answer_history,
           correct_history: this.dataList.correct_history,
-          rate_history: this.dataList.rate_history,
+          bad_history: this.dataList.bad_history,
           good_history: this.dataList.good_history,
+          last_active_time: new Date().toLocaleString("sv-SE"),
         };
 
         await updateDoc(userDocRef, updatedData);
@@ -240,42 +198,72 @@ export const useUserStore = defineStore("User", {
           };
         }
 
-        const q = query(collection(db, "Stats"), where("qid", "==", index));
-        const querySnapshot = await getDocs(q);
-
-        for (const doc of querySnapshot.docs) {
-          await updateDoc(doc.ref, updates);
-        }
+        const docRef = doc(db, "Stats", index.toString());
+        await updateDoc(docRef, updates);
       }
+    },
+
+    _ratingBatchGenerate(
+      batch: any,
+      oldData: string,
+      newData: string,
+      type: string
+    ) {
+      const db = getFirestore();
+
+      let old_bit = fromBase64(oldData);
+      let new_bit = fromBase64(newData);
+      let ind = compareBitArrays(old_bit, new_bit);
+
+      for (let qid of ind) {
+        let updates = {};
+        if (getBit(new_bit, qid) > getBit(old_bit, qid)) {
+          // new > old, user adds a new rate
+          if (type === "good") {
+            updates = {
+              good_count: increment(1),
+            };
+          } else {
+            updates = {
+              bad_count: increment(1),
+            };
+          }
+        } else {
+          //getBit(new_bit, qid) < getBit(old_bit, qid), user removed a rate
+          if (type === "good") {
+            updates = {
+              good_count: increment(-1),
+            };
+          } else {
+            updates = {
+              bad_count: increment(-1),
+            };
+          }
+        }
+        const docRef = doc(db, "Stats", qid.toString());
+        batch.update(docRef, updates);
+      }
+      return batch;
     },
     async updateRatingToDatabase() {
       const db = getFirestore();
-      let inds = compareBitArrays(
-        fromBase64(this.snapShot.rate_history),
-        fromBase64(this.dataList.rate_history)
+      var batch = writeBatch(db);
+
+      batch = this._ratingBatchGenerate(
+        batch,
+        this.snapShot.good_history,
+        this.dataList.good_history,
+        "good"
       );
 
-      for (let index of inds) {
-        let updates = {};
-        let bit = fromBase64(this.dataList.good_history);
-        if (getBit(bit, index) === 1) {
-          updates = {
-            rated_player_count: increment(1),
-            rating: increment(1),
-          };
-        } else {
-          updates = {
-            rated_player_count: increment(1),
-          };
-        }
+      batch = this._ratingBatchGenerate(
+        batch,
+        this.snapShot.bad_history,
+        this.dataList.bad_history,
+        "bad"
+      );
 
-        const q = query(collection(db, "Stats"), where("qid", "==", index));
-        const querySnapshot = await getDocs(q);
-
-        for (const doc of querySnapshot.docs) {
-          await updateDoc(doc.ref, updates);
-        }
-      }
+      await batch.commit();
     },
   },
   persist: true,
