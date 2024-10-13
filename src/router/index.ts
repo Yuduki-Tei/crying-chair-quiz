@@ -94,7 +94,7 @@ router.beforeEach(async (to: any, _: any) => {
   );
   const userStore = useUserStore();
 
-  if (requiresUserData && !userStore.isInitialized) {
+  if (requiresUserData) {
     try {
       await userStore.checkUserAccount();
     } catch (error) {
