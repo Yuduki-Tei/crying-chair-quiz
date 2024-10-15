@@ -9,7 +9,6 @@ import {
   getDocs,
   doc,
   getDoc,
-  QueryDocumentSnapshot,
 } from "firebase/firestore";
 
 interface Stats {
@@ -34,6 +33,22 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
     stats: [] as Stats[],
   }),
   actions: {
+    async _localVersionCheck(type: string) {
+      const db = getFirestore();
+      const docRef = doc(db, "Category", "version");
+      const localStore = useLocalQuestionStore();
+      const docSnapshot = await getDoc(docRef);
+      if (docSnapshot.exists()) {
+        const v = docSnapshot.data().version;
+        if (v !== localStore.version) {
+          localStore.init(type);
+          localStore.setVersion(v);
+        }
+      } else {
+        console.error(`No online version found`);
+      }
+    },
+
     async _getMaxQid() {
       const lastmaxQidUpdate = localStorage.getItem("maxQidLastCatUpdate");
       let maxQid = 0;
@@ -155,25 +170,22 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
 
     async fetchDataFromDatabase(type: string) {
       const db = getFirestore();
-      let querySnapshot: any;
       let qids = new Set<number>();
+      var maxQid = await this._getMaxQid();
 
       if (type === "weekly") {
+        const qidsToFetch = Array.from({ length: 10 }, (_, i) => maxQid - i);
         // Fetch 10 questions with largest qids
-        const q = query(
-          collection(db, "Questions"),
-          orderBy("qid", "desc"),
-          limit(10)
-        );
-        querySnapshot = await getDocs(q);
-
-        // Process the results
-        const fetchedQuestions = querySnapshot.docs.map(
-          (doc: QueryDocumentSnapshot) => doc.data() as Questions
+        const fetchedQuestions = await Promise.all(
+          qidsToFetch.map(async (qid) => {
+            const docRef = doc(db, "Questions", qid.toString());
+            const docSnap = await getDoc(docRef);
+            return docSnap.data() as Questions;
+          })
         );
         this.questions = fetchedQuestions;
       } else {
-        const maxQid = (await this._getMaxQid()) - 10; // all questions except weekly
+        maxQid -= 10; // all questions except weekly
 
         if (type === "random") {
           qids = this._getRandomQids(maxQid, 10);
