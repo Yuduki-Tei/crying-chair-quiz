@@ -59,7 +59,7 @@ const routes = [
   {
     path: "/result",
     component: Result,
-    meta: { requiresAuth: true, requiresUserData: true },
+    meta: { requiresAuth: true },
   },
   {
     path: "/contribution",
