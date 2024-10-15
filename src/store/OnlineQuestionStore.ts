@@ -33,21 +33,21 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
     stats: [] as Stats[],
   }),
   actions: {
-    async _localVersionCheck(type: string) {
-      const db = getFirestore();
-      const docRef = doc(db, "Category", "version");
-      const localStore = useLocalQuestionStore();
-      const docSnapshot = await getDoc(docRef);
-      if (docSnapshot.exists()) {
-        const v = docSnapshot.data().version;
-        if (v !== localStore.version) {
-          localStore.init(type);
-          localStore.setVersion(v);
-        }
-      } else {
-        console.error(`No online version found`);
-      }
-    },
+    // async _localVersionCheck(type: string) {
+    //   const db = getFirestore();
+    //   const docRef = doc(db, "Category", "version");
+    //   const localStore = useLocalQuestionStore();
+    //   const docSnapshot = await getDoc(docRef);
+    //   if (docSnapshot.exists()) {
+    //     const v = docSnapshot.data().version;
+    //     if (v !== localStore.version) {
+    //       localStore.init(type);
+    //       localStore.setVersion(v);
+    //     }
+    //   } else {
+    //     console.error(`No online version found`);
+    //   }
+    // },
 
     async _getMaxQid() {
       const lastmaxQidUpdate = localStorage.getItem("maxQidLastCatUpdate");
