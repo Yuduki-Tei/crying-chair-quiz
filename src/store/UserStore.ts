@@ -26,27 +26,8 @@ export const useUserStore = defineStore("User", {
   state: () => ({
     snapShot: {} as userData,
     dataList: {} as userData,
-    isInitialized: false,
   }),
   actions: {
-    initLocalStore(user: User) {
-      if (this.isInitialized) {
-        return;
-      } else {
-        this.dataList = {
-          uid: user.uid || "",
-          user_name: user.displayName || "",
-          user_mail: user.email || "",
-          answer_history: "",
-          correct_history: "",
-          bad_history: "",
-          good_history: "",
-          last_active_time: "",
-        };
-      }
-      this.isInitialized = true;
-    },
-
     resetStore() {
       this.$reset();
     },
@@ -93,9 +74,6 @@ export const useUserStore = defineStore("User", {
       if (!user) {
         console.error("no user found");
         return;
-      }
-      if (!this.isInitialized) {
-        this.initLocalStore(user);
       }
       const db = getFirestore();
       const userDocRef = doc(db, "users", user.uid);
