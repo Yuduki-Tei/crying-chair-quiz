@@ -8,7 +8,7 @@ import {
   updateDoc,
   writeBatch,
 } from "firebase/firestore";
-import { User, getAuth } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getBit, fromBase64, compareBitArrays, getQid } from "../composables";
 
 interface userData {
