@@ -38,17 +38,17 @@ const routes = [
   {
     path: "/weekly-10",
     component: Weekly_10,
-    meta: { requiresAuth: true, requiresUserData: true },
+    meta: { requiresAuth: true, requiresUserData: true, fromMenu: true },
   },
   {
     path: "/random-10",
     component: Random_10,
-    meta: { requiresAuth: true, requiresUserData: true },
+    meta: { requiresAuth: true, requiresUserData: true, fromMenu: true },
   },
   {
     path: "/cat-10",
     component: Cat_10,
-    meta: { requiresAuth: true, requiresUserData: true },
+    meta: { requiresAuth: true, requiresUserData: true, fromMenu: true },
   },
   {
     path: "/user-data",
@@ -74,7 +74,7 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to: any, _: any) => {
+router.beforeEach(async (to: any, from: any) => {
   const requiresAuth = to.matched.some(
     (record: any) => record.meta.requiresAuth
   );
@@ -86,7 +86,14 @@ router.beforeEach(async (to: any, _: any) => {
   const notAuthenticated = !user || !user.emailVerified;
 
   if (requiresAuth && notAuthenticated) {
+    console.error("尚未登入，重導向至登入畫面。");
     return { path: "/login" };
+  }
+
+  const fromMenu = to.matched.some((record: any) => record.meta.fromMenu);
+  if (fromMenu && from.path !== "/menu") {
+    console.error("錯誤的路徑遷移，重導向至主畫面。");
+    return { path: "/menu" };
   }
 
   const requiresUserData = to.matched.some(
@@ -98,7 +105,7 @@ router.beforeEach(async (to: any, _: any) => {
     try {
       await userStore.checkUserAccount();
     } catch (error) {
-      console.error("資料載入失敗", error);
+      console.error("資料載入失敗，重導向至主畫面。", error);
       return { path: "/menu" };
     }
   }
