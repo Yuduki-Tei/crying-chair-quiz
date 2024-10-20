@@ -93,10 +93,12 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
 
     _getLastSunday() {
       const now = new Date();
-      const lastSunday = new Date(now);
       const dayOfWeek = now.getUTCDay();
-      lastSunday.setUTCDate(now.getUTCDate() - dayOfWeek);
+      const lastSunday = new Date(now);
+
+      lastSunday.setUTCDate(now.getUTCDate() - dayOfWeek - 7);
       lastSunday.setUTCHours(14, 0, 0, 0);
+      
       return lastSunday;
     },
 
