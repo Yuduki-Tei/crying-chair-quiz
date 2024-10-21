@@ -50,12 +50,9 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
     // },
 
     async _getMaxQid() {
-      const lastmaxQidUpdate = localStorage.getItem("maxQidLastCatUpdate");
+      const lastmaxQidUpdate = localStorage.getItem("maxQidLastUpdate") || "";
       let maxQid = 0;
-      if (
-        !lastmaxQidUpdate ||
-        new Date(lastmaxQidUpdate) < this._getLastSunday()
-      ) {
+      if (!lastmaxQidUpdate || lastmaxQidUpdate < this._getLastSunday()) {
         const db = getFirestore();
         const mq = query(
           //get the document with maximum id from database
@@ -66,7 +63,7 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
         const maxSnapshot = await getDocs(mq);
         maxSnapshot.forEach((doc: any) => {
           maxQid = doc.data().qid;
-          localStorage.setItem("maxQidLastCatUpdate", new Date().toISOString());
+          localStorage.setItem("maxQidLastUpdate", new Date().toISOString());
           localStorage.setItem("maxQid", maxQid.toString());
         });
       }
@@ -96,10 +93,10 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
       const dayOfWeek = now.getUTCDay();
       const lastSunday = new Date(now);
 
-      lastSunday.setUTCDate(now.getUTCDate() - dayOfWeek - 7);
+      lastSunday.setUTCDate(now.getUTCDate() - dayOfWeek);
       lastSunday.setUTCHours(14, 0, 0, 0);
-      
-      return lastSunday;
+
+      return lastSunday.toISOString();
     },
 
     async _fetchQuestionsByQids(qids: Set<number>) {
@@ -146,7 +143,7 @@ export const useOnlineQuestionStore = defineStore("OnlineQuestion", {
 
       const lastCatUpdate = localStorage.getItem(`${type}LastCatUpdate`);
 
-      if (!lastCatUpdate || new Date(lastCatUpdate) < this._getLastSunday()) {
+      if (!lastCatUpdate || lastCatUpdate < this._getLastSunday()) {
         // old local store version or last update before weekly upload, update local store
         localStorage.setItem(`${type}LastCatUpdate`, new Date().toISOString());
         const docRef = doc(db, "Category", type);
