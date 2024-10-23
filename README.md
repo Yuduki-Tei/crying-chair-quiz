@@ -8,24 +8,16 @@ and Firebase Store as database.
 ・basic database interaction function  
 ・a HAYAOSHI quiz page with three different game mode  
 ・a welcome banner
+・question contribution function 
+・user profile page  
 
 ## Working on
-・question contribution function  
 ・tutorial and newcomer mode  
-・more detailed user profile page  
 ・Leaderboard page  
+・improve data fetching and updating method  
 
 ## Planning to do ~~someday~~
 ・achievement system  
 ・weekly competition  
 ・fix the ugly code style  
 ・move to SCSS + Bootstrap instead of old css  
-・improve data fetching and updating method  
-
-## Contributing
-I wrote this project from almost zero basic of front end coding,  
-thus there might be lots of bug and stupid mplementation.  
-
-Also, this is my first open source project,  
-so if you found anything want to tell me or want to fix, just do what you want.  
-I will really appreciate that.
