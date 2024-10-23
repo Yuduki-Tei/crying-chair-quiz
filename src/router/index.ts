@@ -13,22 +13,6 @@ import Cat_10 from "../views/Cat_10.vue";
 import Contribution from "../views/Contribution.vue";
 import Principle from "../views/Principle.vue";
 
-// route for local development
-// const routes = [
-//   { path: "/", component: Login },
-//   { path: "/login", component: Login },
-//   { path: "/register", component: Register },
-//   { path: "/menu", component: Menu },
-//   { path: "/weekly-10", component: Weekly_10 },
-//   { path: "/random-10", component: Random_10 },
-//   { path: "/cat-10", component: Cat_10 },
-//   { path: "/user-data", component: UserProfile },
-//   { path: "/leaderboard", component: Menu },
-//   { path: "/result", component: Result },
-//   { path: "/contribution", component: Contribution },
-//   { path: "/contribution/principle", component: Principle },
-// ];
-
 // route for production environment
 const routes = [
   { path: "/", component: Login },
@@ -55,7 +39,6 @@ const routes = [
     component: UserProfile,
     meta: { requiresAuth: true, requiresUserData: true },
   },
-  { path: "/leaderboard", component: Menu, meta: { requiresAuth: true } },
   {
     path: "/result",
     component: Result,
