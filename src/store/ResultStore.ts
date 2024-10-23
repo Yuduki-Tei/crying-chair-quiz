@@ -12,7 +12,6 @@ export const useResultStore = defineStore("Result", {
     isWeekly: false, //status to check if function buttons are available
     total: 0,
     dataList: [] as resData[],
-    length: 0,
   }),
   actions: {
     setType(type: string) {
@@ -27,12 +26,10 @@ export const useResultStore = defineStore("Result", {
         done: false,
       }));
       this.dataList = data;
-      this.length = this.dataList.length;
     },
     clearDataList() {
       this.total = 0;
       this.dataList = [];
-      this.length = this.dataList.length;
       this.isWeekly = false;
     },
     getRes(index: number) {
