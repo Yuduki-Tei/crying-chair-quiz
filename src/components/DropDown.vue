@@ -50,7 +50,7 @@ export default defineComponent({
     const logOut = () => {
       userData.resetStore();
       auth.signOut().then(() => {
-        router.push("/login");
+        router.replace("/login");
       });
     };
     return {

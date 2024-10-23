@@ -8,7 +8,7 @@ import {
   updateDoc,
   writeBatch,
 } from "firebase/firestore";
-import { User, getAuth } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getBit, fromBase64, compareBitArrays, getQid } from "../composables";
 
 interface userData {
@@ -26,27 +26,8 @@ export const useUserStore = defineStore("User", {
   state: () => ({
     snapShot: {} as userData,
     dataList: {} as userData,
-    isInitialized: false,
   }),
   actions: {
-    initLocalStore(user: User) {
-      if (this.isInitialized) {
-        return;
-      } else {
-        this.dataList = {
-          uid: user.uid || "",
-          user_name: user.displayName || "",
-          user_mail: user.email || "",
-          answer_history: "",
-          correct_history: "",
-          bad_history: "",
-          good_history: "",
-          last_active_time: "",
-        };
-      }
-      this.isInitialized = true;
-    },
-
     resetStore() {
       this.$reset();
     },
@@ -94,9 +75,6 @@ export const useUserStore = defineStore("User", {
         console.error("no user found");
         return;
       }
-      if (!this.isInitialized) {
-        this.initLocalStore(user);
-      }
       const db = getFirestore();
       const userDocRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
@@ -123,7 +101,6 @@ export const useUserStore = defineStore("User", {
           good_history: data.good_history || "",
           last_active_time: data.last_active_time || "",
         };
-        this.snapShot = this.dataList;
       }
     },
 
@@ -148,7 +125,7 @@ export const useUserStore = defineStore("User", {
         this.snapShot.last_active_time &&
         this.dataList.last_active_time &&
         this.snapShot.last_active_time.trim() !=
-          this.dataList.last_active_time.trim()
+          this.dataList.last_active_time.trim() // when user is tyring to upload an old version data
       ) {
         console.error("data version mismatch, roll back to online data");
         this.dataList = this.snapShot;
@@ -161,6 +138,7 @@ export const useUserStore = defineStore("User", {
         this.dataList.bad_history !== this.snapShot.bad_history ||
         this.dataList.good_history !== this.snapShot.good_history;
       if (!ans_diff && !rate_diff) {
+        //same result as old data, no need to upload
         return;
       } else {
         const db = getFirestore();
@@ -171,7 +149,7 @@ export const useUserStore = defineStore("User", {
           correct_history: this.dataList.correct_history,
           bad_history: this.dataList.bad_history,
           good_history: this.dataList.good_history,
-          last_active_time: new Date().toLocaleString("sv-SE"),
+          last_active_time: new Date().toLocaleString("sv-SE"), //only this format can get correct != result somehow
         };
 
         await updateDoc(userDocRef, updatedData);
@@ -188,12 +166,14 @@ export const useUserStore = defineStore("User", {
         let updates = {};
         let bit = fromBase64(this.dataList.correct_history);
         if (getBit(bit, index) === 1) {
+          //correct answer
           updates = {
             attempt_count: increment(1),
             correct_count: increment(1),
           };
         } else {
           updates = {
+            //incorrect answer
             attempt_count: increment(1),
           };
         }

@@ -14,12 +14,12 @@ export default {
     const loading = ref(false);
     const router = useRouter();
 
-    router.beforeEach((_to, _from, next) => {
+    router.beforeEach((_to, _from, next) => { //enter loading before any page load
       loading.value = true;
       next();
     });
 
-    router.afterEach(() => {
+    router.afterEach(() => { //leave loading
       loading.value = false;
     });
 

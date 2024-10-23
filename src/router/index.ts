@@ -13,22 +13,6 @@ import Cat_10 from "../views/Cat_10.vue";
 import Contribution from "../views/Contribution.vue";
 import Principle from "../views/Principle.vue";
 
-// route for local development
-// const routes = [
-//   { path: "/", component: Login },
-//   { path: "/login", component: Login },
-//   { path: "/register", component: Register },
-//   { path: "/menu", component: Menu },
-//   { path: "/weekly-10", component: Weekly_10 },
-//   { path: "/random-10", component: Random_10 },
-//   { path: "/cat-10", component: Cat_10 },
-//   { path: "/user-data", component: UserProfile },
-//   { path: "/leaderboard", component: Menu },
-//   { path: "/result", component: Result },
-//   { path: "/contribution", component: Contribution },
-//   { path: "/contribution/principle", component: Principle },
-// ];
-
 // route for production environment
 const routes = [
   { path: "/", component: Login },
@@ -38,28 +22,27 @@ const routes = [
   {
     path: "/weekly-10",
     component: Weekly_10,
-    meta: { requiresAuth: true, requiresUserData: true },
+    meta: { requiresAuth: true, requiresUserData: true, fromMenu: true },
   },
   {
     path: "/random-10",
     component: Random_10,
-    meta: { requiresAuth: true, requiresUserData: true },
+    meta: { requiresAuth: true, requiresUserData: true, fromMenu: true },
   },
   {
     path: "/cat-10",
     component: Cat_10,
-    meta: { requiresAuth: true, requiresUserData: true },
+    meta: { requiresAuth: true, requiresUserData: true, fromMenu: true },
   },
   {
     path: "/user-data",
     component: UserProfile,
     meta: { requiresAuth: true, requiresUserData: true },
   },
-  { path: "/leaderboard", component: Menu, meta: { requiresAuth: true } },
   {
     path: "/result",
     component: Result,
-    meta: { requiresAuth: true, requiresUserData: true },
+    meta: { requiresAuth: true },
   },
   {
     path: "/contribution",
@@ -74,7 +57,7 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to: any, _: any) => {
+router.beforeEach(async (to: any, from: any) => {
   const requiresAuth = to.matched.some(
     (record: any) => record.meta.requiresAuth
   );
@@ -86,7 +69,14 @@ router.beforeEach(async (to: any, _: any) => {
   const notAuthenticated = !user || !user.emailVerified;
 
   if (requiresAuth && notAuthenticated) {
+    console.error("尚未登入，重導向至登入畫面。");
     return { path: "/login" };
+  }
+
+  const fromMenu = to.matched.some((record: any) => record.meta.fromMenu);
+  if (fromMenu && from.path !== "/menu") {
+    console.error("錯誤的路徑遷移，重導向至主畫面。");
+    return { path: "/menu" };
   }
 
   const requiresUserData = to.matched.some(
@@ -94,11 +84,11 @@ router.beforeEach(async (to: any, _: any) => {
   );
   const userStore = useUserStore();
 
-  if (requiresUserData && !userStore.isInitialized) {
+  if (requiresUserData) {
     try {
       await userStore.checkUserAccount();
     } catch (error) {
-      console.error("資料載入失敗", error);
+      console.error("資料載入失敗，重導向至主畫面。", error);
       return { path: "/menu" };
     }
   }

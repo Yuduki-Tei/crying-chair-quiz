@@ -64,7 +64,7 @@ export default defineComponent({
       catSelected.value = true;
     };
 
-    const getCatCount = (cat:string) => {
+    const getCatCount = (cat:string) => {//get total question amount and user answer count
       let cats = local.getCat(cat) || [];
       let len = cats.length;
       let ansCount = 0;
