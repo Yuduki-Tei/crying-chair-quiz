@@ -76,11 +76,11 @@ export default defineComponent({
         ];
 
     let cor_bit = fromBase64(data.correct_history);
-    let ans_bit = fromBase64(data.answer_history);
+    let ans_bit = fromBase64(data.answer_history); // transfer base64string to binary
 
-    const correctRating = Math.floor((sumBits(cor_bit) / sumBits(ans_bit) || 0) * 10000) / 100;
+    const correctRating = Math.floor((sumBits(cor_bit) / sumBits(ans_bit) || 0) * 10000) / 100; // calculate percentage
 
-    const calculateCatCorrect = async (cat: string) => {
+    const calculateCatCorrect = async (cat: string) => { // display correct_count, attempted_count, correct rate by category
       let qids = new Set(await online.fetchCategoryQids(cat));
 
       let ans_cnt = 0;
@@ -99,7 +99,7 @@ export default defineComponent({
       questionCounts.value.push(`${cor_cnt}/${ans_cnt}`)
     }
 
-    const enableEditing = () => {
+    const enableEditing = () => { //name editing
       let last = localStorage.getItem('lastUpdateUserName');
       if(last && !(new Date().getTime() - new Date(last).getTime() >= 1000 * 60 * 60 * 24)){
         errorMessage.value = "兩次名稱更新間隔不可低於24小時";
@@ -144,7 +144,7 @@ export default defineComponent({
       }
     };
 
-    const handleContainerClick = (event: MouseEvent) => {
+    const handleContainerClick = (event: MouseEvent) => { //handle click outside of input box to cancel name editing
       var element = event.target as HTMLElement;
       if (!isEditing.value || element.tagName.toUpperCase() === 'INPUT') {
         return;

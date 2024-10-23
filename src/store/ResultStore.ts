@@ -9,7 +9,7 @@ interface resData {
 
 export const useResultStore = defineStore("Result", {
   state: () => ({
-    isWeekly: false,
+    isWeekly: false, //status to check if function buttons are available
     total: 0,
     dataList: [] as resData[],
     length: 0,

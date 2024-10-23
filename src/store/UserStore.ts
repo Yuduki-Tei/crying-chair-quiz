@@ -125,7 +125,7 @@ export const useUserStore = defineStore("User", {
         this.snapShot.last_active_time &&
         this.dataList.last_active_time &&
         this.snapShot.last_active_time.trim() !=
-          this.dataList.last_active_time.trim()
+          this.dataList.last_active_time.trim() // when user is tyring to upload an old version data
       ) {
         console.error("data version mismatch, roll back to online data");
         this.dataList = this.snapShot;
@@ -138,6 +138,7 @@ export const useUserStore = defineStore("User", {
         this.dataList.bad_history !== this.snapShot.bad_history ||
         this.dataList.good_history !== this.snapShot.good_history;
       if (!ans_diff && !rate_diff) {
+        //same result as old data, no need to upload
         return;
       } else {
         const db = getFirestore();
@@ -148,7 +149,7 @@ export const useUserStore = defineStore("User", {
           correct_history: this.dataList.correct_history,
           bad_history: this.dataList.bad_history,
           good_history: this.dataList.good_history,
-          last_active_time: new Date().toLocaleString("sv-SE"),
+          last_active_time: new Date().toLocaleString("sv-SE"), //only this format can get correct != result somehow
         };
 
         await updateDoc(userDocRef, updatedData);
@@ -165,12 +166,14 @@ export const useUserStore = defineStore("User", {
         let updates = {};
         let bit = fromBase64(this.dataList.correct_history);
         if (getBit(bit, index) === 1) {
+          //correct answer
           updates = {
             attempt_count: increment(1),
             correct_count: increment(1),
           };
         } else {
           updates = {
+            //incorrect answer
             attempt_count: increment(1),
           };
         }

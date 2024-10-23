@@ -46,7 +46,7 @@ export default defineComponent({
       await user.updateResToDatabase();
       await user.updateStatsToDatabase();
       await user.updateRatingToDatabase();
-      dataUpdated.value = true;
+      dataUpdated.value = true; //show page after upload result to database
     });
 
     return {

@@ -85,7 +85,7 @@ export default defineComponent({
     const auth = getAuth();
     const errorMessage = ref<string>("");
     const successMessage = ref<string>("");
-    const buttonActivate = ref(true);
+    const buttonActivate = ref(true); // value will become false when data processing/loading to prevent mutiple request
 
     const handleRegister = async () => {
       if (password.value !== confirm.value) {
