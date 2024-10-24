@@ -1,7 +1,7 @@
 <template>
-    <div v-if="showModal && buttonShowModal" class="modal position-fixed d-block pb-5" style="height:auto; overflow-y: hidden;">
-      <div class="modal-dialog pb-5" role="document">
-        <div class="modal-content pb-5 shadow">
+    <div v-if="showModal && buttonShowModal" class="modal position-fixed d-block" style="height:auto; overflow-y: hidden;">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content shadow">
           <div class="modal-header">
             <h1 class="modal-title fs-6">{{ modalTitle }}</h1>
           </div>
