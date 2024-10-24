@@ -139,7 +139,7 @@ export default defineComponent({
       }
     };
 
-    const _getAdjustTime = () => {
+    const _getAdjustTime = () => { //magic numbers, determine by UX, no special meaning
       let len = qStore.checkAnswerLength(curInd.value);
       let adjustedCountDownTime = countDownTime;
 
@@ -180,7 +180,6 @@ export default defineComponent({
 
     const _stopDisplayingText = () => {
       res.setRes(curInd.value, { interval: displayedText.value.length }); //store the stop point
-      // clearInterval(questionInterval); //stop the question
       isTextDisplaying = false; //cacel text display
     };
 
@@ -190,14 +189,14 @@ export default defineComponent({
     });
 
     const buttonPlusTime = _throttle(() => {
-      adjustedCountDownTime += countDownTime * 2;
+      adjustedCountDownTime += countDownTime * 2; //magic numbers, determine by UX, no special meaning
     });
 
     const buttonPlusText = _throttle(() => {
       let curLen = displayedText.value.length;
       let qt = qStore.getQuestion(curInd.value).q_text;
       let allLen = qt.length;
-      let p = Math.max(Math.ceil(allLen / 10), 5);
+      let p = Math.max(Math.ceil(allLen / 10), 5); //magic numbers, determine by UX, no special meaning
       displayedText.value = qt.slice(0, Math.min(curLen + p, allLen));
     });
 
