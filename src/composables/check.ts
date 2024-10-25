@@ -1,9 +1,9 @@
-import { useResultStore, useOnlineQuestionStore, useUserStore } from "../store";
+import { useResultStore, useQuestionStore, useUserStore } from "../store";
 import { getBit, setBit, fromBase64, toBase64 } from "./index";
 
 export function useCheckAnswer(qInd: number, ans: string) {
   const res = useResultStore();
-  const qStore = useOnlineQuestionStore();
+  const qStore = useQuestionStore();
   const qData = qStore.getQuestion(qInd);
 
   updateResultStore(qInd, qStore, ans, res);
@@ -26,7 +26,7 @@ export function buttonBad(qInd: number) {
 }
 
 export function getQid(qInd: number) {
-  const qStore = useOnlineQuestionStore();
+  const qStore = useQuestionStore();
   const qid = qStore.getQuestion(qInd).qid;
   return qid;
 }

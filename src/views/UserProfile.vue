@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
-import { useUserStore, useOnlineQuestionStore } from "../store";
+import { useUserStore, useQuestionStore } from "../store";
 import { fromBase64, sumBits, getBit } from "../composables";
 import CountdownBar from "../components/CountdownBar.vue";
 import DropDown from "../components/DropDown.vue";
@@ -61,7 +61,7 @@ export default defineComponent({
     const name = ref(data.user_name || "尚未設定名稱");
     const editName = ref(data.user_name);
     const isEditing = ref(false);
-    const online = useOnlineQuestionStore();
+    const qStore = useQuestionStore();
     const allCats = [
           '文學',
           '理科',
@@ -81,7 +81,7 @@ export default defineComponent({
     const correctRating = Math.floor((sumBits(cor_bit) / sumBits(ans_bit) || 0) * 10000) / 100; // calculate percentage
 
     const calculateCatCorrect = async (cat: string) => { // display correct_count, attempted_count, correct rate by category
-      let qids = new Set(await online.fetchCategoryQids(cat));
+      let qids = new Set(await qStore.fetchCategoryQids(cat));
 
       let ans_cnt = 0;
       let cor_cnt = 0;
