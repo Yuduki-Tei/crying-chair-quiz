@@ -77,9 +77,9 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      categories.forEach(async cat => {
-         await qStore.fetchCategoryQids(cat)
-      });
+      for (const cat of categories) {
+        await qStore.fetchCategoryQids(cat);
+      };
       isLoading.value = false;
       
     });
