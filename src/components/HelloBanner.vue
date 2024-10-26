@@ -29,18 +29,17 @@ export default defineComponent({
     ) {
       showModal.value = true;
       localStorage.setItem("helloID", helloID);
+      const requiredKeys = ["userNameLastUpdate", "catLastUpdate", "maxQid", "maxQidLastUpdate", "helloID", "User", "Cat"];
+      const allKeys = Object.keys(localStorage);
+
+      allKeys.forEach((key) => {
+        if (!requiredKeys.includes(key)) {
+          localStorage.removeItem(key);
+        }
+      });
     } else {
       showModal.value = false;
     }
-
-    const requiredKeys = ["userNameLastUpdate", "catLastUpdate", "maxQid", "maxQidLastUpdate", "helloID", "User", "Cat"];
-    const allKeys = Object.keys(localStorage);
-
-    allKeys.forEach((key) => {
-      if (!requiredKeys.includes(key)) {
-        localStorage.removeItem(key);
-      }
-    });
 
     return {
       showModal,
