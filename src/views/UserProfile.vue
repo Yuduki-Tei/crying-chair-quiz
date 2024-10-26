@@ -100,7 +100,7 @@ export default defineComponent({
     }
 
     const enableEditing = () => { //name editing
-      let last = localStorage.getItem('lastUpdateUserName');
+      let last = localStorage.getItem('userNameLastUpdate');
       if(last && !(new Date().getTime() - new Date(last).getTime() >= 1000 * 60 * 60 * 24)){
         errorMessage.value = "兩次名稱更新間隔不可低於24小時";
         return
@@ -134,7 +134,7 @@ export default defineComponent({
       else errorMessage.value = "";
       try {
         await user.updateUserName(editName.value);
-        localStorage.setItem('lastUpdateUserName', new Date().toISOString());
+        localStorage.setItem('userNameLastUpdate', new Date().toISOString());
         name.value = editName.value;
         data.user_name = editName.value;
         isEditing.value = false;
