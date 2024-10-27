@@ -75,10 +75,11 @@ export const useQuestionStore = defineStore("Question", {
       const now = new Date();
       const dayOfWeek = now.getUTCDay();
       const lastSunday = new Date(now);
-
       lastSunday.setUTCDate(now.getUTCDate() - dayOfWeek);
       lastSunday.setUTCHours(14, 0, 0, 0);
-
+      if (lastSunday > new Date()){
+        lastSunday.setUTCDate(now.getUTCDate() - 7);
+      }
       return lastSunday.toISOString();
     },
 
