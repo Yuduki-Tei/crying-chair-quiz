@@ -76,6 +76,8 @@ export default defineComponent({
     const answerInput = ref<HTMLInputElement | null>(null);
 
     //local var
+    var countDownId: number = 0;
+    var textDisplayId: number = 0;
     var isCountingDown: boolean = false;
     var isTextDisplaying: boolean = false;
     var adjustedCountDownTime: number = 0;
@@ -113,6 +115,7 @@ export default defineComponent({
           } else { //fastforward display ends
             buttonStatus.endQuestion();
           }
+          cancelAnimationFrame(textDisplayId);
           return;
         }
         const currentTime = Date.now();
@@ -125,9 +128,9 @@ export default defineComponent({
           lastUpdateTime = currentTime;
           displayedText.value = curText;
         }
-        requestAnimationFrame(__updateText); //recursive call
+        textDisplayId = requestAnimationFrame(__updateText); //recursive call
       }
-      requestAnimationFrame(__updateText); // trigger
+      textDisplayId = requestAnimationFrame(__updateText); // trigger
     };
 
     const _changeLabelText = () => {
@@ -153,14 +156,17 @@ export default defineComponent({
       return adjustedCountDownTime;
     };
 
-    const _startCountDown = () => {
+    const _startCountDown = _throttle(() => {
       if (isCountingDown) return;
       isCountingDown = true;
       adjustedCountDownTime = _getAdjustTime();
       const start = new Date().getTime();
 
       const __tick = () => {
-        if (!isCountingDown) return; //isCountingDown == false means the countdown has been canceled
+        if (!isCountingDown){
+          cancelAnimationFrame(countDownId)
+          return; //isCountingDown == false means the countdown has been canceled
+        }
 
         const curTime = new Date().getTime() - start;
         barLength.value = Math.floor(
@@ -169,17 +175,19 @@ export default defineComponent({
 
         if (curTime > adjustedCountDownTime * 1010) {// timeout
           // 1.01x tolerance
+          cancelAnimationFrame(countDownId)
           isCountingDown = false;
           checkAnswer();
         } else {
-          requestAnimationFrame(__tick); // recursive functioncall
+          countDownId = requestAnimationFrame(__tick); // recursive functioncall
         }
       };
-      requestAnimationFrame(__tick); // trigger
-    };
+      countDownId = requestAnimationFrame(__tick); // trigger
+    });
 
     const _stopDisplayingText = () => {
       res.setRes(curInd.value, { interval: displayedText.value.length }); //store the stop point
+      cancelAnimationFrame(textDisplayId);
       isTextDisplaying = false; //cacel text display
     };
 
@@ -233,6 +241,7 @@ export default defineComponent({
       if (res.getRes(curInd.value).interval === 0) {
         res.setRes(curInd.value, { interval: displayedText.value.length });
       }
+      cancelAnimationFrame(countDownId);
       isCountingDown = false; //cancel countdown
 
       useCheckAnswer(curInd.value, answer.value); //check if the answer is right and write the result to store
