@@ -109,7 +109,12 @@ export default defineComponent({
       answerOK.value = false; //not allow to answer when text displaying
 
       const __updateText = () =>{
-        if (char >= text.length || !isTextDisplaying) { // isTextDisplaying == false means text update has been canceled
+        if(!isTextDisplaying){// isTextDisplaying == false means text update has been canceled
+          cancelAnimationFrame(textDisplayId);
+          return;
+        }
+
+        if (char >= text.length) {
           if (speed === displaySpeed) { //nomal display ends
             _startCountDown();
           } else { //fastforward display ends
@@ -156,7 +161,7 @@ export default defineComponent({
       return adjustedCountDownTime;
     };
 
-    const _startCountDown = _throttle(() => {
+    const _startCountDown = () => {
       if (isCountingDown) return;
       isCountingDown = true;
       adjustedCountDownTime = _getAdjustTime();
@@ -183,7 +188,7 @@ export default defineComponent({
         }
       };
       countDownId = requestAnimationFrame(__tick); // trigger
-    });
+    };
 
     const _stopDisplayingText = () => {
       res.setRes(curInd.value, { interval: displayedText.value.length }); //store the stop point
