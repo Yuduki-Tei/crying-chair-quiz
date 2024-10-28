@@ -75,10 +75,11 @@ export const useQuestionStore = defineStore("Question", {
       const now = new Date();
       const dayOfWeek = now.getUTCDay();
       const lastSunday = new Date(now);
-
       lastSunday.setUTCDate(now.getUTCDate() - dayOfWeek);
       lastSunday.setUTCHours(14, 0, 0, 0);
-
+      if (lastSunday > new Date()){
+        lastSunday.setUTCDate(now.getUTCDate() - 7);
+      }
       return lastSunday.toISOString();
     },
 
@@ -128,11 +129,12 @@ export const useQuestionStore = defineStore("Question", {
       const querySnapshot = await getDocs(q);
       const fetchedQuestions = querySnapshot.docs.map((doc) => doc.data() as Questions);
       fetchedQuestions.sort((a, b) => {return a['qid'] -b['qid'];});
+
       this.questions = fetchedQuestions;
-      this.stats = await this._fetchStatsForQids(Array.from(qids));
+      await this._fetchStatsForQids(Array.from(qids));
     },
 
-    async _fetchStatsForQids(qids: number[]): Promise<Stats[]> {
+    async _fetchStatsForQids(qids: number[]){
       const db = getFirestore();
 
       const q = query(
@@ -141,8 +143,9 @@ export const useQuestionStore = defineStore("Question", {
       );
       const querySnapshot = await getDocs(q);
       const statsSnapshots = querySnapshot.docs.map((doc) => doc.data() as Stats);
+      statsSnapshots.sort((a, b) => {return a['qid'] -b['qid'];});
 
-      return statsSnapshots
+      this.stats = statsSnapshots
     },
 
     getQuestion(index: number) {
