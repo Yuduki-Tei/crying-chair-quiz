@@ -48,27 +48,6 @@ export const useUserStore = defineStore("User", {
       return rate;
     },
 
-    async _getDatabaseSnapshot() {
-      const db = getFirestore();
-      const userDocRef = doc(db, "users", this.dataList.uid);
-      const userDoc = await getDoc(userDocRef);
-      if (!userDoc.exists()) {
-        console.error("no user data found");
-        return;
-      }
-      const data = userDoc.data();
-      this.snapShot = {
-        uid: data.uid,
-        user_name: data.user_name || "",
-        user_mail: data.user_mail || "",
-        answer_history: data.answer_history || "",
-        correct_history: data.correct_history || "",
-        bad_history: data.bad_history || "",
-        good_history: data.good_history || "",
-        last_active_time: data.last_active_time || "",
-      };
-    },
-
     async checkUserAccount() {
       const user = getAuth().currentUser;
       if (!user) {
@@ -101,6 +80,7 @@ export const useUserStore = defineStore("User", {
           good_history: data.good_history || "",
           last_active_time: data.last_active_time || "",
         };
+        this.snapShot = this.dataList;
       }
     },
 
@@ -119,8 +99,6 @@ export const useUserStore = defineStore("User", {
     },
 
     async updateResToDatabase() {
-      await this._getDatabaseSnapshot();
-
       if (
         this.snapShot.last_active_time &&
         this.dataList.last_active_time &&

@@ -46,7 +46,7 @@
 
 <script>
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
-import { useOnlineQuestionStore, useResultStore, useButtonStatusStore } from "../store";
+import { useQuestionStore, useResultStore, useButtonStatusStore } from "../store";
 import { buttonGood, buttonBad } from "../composables";
 import ResultGrid from "./ResultGrid.vue";
 import QuestionButtons from "./QuestionButtons.vue";
@@ -58,7 +58,7 @@ export default defineComponent({
     const resultQText = new Array();
     const resultAText = new Array();
     const userAns = new Array();
-    const qStore = useOnlineQuestionStore();
+    const qStore = useQuestionStore();
     const res = useResultStore();
     const button = useButtonStatusStore();
     const currentIdx = ref(0);

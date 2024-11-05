@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
-import { useUserStore, useOnlineQuestionStore } from "../store";
+import { useUserStore, useQuestionStore } from "../store";
 import { fromBase64, sumBits, getBit } from "../composables";
 import CountdownBar from "../components/CountdownBar.vue";
 import DropDown from "../components/DropDown.vue";
@@ -61,7 +61,7 @@ export default defineComponent({
     const name = ref(data.user_name || "尚未設定名稱");
     const editName = ref(data.user_name);
     const isEditing = ref(false);
-    const online = useOnlineQuestionStore();
+    const qStore = useQuestionStore();
     const allCats = [
           '文學',
           '理科',
@@ -81,7 +81,7 @@ export default defineComponent({
     const correctRating = Math.floor((sumBits(cor_bit) / sumBits(ans_bit) || 0) * 10000) / 100; // calculate percentage
 
     const calculateCatCorrect = async (cat: string) => { // display correct_count, attempted_count, correct rate by category
-      let qids = new Set(await online.fetchCategoryQids(cat));
+      let qids = new Set(await qStore.fetchCategoryQids(cat));
 
       let ans_cnt = 0;
       let cor_cnt = 0;
@@ -100,7 +100,7 @@ export default defineComponent({
     }
 
     const enableEditing = () => { //name editing
-      let last = localStorage.getItem('lastUpdateUserName');
+      let last = localStorage.getItem('userNameLastUpdate');
       if(last && !(new Date().getTime() - new Date(last).getTime() >= 1000 * 60 * 60 * 24)){
         errorMessage.value = "兩次名稱更新間隔不可低於24小時";
         return
@@ -134,7 +134,7 @@ export default defineComponent({
       else errorMessage.value = "";
       try {
         await user.updateUserName(editName.value);
-        localStorage.setItem('lastUpdateUserName', new Date().toISOString());
+        localStorage.setItem('userNameLastUpdate', new Date().toISOString());
         name.value = editName.value;
         data.user_name = editName.value;
         isEditing.value = false;
