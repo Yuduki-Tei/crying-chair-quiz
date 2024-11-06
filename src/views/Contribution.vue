@@ -20,7 +20,7 @@
             </button>
             <ul class="dropdown-menu w-100">
               <li v-for="(_, cat) in cats" :key="cat">
-                <a class="dropdown-item" @click="selectCategory(cat as string)">{{ cat }}</a>
+                <a class="dropdown-item link" @click="selectCategory(cat as string)">{{ cat }}</a>
               </li>
             </ul>
           </div>
@@ -41,7 +41,7 @@
             </button>
             <ul class="dropdown-menu w-100">
               <li v-for="subcat in subCats" :key="subcat">
-                <a class="dropdown-item" @click="selectSubcategory(subcat)">{{ subcat }}</a>
+                <a class="dropdown-item link" @click="selectSubcategory(subcat)">{{ subcat }}</a>
               </li>
             </ul>
           </div>
@@ -49,11 +49,11 @@
       </div>
       <p class = "border-bottom"> {{detail}}</p>
       <div class="mb-3">
-        <label for="qText" class="form-label">問題本文</label>
+        <label for="qText" class="form-label info-text">問題本文</label>
         <textarea class="form-control" id="qText" rows="3" v-model="qText" required />
       </div>
       <div class="mb-3">
-        <label for="aText" class="form-label">答案</label>
+        <label  for="aText" class="form-label info-text">答案</label>
         <input class="form-control" id="aText" v-model="aText" required />
       </div>
       <button class="btn btn-primary w-100 py-2" type="submit">

@@ -28,3 +28,18 @@ export default defineComponent({
     },
 });
 </script>
+
+<style scoped>
+.bar-high {
+  background-color: var(--mytheme-light);
+}
+.bar-medium {
+  background-color: var(--mylinkblue-light);
+}
+.bar-low {
+  background-color: var(--myorange);
+}
+.bar-danger {
+  background-color: var(--myred);
+}
+</style>

@@ -70,3 +70,9 @@ export default defineComponent({
   }
 });
 </script>
+
+<style lang="css" scoped>
+.modal {
+  background-color: var(--mygray-dark);
+}
+</style>

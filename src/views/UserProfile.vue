@@ -27,7 +27,7 @@
           </div>
         </div>
       </div>
-      <label for="bar">平均正解率 : {{ correctRating }} %</label>
+      <label for="bar" class = "info-text">平均正解率 : {{ correctRating }} %</label>
       <CountdownBar id="bar" :barLength="correctRating" style="height: 8px; max-width: 240px" />
     </div>
     <div

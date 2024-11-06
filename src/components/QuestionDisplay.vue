@@ -19,7 +19,7 @@
           v-model="answer"
           autocomplete="off"
         />
-        <label for="answer">{{ labelText }}</label>
+        <label class ="info-text" for="answer">{{ labelText }}</label>
       </div>
     </div>
   </div>

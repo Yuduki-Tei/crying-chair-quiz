@@ -28,7 +28,7 @@
   --mytheme-lighter: #02dada;
   --mytheme-light: #00b7b7;
   --mytheme: #039393;
-  --mytheme-dark: #156160;
+  --mytheme-dark: #036363;
 
   --bs-body-color: var(--mywhite);
   --bs-secondary-color: var(--mywhite);
@@ -47,7 +47,7 @@
   --bs-primary: var(--mytheme);
   --bs-primary-bg-subtle: var(--mytheme-light);
 
-  background-color: var(--myblack) !important;
+  background-color: var(--myblack);
 }
 
 .alert-primary {
@@ -128,12 +128,8 @@ h2 {
   color: var(--myorange-light);
 }
 
-.text-danger {
-  color: var(--bs-danger) !important;
-}
-
-input,
-label {
+input.info-text,
+label.info-text {
   color: var(--mygray-light) !important;
 }
 
@@ -149,18 +145,24 @@ label {
 }
 
 /* color of hyper link */
-a,
-a:visited {
-  color: var(--mylinkblue) !important;
+a.link,
+a.link:visited {
+  color: var(--mylinkblue);
   text-decoration: none;
 }
 
-a:hover,
-a:active {
+a.link:hover,
+a.link:active {
   cursor: pointer;
+  color: var(--mylinkblue-light);
+  text-decoration: none;
+}
+
+/* color of dropdown-item */
+.dropdown-item.active,
+.dropdown-item:active {
   background-color: var(--mygray-dark) !important;
   color: var(--mylinkblue-light) !important;
-  text-decoration: none;
 }
 
 /* change the show pass eyemark color */
@@ -205,27 +207,6 @@ input:-webkit-autofill:focus {
 }
 .list-group-item {
   cursor: pointer;
-}
-
-.bar-high {
-  background-color: var(--mytheme-light);
-}
-.bar-medium {
-  background-color: var(--mylinkblue-light);
-}
-.bar-low {
-  background-color: var(--myorange);
-}
-.bar-danger {
-  background-color: var(--myred);
-}
-
-.modal {
-  background-color: var(--mygray-dark);
-}
-
-#text-danger {
-  color: var(--myorange) !important;
 }
 
 /* scaling */
