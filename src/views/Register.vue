@@ -26,7 +26,7 @@
             autocomplete="on"
             required
           />
-          <label for="floatingInput">Email address</label>
+          <label for="floatingInput" class = "info-text">Email address</label>
         </div>
         <div class="form-floating">
           <input
@@ -38,7 +38,7 @@
             autocomplete="on"
             required
           />
-          <label for="floatingPassword">Password</label>
+          <label for="floatingPassword" class = "info-text">Password</label>
         </div>
         <div class="form-floating">
           <input
@@ -50,12 +50,12 @@
             autocomplete="on"
             required
           />
-          <label for="floatingPassword">Confirm Password</label>
+          <label for="floatingPassword" class = "info-text">Confirm Password</label>
         </div>
         <div class="text-start my-3">
           <p>
             已經有帳號了嗎?
-            <router-link to="/login" replace>點此登入</router-link>
+            <router-link class = "link" to="/login" replace>點此登入</router-link>
           </p>
         </div>
         <button class="btn btn-primary w-100 py-2" type="submit">註冊</button>

@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.3",
     "chart.js": "^4.4.4",
     "firebase": "^10.12.3",
     "firebase-admin": "^12.2.0",

@@ -10,23 +10,23 @@
     </button>
     <ul class="dropdown-menu dropdown-menu-end">
       <li>
-        <router-link to="/menu" replace class="dropdown-item">
+        <router-link class="link dropdown-item" to="/menu" replace>
           <i class="bi bi-house"></i> 主畫面
         </router-link>
       </li>
       <li>
-        <router-link to="/user-data" replace class="dropdown-item">
+        <router-link class="link dropdown-item" to="/user-data" replace>
           <i class="bi bi-person"></i> 使用者資料
         </router-link>
       </li>
       <li>
-        <a class="dropdown-item" href="https://forms.gle/pjemqobqFgbZLSjY7"
+        <a class="link dropdown-item" href="https://forms.gle/pjemqobqFgbZLSjY7"
           ><i class="bi bi-send"></i> 問題回報</a
         >
       </li>
       <li v-if="user"><hr class="dropdown-divider" /></li>
       <li v-if="user">
-        <a class="dropdown-item" id="text-danger" @click="logOut"
+        <a class="link dropdown-item" id="text-logout" @click="logOut"
           ><i class="bi bi-box-arrow-right"></i> 帳號登出</a
         >
       </li>
@@ -65,5 +65,8 @@ export default defineComponent({
 .dropdown {
   margin-right: 1rem;
   margin-top : 1rem;
+}
+#text-logout {
+  color: var(--myorange) !important;
 }
 </style>

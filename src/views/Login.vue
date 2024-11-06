@@ -20,7 +20,7 @@
             autocomplete="on"
             required
           />
-          <label for="floatingInput">Email address</label>
+          <label for="floatingInput" class = "info-text">Email address</label>
         </div>
         <div class="form-floating">
           <input
@@ -32,13 +32,13 @@
             autocomplete="on"
             required
           />
-          <label for="floatingPassword">Password</label>
+          <label for="floatingPassword" class = "info-text">Password</label>
         </div>
         <div class="text-start my-3">
           <p>
             還沒有帳號嗎?
-            <router-link to="/register" replace>點此註冊</router-link> 或
-            <a @click="loginWithGoogle"
+            <router-link class = "link" to="/register" replace>點此註冊</router-link> 或
+            <a class = "link" @click="loginWithGoogle"
               ><i class="bi bi-google"></i>登入</a
             >
           </p>
