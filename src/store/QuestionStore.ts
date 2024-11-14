@@ -22,6 +22,7 @@ export const useQuestionStore = defineStore("Question", {
   state: () => ({
     questions: [] as Questions[],
     stats: [] as Stats[],
+    cats: {} as Record<string, number[]>,
     apiUrl: import.meta.env.VITE_BACKEND_API_URL,
   }),
   actions: {
@@ -46,6 +47,27 @@ export const useQuestionStore = defineStore("Question", {
         this.stats = statsArray;
       } catch (error) {
         console.error("Error fetching questions:", error);
+      }
+    },
+
+    async fetchCatQidsFromDatabase() {
+      try {
+        const response = await axios.get(`${this.apiUrl}/cat-qids`, {
+          headers: {
+            Authorization: await getFirebaseIdToken(),
+          },
+        });
+        this.cats = response.data;
+      } catch (error) {
+        console.error("Error fetching CatQids:", error);
+      }
+    },
+
+    getCatQids(cat: string) {
+      if (cat in this.cats) {
+        return this.cats[cat];
+      } else {
+        throw new Error("cat not exist");
       }
     },
 
