@@ -25,32 +25,25 @@ export const useQuestionStore = defineStore("Question", {
     apiUrl: import.meta.env.VITE_BACKEND_API_URL,
   }),
   actions: {
-    async fetchDataFromDatabase(type: string) {
+    async fetchDataFromDatabase(mode: string) {
       try {
-        const response = await axios.post(
-          `${this.apiUrl}/questions-and-stats`,
-          {
-            mode: type,
-          },
+        const response = await axios.get(
+          `${this.apiUrl}/questions-and-stats?mode=${mode}`,
           {
             headers: {
               Authorization: await getFirebaseIdToken(),
-              "Content-Type": "application/json",
             },
           }
         );
-        if (response.data && response.data.questions && response.data.stats) {
-          console.log("response exist");
-          const questionsArray = Object.values(
-            response.data.questions
-          ) as Questions[];
-          questionsArray.sort((a, b) => a.qid - b.qid);
-          this.questions = questionsArray;
+        const questionsArray = Object.values(
+          response.data.questions
+        ) as Questions[];
+        questionsArray.sort((a, b) => a.qid - b.qid);
+        this.questions = questionsArray;
 
-          const statsArray = Object.values(response.data.stats) as Stats[];
-          statsArray.sort((a, b) => a.qid - b.qid);
-          this.stats = statsArray;
-        }
+        const statsArray = Object.values(response.data.stats) as Stats[];
+        statsArray.sort((a, b) => a.qid - b.qid);
+        this.stats = statsArray;
       } catch (error) {
         console.error("Error fetching questions:", error);
       }
