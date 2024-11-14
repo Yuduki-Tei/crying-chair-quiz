@@ -52,7 +52,7 @@ export const useQuestionStore = defineStore("Question", {
 
     async fetchCatQidsFromDatabase() {
       try {
-        const response = await axios.get(`${this.apiUrl}/cat-qids`, {
+        const response = await axios.get(`${this.apiUrl}/cats-qids`, {
           headers: {
             Authorization: await getFirebaseIdToken(),
           },
