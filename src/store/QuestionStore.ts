@@ -1,14 +1,6 @@
 import { defineStore } from "pinia";
-import { useCatStore } from "./"
-import {
-  getFirestore,
-  collection,
-  query,
-  orderBy,
-  limit,
-  getDocs,
-  where,
-} from "firebase/firestore";
+import axios from "axios";
+import { getFirebaseIdToken } from "../services/firebase";
 
 interface Stats {
   qid: number;
@@ -30,122 +22,38 @@ export const useQuestionStore = defineStore("Question", {
   state: () => ({
     questions: [] as Questions[],
     stats: [] as Stats[],
+    apiUrl: import.meta.env.VITE_BACKEND_API_URL,
   }),
   actions: {
-    async _getMaxQid() {
-      const lastmaxQidUpdate = localStorage.getItem("maxQidLastUpdate") || "";
-      let maxQid = 0;
-      if (!lastmaxQidUpdate || lastmaxQidUpdate < this._getLastSunday()) {
-        const db = getFirestore();
-        const mq = query(
-          //get the document with maximum id from database
-          collection(db, "Questions"),
-          orderBy("qid", "desc"),
-          limit(1)
-        );
-        const maxSnapshot = await getDocs(mq);
-        maxSnapshot.forEach((doc: any) => {
-          maxQid = doc.data().qid;
-          localStorage.setItem("maxQidLastUpdate", new Date().toISOString());
-          localStorage.setItem("maxQid", maxQid.toString());
-        });
-      }
-      maxQid = parseInt(localStorage.getItem("maxQid") || "0");
-      return maxQid;
-    },
-
-    _getRandomQids(
-      maxQid: number,
-      count: number,
-      from: Set<number> = new Set()
-    ): Set<number> {
-      const qids: Set<number> = new Set<number>();
-      while (qids.size < count) {
-        //generate random qids until count
-        const randomQid = Math.floor(Math.random() * maxQid) + 1; // 1 indexed
-        if (from.size > 0 && !from.has(randomQid)) {
-          continue;
-        }
-        qids.add(randomQid);
-      }
-      return qids;
-    },
-
-    _getLastSunday() {
-      const now = new Date();
-      const dayOfWeek = now.getUTCDay();
-      const lastSunday = new Date(now);
-      lastSunday.setUTCDate(now.getUTCDate() - dayOfWeek);
-      lastSunday.setUTCHours(14, 0, 0, 0);
-      if (lastSunday > new Date()){
-        lastSunday.setUTCDate(now.getUTCDate() - 7);
-      }
-      return lastSunday.toISOString();
-    },
-
-    async fetchCategoryQids(type: string): Promise<number[]> {
-
-      const catLastUpdate = localStorage.getItem("catLastUpdate");
-      const cStore = useCatStore()
-
-      if (!catLastUpdate || catLastUpdate < this._getLastSunday()){
-        await cStore.updateCat();
-        localStorage.setItem("catLastUpdate", new Date().toISOString())
-      }
-
-      let cat = cStore.getCat(type);
-
-      if (cat && cat.length > 0) {
-        // get data from local store
-        return cat;
-      } else {
-        console.error("No available local data");
-        return [];
-      }
-    },
-
     async fetchDataFromDatabase(type: string) {
-      const db = getFirestore();
-      var maxQid = await this._getMaxQid();
-      let qids = new Array<number>();
+      try {
+        const response = await axios.post(
+          `${this.apiUrl}/questions-and-stats`,
+          {
+            mode: type,
+          },
+          {
+            headers: {
+              Authorization: await getFirebaseIdToken(),
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.data && response.data.questions && response.data.stats) {
+          console.log("response exist");
+          const questionsArray = Object.values(
+            response.data.questions
+          ) as Questions[];
+          questionsArray.sort((a, b) => a.qid - b.qid);
+          this.questions = questionsArray;
 
-      if (type === "weekly") {
-        // Fetch 10 questions with largest qids
-        qids = Array.from({ length: 10 }, (_, i) => maxQid - i);
-      } else {
-        maxQid -= 10; // all questions except weekly
-        if (type === "random") {
-          qids = Array.from(this._getRandomQids(maxQid, 10));
-        } else {
-          const qidSet = new Set(await this.fetchCategoryQids(type));
-          qids = Array.from(this._getRandomQids(maxQid, 10, qidSet));
+          const statsArray = Object.values(response.data.stats) as Stats[];
+          statsArray.sort((a, b) => a.qid - b.qid);
+          this.stats = statsArray;
         }
+      } catch (error) {
+        console.error("Error fetching questions:", error);
       }
-      // We have correct qids now
-      const q = query(
-        collection(db, "Questions"),
-        where("qid", "in", qids)
-      );
-      const querySnapshot = await getDocs(q);
-      const fetchedQuestions = querySnapshot.docs.map((doc) => doc.data() as Questions);
-      fetchedQuestions.sort((a, b) => {return a['qid'] -b['qid'];});
-
-      this.questions = fetchedQuestions;
-      await this._fetchStatsForQids(Array.from(qids));
-    },
-
-    async _fetchStatsForQids(qids: number[]){
-      const db = getFirestore();
-
-      const q = query(
-        collection(db, "Stats"),
-        where("qid", "in", qids)
-      );
-      const querySnapshot = await getDocs(q);
-      const statsSnapshots = querySnapshot.docs.map((doc) => doc.data() as Stats);
-      statsSnapshots.sort((a, b) => {return a['qid'] -b['qid'];});
-
-      this.stats = statsSnapshots
     },
 
     getQuestion(index: number) {
