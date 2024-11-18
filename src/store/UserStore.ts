@@ -80,7 +80,7 @@ export const useUserStore = defineStore("User", {
           good_history: data.good_history || "",
           last_active_time: data.last_active_time || "",
         };
-        this.snapShot = this.dataList;
+        this.snapShot = {...this.dataList};
       }
     },
 
