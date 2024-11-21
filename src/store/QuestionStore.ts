@@ -27,6 +27,7 @@ export const useQuestionStore = defineStore("Question", {
   }),
   actions: {
     async fetchDataFromDatabase(mode: string) {
+      mode = encodeURIComponent(mode);
       try {
         const response = await axios.get(
           `${this.apiUrl}/questions-and-stats?mode=${mode}`,
