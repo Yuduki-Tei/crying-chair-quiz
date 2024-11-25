@@ -48,6 +48,7 @@
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
 import { useQuestionStore, useResultStore, useButtonStatusStore } from "../store";
 import { buttonGood, buttonBad } from "../composables";
+import Carousel from 'bootstrap/js/dist/carousel';
 import ResultGrid from "./ResultGrid.vue";
 import QuestionButtons from "./QuestionButtons.vue";
 
@@ -80,7 +81,7 @@ export default defineComponent({
     }
     onMounted(() => {
       const carouselElement = document.querySelector("#questionCarousel");
-      carouselInstance = new bootstrap.Carousel(carouselElement, {
+      carouselInstance = new Carousel(carouselElement, {
         interval: false,
       });
 
