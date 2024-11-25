@@ -43,9 +43,7 @@ export default defineComponent({
     };
     
     onMounted(async () => {
-      await user.updateResToDatabase();
-      await user.updateStatsToDatabase();
-      await user.updateRatingToDatabase();
+      await user.updateRes();
       dataUpdated.value = true; //show page after upload result to database
     });
 
