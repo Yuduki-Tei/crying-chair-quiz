@@ -75,12 +75,8 @@ export default defineComponent({
           '娛樂'
         ];
 
-    let cor_bit = fromBase64(data.correct_history);
-    let ans_bit = fromBase64(data.answer_history); // transfer base64string to binary
-
-    const correctRating = Math.floor((sumBits(cor_bit) / sumBits(ans_bit) || 0) * 10000) / 100; // calculate percentage
-
-    const calculateCatCorrect = async (cat: string) => { // display correct_count, attempted_count, correct rate by category
+    const correctRating = ref(0); // calculate percentage
+    const calculateCatCorrect = async (cat: string, cor_bit: Uint8Array, ans_bit: Uint8Array) => { // display correct_count, attempted_count, correct rate by category
       let qids = new Set(qStore.getCatQids(cat));
 
       let ans_cnt = 0;
@@ -155,10 +151,15 @@ export default defineComponent({
       else cancelEdit();
     };
     onMounted(async() => {
+      await user.checkUserAccount();
       await qStore.fetchCatQidsFromDatabase();
+      let data = user.dataList
+      let cor_bit = fromBase64(data.correct_history);
+      let ans_bit = fromBase64(data.answer_history); // transfer base64string to binary
       for (const cat of allCats) {
-        await calculateCatCorrect(cat);
+        await calculateCatCorrect(cat, cor_bit, ans_bit);
       };
+      correctRating.value = Math.floor((sumBits(cor_bit) / sumBits(ans_bit) || 0) * 10000) / 100;
       loading.value = false;
     })
     return {
