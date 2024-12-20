@@ -58,7 +58,7 @@ export default defineComponent({
     const questionCounts = ref<string[]>([]);
     const user = useUserStore();
     const data = user.dataList;
-    const name = ref(data.user_name || "尚未設定名稱");
+    const name = ref("");
     const editName = ref(data.user_name);
     const isEditing = ref(false);
     const qStore = useQuestionStore();
@@ -154,6 +154,7 @@ export default defineComponent({
       await user.checkUserAccount();
       await qStore.fetchCatQidsFromDatabase();
       let data = user.dataList
+      name.value = (data.user_name || "尚未設定名稱");
       let cor_bit = fromBase64(data.correct_history);
       let ans_bit = fromBase64(data.answer_history); // transfer base64string to binary
       for (const cat of allCats) {
