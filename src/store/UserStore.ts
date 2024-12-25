@@ -17,7 +17,7 @@ interface userData {
 export const useUserStore = defineStore("User", {
   state: () => ({
     dataList: {} as userData,
-    apiUrl: import.meta.env.VITE_BACKEND_API_URL
+    apiUrl: import.meta.env.VITE_BACKEND_API_URL,
   }),
   actions: {
     resetStore() {
@@ -39,12 +39,12 @@ export const useUserStore = defineStore("User", {
       }
       return rate;
     },
-    
-    async _updateUserData(data: Record<string, any>){
+
+    async _updateUserData(data: Record<string, any>) {
       try {
         await axios.put(
           `${this.apiUrl}/user-data`,
-          {...data},
+          { ...data },
           {
             headers: {
               Authorization: await getFirebaseIdToken(),
@@ -58,35 +58,31 @@ export const useUserStore = defineStore("User", {
 
     async checkUserAccount() {
       try {
-        const response = await axios.get(
-          `${this.apiUrl}/user-data`,
-          {
-            headers: {
-              Authorization: await getFirebaseIdToken(),
-            },
-          }
-        );
-        this.dataList = response.data
-
-      }catch (error) {
+        const response = await axios.get(`${this.apiUrl}/user-data`, {
+          headers: {
+            Authorization: await getFirebaseIdToken(),
+          },
+        });
+        this.dataList = response.data;
+      } catch (error) {
         console.error("Error fetching user data", error);
       }
     },
 
-    async updateRes(){
+    async updateRes() {
       let data = {
-        answer_history : this.dataList.answer_history,
-        correct_history : this.dataList.correct_history,
+        answer_history: this.dataList.answer_history,
+        correct_history: this.dataList.correct_history,
         bad_history: this.dataList.bad_history,
-        good_history : this.dataList.good_history,
-        last_active_time : new Date().toISOString()
-      }
-      await this._updateUserData(data)
+        good_history: this.dataList.good_history,
+        last_active_time: new Date().toLocaleString("sv-SE"),
+      };
+      await this._updateUserData(data);
     },
 
     async updateUserName(name: string) {
       await this._updateUserData({ user_name: name });
     },
   },
-    persist: true,
-  });
+  persist: true,
+});

@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted, ref, computed } from "vue";
-import { useResultStore, useQuestionStore, useButtonStatusStore } from "../store";
+import { useResultStore, useQuestionStore, useUserStore, useButtonStatusStore } from "../store";
 import QuestionDisplay from "./QuestionDisplay.vue";
 import Loading from "./Loading.vue";
 import NumberIncrement from "./NumberIncrement.vue";
@@ -23,6 +23,7 @@ export default defineComponent({
   setup(props) {
     //initialize the result and question list
     const res = useResultStore();
+    const user = useUserStore();
     const qStore = useQuestionStore();
     const button = useButtonStatusStore();
     const dataLoaded = ref(false);
@@ -40,6 +41,7 @@ export default defineComponent({
     };
 
     onMounted(async () => {
+      await user.checkUserAccount();
       await qStore.fetchDataFromDatabase(props.qType);
       dataLoaded.value = true;
 

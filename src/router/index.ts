@@ -1,6 +1,5 @@
 import { createWebHistory, createRouter } from "vue-router";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import { useUserStore } from "../store";
 
 import Login from "../views/Login.vue";
 import Menu from "../views/Menu.vue";
@@ -22,22 +21,22 @@ const routes = [
   {
     path: "/weekly-10",
     component: Weekly_10,
-    meta: { requiresAuth: true, requiresUserData: true, fromMenu: true },
+    meta: { requiresAuth: true, fromMenu: true },
   },
   {
     path: "/random-10",
     component: Random_10,
-    meta: { requiresAuth: true, requiresUserData: true, fromMenu: true },
+    meta: { requiresAuth: true, fromMenu: true },
   },
   {
     path: "/cat-10",
     component: Cat_10,
-    meta: { requiresAuth: true, requiresUserData: true, fromMenu: true },
+    meta: { requiresAuth: true, fromMenu: true },
   },
   {
     path: "/user-data",
     component: UserProfile,
-    meta: { requiresAuth: true, requiresUserData: true },
+    meta: { requiresAuth: true },
   },
   {
     path: "/result",
@@ -77,20 +76,6 @@ router.beforeEach(async (to: any, from: any) => {
   if (fromMenu && from.path !== "/menu") {
     console.error("錯誤的路徑遷移，重導向至主畫面。");
     return { path: "/menu" };
-  }
-
-  const requiresUserData = to.matched.some(
-    (record: any) => record.meta.requiresUserData
-  );
-  const userStore = useUserStore();
-
-  if (requiresUserData) {
-    try {
-      await userStore.checkUserAccount();
-    } catch (error) {
-      console.error("資料載入失敗，重導向至主畫面。", error);
-      return { path: "/menu" };
-    }
   }
 
   return true;
