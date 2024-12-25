@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, nextTick } from "vue";
+import { defineComponent, ref, watch, nextTick, computed } from "vue";
 import { useRouter } from "vue-router";
 import QuestionButtons from "./QuestionButtons.vue";
 import ResultGrid from "./ResultGrid.vue";
@@ -46,7 +46,7 @@ import { useCheckAnswer, buttonBad, buttonGood } from "../composables";
 import {
   useResultStore,
   useQuestionStore,
-  useButtonStatusStore,
+  useQuestionStateStore,
 } from "../store";
 
 export default defineComponent({
@@ -62,25 +62,26 @@ export default defineComponent({
     // get store data
     const router = useRouter();
     const res = useResultStore();
-    const buttonStatus = useButtonStatusStore();
-    buttonStatus.reset();
+    const questionState = useQuestionStateStore();
+    questionState.reset();
     const qStore = useQuestionStore();
 
     // data for ref
-    const curInd = ref<number>(-1); //zero indexed
-    const displayedText = ref<string>("");
-    const barLength = ref<number>(100);
-    const answerOK = ref<boolean>(false);
+    const answerOK = computed(() => questionState.answerOK);
+    const curInd = computed(() => questionState.curInd);
+    const labelText = computed(() => questionState.labelText);
+    const adjustedCountDownTime = computed(() => questionState.adjustedTime);
+
     const answer = ref<string>("");
-    const labelText = ref<string>("先按鈴 再回答!");
     const answerInput = ref<HTMLInputElement | null>(null);
+    const barLength = ref<number>(100);
+    const displayedText = ref<string>("");
 
     //local var
     var countDownId: number = 0;
     var textDisplayId: number = 0;
     var isCountingDown: boolean = false;
     var isTextDisplaying: boolean = false;
-    var adjustedCountDownTime: number = 0;
 
     const _throttle = (func: Function, limit: number = 100) => {
       let inThrottle: boolean;
@@ -106,8 +107,6 @@ export default defineComponent({
       const startTime = Date.now();
       let lastUpdateTime = startTime;
 
-      answerOK.value = false; //not allow to answer when text displaying
-
       const __updateText = () =>{
         if(!isTextDisplaying){// isTextDisplaying == false means text update has been canceled
           cancelAnimationFrame(textDisplayId);
@@ -118,7 +117,7 @@ export default defineComponent({
           if (speed === displaySpeed) { //nomal display ends
             _startCountDown();
           } else { //fastforward display ends
-            buttonStatus.endQuestion();
+            questionState.endQuestion();
           }
           cancelAnimationFrame(textDisplayId);
           return;
@@ -138,33 +137,10 @@ export default defineComponent({
       textDisplayId = requestAnimationFrame(__updateText); // trigger
     };
 
-    const _changeLabelText = () => {
-      let len = qStore.checkAnswerLength(curInd.value);// get minus number when the first character is not KANJI
-      if (len > 0) {
-        labelText.value = `最佳答案 : 中文${len}字`;
-      } else {
-        labelText.value = `最佳答案 : 非中文${-len}詞`;
-      }
-    };
-
-    const _getAdjustTime = () => { //magic numbers, determine by UX, no special meaning
-      let len = qStore.checkAnswerLength(curInd.value);
-      let adjustedCountDownTime = countDownTime;
-
-      if (len >= 4) {
-        adjustedCountDownTime = countDownTime * 1.4;
-      } else if (len <= 2 && len > 0) {
-        adjustedCountDownTime = countDownTime * 0.8;
-      } else if (len < 0 && Math.abs(len) >= 2) {
-        adjustedCountDownTime = countDownTime * 1.4;
-      }
-      return adjustedCountDownTime;
-    };
-
     const _startCountDown = () => {
       if (isCountingDown) return;
       isCountingDown = true;
-      adjustedCountDownTime = _getAdjustTime();
+      questionState.calculateAdjustTime(countDownTime);
       const start = new Date().getTime();
 
       const __tick = () => {
@@ -175,10 +151,10 @@ export default defineComponent({
 
         const curTime = new Date().getTime() - start;
         barLength.value = Math.floor(
-          Math.max((1 - curTime / (adjustedCountDownTime * 1000)) * 100, 0)
+          Math.max((1 - curTime / (adjustedCountDownTime.value * 1000)) * 100, 0)
         );
 
-        if (curTime > adjustedCountDownTime * 1010) {// timeout
+        if (curTime > adjustedCountDownTime.value  * 1010) {// timeout
           // 1.01x tolerance
           cancelAnimationFrame(countDownId)
           isCountingDown = false;
@@ -202,7 +178,7 @@ export default defineComponent({
     });
 
     const buttonPlusTime = _throttle(() => {
-      adjustedCountDownTime += countDownTime * 2; //magic numbers, determine by UX, no special meaning
+      questionState.plusAdjustedTime(countDownTime); //magic numbers, determine by UX, no special meaning
     });
 
     const buttonPlusText = _throttle(() => {
@@ -215,8 +191,7 @@ export default defineComponent({
 
     const buttonStop = _throttle(() => {
       //when user push the pause button
-      answerOK.value = true; // allow to answer
-      _changeLabelText();
+      questionState.setLabelText();
       _stopDisplayingText();
       _startCountDown();
     });
@@ -224,7 +199,7 @@ export default defineComponent({
     const startDisplayingText = _throttle(() => {
       // start/next button
       displayedText.value = "";
-      curInd.value++; //current local question index
+      questionState.plusCurInd(); //current local question index
 
       if (curInd.value > totalQuestionCount) {
         router.replace("/result");
@@ -242,7 +217,6 @@ export default defineComponent({
     });
 
     const checkAnswer = _throttle(() => {
-      buttonStatus.submitAnswer();
       if (res.getRes(curInd.value).interval === 0) {
         res.setRes(curInd.value, { interval: displayedText.value.length });
       }

@@ -137,7 +137,7 @@ import {
   onMounted,
   onBeforeUnmount,
 } from "vue";
-import { useButtonStatusStore, useUserStore } from "../store";
+import { useQuestionStateStore, useUserStore } from "../store";
 
 export default defineComponent({
   name: "QuestionButtons",
@@ -177,57 +177,57 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const buttonStatus = useButtonStatusStore();
+    const questionState = useQuestionStateStore();
     const user = useUserStore();
 
     const userRating = computed(() =>
       user.getUserRate(Math.min(Math.max(props.curInd, 0), 9))
     );
-    const answerOK = computed(() => buttonStatus.answerOK);
-    const nextOK = computed(() => buttonStatus.nextOK);
-    const stopOK = computed(() => buttonStatus.stopOK);
-    const startOK = computed(() => buttonStatus.startOK);
-    const rateOK = computed(() => buttonStatus.rateOK);
+    const answerOK = computed(() => questionState.answerOK);
+    const nextOK = computed(() => questionState.nextOK);
+    const stopOK = computed(() => questionState.stopOK);
+    const startOK = computed(() => questionState.startOK);
+    const rateOK = computed(() => questionState.rateOK);
     const hintOK = computed(
-      () => buttonStatus.hintOK && !buttonStatus.isWeekly
+      () => questionState.hintOK && !questionState.isWeekly
     );
     const plusTimeOK = computed(
-      () => buttonStatus.plusTimeOK && !buttonStatus.isWeekly
+      () => questionState.plusTimeOK && !questionState.isWeekly
     );
     const plusTextOK = computed(
-      () => buttonStatus.plusTextOK && !buttonStatus.isWeekly
+      () => questionState.plusTextOK && !questionState.isWeekly
     );
     const funcsOK = computed(
-      () => !buttonStatus.isWeekly && buttonStatus.answerOK
+      () => !questionState.isWeekly && questionState.answerOK
     );
 
     const pauseQuestion = () => {
-      buttonStatus.pauseQuestion();
+      questionState.pauseQuestion();
       props.onPause && props.onPause();
     };
 
     const displayNextQuestion = () => {
-      buttonStatus.displayQuestion();
+      questionState.displayQuestion();
       props.onNext && props.onNext();
     };
 
     const checkAnswer = () => {
-      buttonStatus.submitAnswer();
+      questionState.submitAnswer();
       props.onAnswer && props.onAnswer();
     };
 
     const getOneWord = () => {
-      buttonStatus.hintOK = false;
+      questionState.hintOK = false;
       props.onHint && props.onHint();
     };
 
     const plusTime = () => {
-      buttonStatus.plusTimeOK = false;
+      questionState.plusTimeOK = false;
       props.onPlusTime && props.onPlusTime();
     };
 
     const plusText = () => {
-      buttonStatus.plusTextOK = false;
+      questionState.plusTextOK = false;
       props.onPlusText && props.onPlusText();
     };
 

@@ -8,7 +8,7 @@ storeq<template>
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted, ref, computed } from "vue";
-import { useResultStore, useQuestionStore, useButtonStatusStore, useUserStore } from "../store";
+import { useResultStore, useQuestionStore, useQuestionStateStore, useUserStore } from "../store";
 import QuestionDisplay from "./QuestionDisplay.vue";
 import Loading from "./Loading.vue";
 import NumberIncrement from "./NumberIncrement.vue";
@@ -25,7 +25,7 @@ export default defineComponent({
     const res = useResultStore();
     const user = useUserStore();
     const qStore = useQuestionStore();
-    const button = useButtonStatusStore();
+    const button = useQuestionStateStore();
     const dataLoaded = ref(false);
     const total = computed(() => res.total);
 
