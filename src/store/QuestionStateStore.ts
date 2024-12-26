@@ -15,6 +15,7 @@ export const useQuestionStateStore = defineStore("QuestionState", {
     curInd: -1,
     labelText: "先按鈴 再回答!",
     adjustedTime: 0,
+    displaySpeed: 0,
   }),
   actions: {
     setType(type: string) {
@@ -94,6 +95,10 @@ export const useQuestionStateStore = defineStore("QuestionState", {
       this.adjustedTime += countDownTime * 2;
     },
 
+    setDisplaySpeed(speed:number) {
+      this.displaySpeed = speed;
+    },
+
     reset() {
       this.startOK = true;
 
@@ -109,6 +114,7 @@ export const useQuestionStateStore = defineStore("QuestionState", {
       this.curInd = -1; //zero indexed
       this.labelText = "先按鈴 再回答!";
       this.adjustedTime = 0;
+      this.displaySpeed = 0;
     },
   },
 });

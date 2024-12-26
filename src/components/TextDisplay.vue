@@ -3,7 +3,8 @@
 </template>
   
 <script lang="ts">
-  import { defineComponent, ref, watch } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
+import { useQuestionStateStore } from "../store";
   
   export default defineComponent({
     name: "TextDisplay",
@@ -16,14 +17,12 @@
         type: Number,
         default: 120, // ms/chr
       },
-      displaySpeed: {
-        type: Number,
-        default: 120, // ms/chr
-      },
     },
     emits: ["countdown", "finish"],
     setup(props, { emit }) {
+      const qState = useQuestionStateStore();
       const normalSpeed = props.normalSpeed;
+      const displaySpeed = computed(() => qState.displaySpeed);
 
       const displayedText = ref("");
       var isTextDisplaying = false;
@@ -79,9 +78,8 @@
         let p = Math.max(Math.ceil(allLen / 10), 5); //magic numbers, determine by UX, no special meaning
         displayedText.value = qt.slice(0, Math.min(curText.length + p, allLen));
       };
-
-      watch(() => props.displaySpeed, () => {
-        let speed = props.displaySpeed;
+      watch(displaySpeed, (newValue: number) => {
+        let speed = newValue;
         if(speed === 0){
           isTextDisplaying = false;
         }
