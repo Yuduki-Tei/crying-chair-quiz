@@ -9,7 +9,6 @@
       <TextDisplay class="mt-1"
         :fullText="fullText"
         :normalSpeed="normalSpeed"
-        :displaySpeed="displaySpeed"
         @countdown="startCountDown"
         @finish="onFinish"
       />
@@ -51,7 +50,6 @@ import CountdownBar from "./CountdownBar.vue";
 import TextDisplay from "./TextDisplay.vue";
 import { useCheckAnswer, buttonBad, buttonGood } from "../composables";
 import {
-  useResultStore,
   useQuestionStore,
   useQuestionStateStore,
 } from "../store";
@@ -68,28 +66,26 @@ export default defineComponent({
 
     // get store data
     const router = useRouter();
-    const res = useResultStore();
-    const questionState = useQuestionStateStore();
+    const qState = useQuestionStateStore();
     const qStore = useQuestionStore();
 
     // data for ref
-    const answerOK = computed(() => questionState.answerOK);
-    const curInd = computed(() => questionState.curInd);
-    const labelText = computed(() => questionState.labelText);
+    const answerOK = computed(() => qState.answerOK);
+    const curInd = computed(() => qState.curInd);
+    const labelText = computed(() => qState.labelText);
 
     const fullText = ref<string>("");
-    const displaySpeed = ref<number>(0); // pass to TextDisplay, 0:stop, 1:use textPlus(), else just uset the speed to display
     const answer = ref<string>("");
     const answerInput = ref<HTMLInputElement | null>(null);
     const barLength = ref<number>(100);
 
     //local var
-    const adjustedCountDownTime = computed(() => questionState.adjustedTime);
+    const adjustedCountDownTime = computed(() => qState.adjustedTime);
     var countDownId: number = 0;
     var isCountingDown: boolean = false;
     var curPos: number = 0; // log current position when pause
 
-    questionState.reset();
+    qState.reset();
 
     const _throttle = (func: Function, limit: number = 100) => {
       let inThrottle: boolean;
@@ -105,9 +101,8 @@ export default defineComponent({
     const startCountDown = (pos: number) => {
       if (isCountingDown) return;
       isCountingDown = true;
-      questionState.calculateAdjustTime(countDownTime);
+      qState.calculateAdjustTime(countDownTime);
       const start = new Date().getTime();
-      res.setRes(curInd.value, { interval: pos });
       curPos = pos;
 
       const _tick = () => {
@@ -139,22 +134,22 @@ export default defineComponent({
     });
 
     const buttonPlusTime = _throttle(() => {
-      questionState.plusAdjustedTime(countDownTime);
+      qState.plusAdjustedTime(countDownTime);
     });
 
     const buttonPlusText = _throttle(() => {
-      displaySpeed.value = 1;
+      qState.setDisplaySpeed(1);
     });
 
     const buttonStop = _throttle(() => {
       //when user push the pause button
-      questionState.setLabelText();
-      displaySpeed.value = 0;
+      qState.setLabelText();
+      qState.setDisplaySpeed(0);
     });
 
     const startDisplayingText = _throttle(() => {
       // start/next button
-      questionState.plusCurInd(); //current local question index
+      qState.plusCurInd(); //current local question index
 
       if (curInd.value > totalQuestionCount) {
         router.replace("/result");
@@ -164,25 +159,22 @@ export default defineComponent({
       fullText.value = qStore.getQuestion(curInd.value).q_text;
       barLength.value = 100;
       answer.value = ""; //init countdown bar and answer value
-      displaySpeed.value = normalSpeed;
+      qState.setDisplaySpeed(normalSpeed);
     });
 
     const checkAnswer = _throttle(() => {
-      if (res.getRes(curInd.value).interval === 0) {
-        res.setRes(curInd.value, { interval: fullText.value.length });
-      }
       cancelAnimationFrame(countDownId);
       isCountingDown = false; //cancel countdown
 
-      useCheckAnswer(curInd.value, answer.value); //check if the answer is right and write the result to store
-      displaySpeed.value = fastForwardSpeed;
+      useCheckAnswer(curInd.value, answer.value, curPos); //check if the answer is right and write the result to store
+      qState.setDisplaySpeed(fastForwardSpeed);
     });
 
     const onFinish = () =>{
-      questionState.endQuestion();
+      qState.endQuestion();
     }
 
-    watch(answerOK, async (newValue) => { //auto focus when input box appears
+    watch(answerOK, async (newValue: boolean) => { //auto focus when input box appears
       if (newValue) {
         await nextTick();
         answerInput.value?.focus();
@@ -208,7 +200,6 @@ export default defineComponent({
       answerOK,
       barLength,
       normalSpeed,
-      displaySpeed,
     };
   },
 });
