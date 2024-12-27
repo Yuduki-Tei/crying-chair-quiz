@@ -12,7 +12,8 @@ export const useQuestionStateStore = defineStore("QuestionState", {
     plusTimeOK: false,
     plusTextOK: false,
     rateOK: false,
-    curInd: -1,
+    curInd: -1, // beacuse the [start] and [next] button are same button, and curInd plus 1 when the button be pressed, so the init value is -1
+    curPos: 0,
     labelText: "先按鈴 再回答!",
     adjustedTime: 0,
     displaySpeed: 0,
@@ -99,6 +100,10 @@ export const useQuestionStateStore = defineStore("QuestionState", {
       this.displaySpeed = speed;
     },
 
+    setCurPos(pos : number) {
+      this.curPos = pos;
+    },
+
     reset() {
       this.startOK = true;
 
@@ -111,7 +116,8 @@ export const useQuestionStateStore = defineStore("QuestionState", {
       this.plusTimeOK = !this.isWeekly;
       this.plusTextOK = !this.isWeekly;
 
-      this.curInd = -1; //zero indexed
+      this.curInd = -1;
+      this.curPos = 0;
       this.labelText = "先按鈴 再回答!";
       this.adjustedTime = 0;
       this.displaySpeed = 0;
