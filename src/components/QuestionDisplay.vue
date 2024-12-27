@@ -73,7 +73,7 @@ export default defineComponent({
     const answerOK = computed(() => qState.answerOK);
     const curInd = computed(() => qState.curInd);
     const labelText = computed(() => qState.labelText);
-
+    
     const fullText = ref<string>("");
     const answer = ref<string>("");
     const answerInput = ref<HTMLInputElement | null>(null);
@@ -83,7 +83,6 @@ export default defineComponent({
     const adjustedCountDownTime = computed(() => qState.adjustedTime);
     var countDownId: number = 0;
     var isCountingDown: boolean = false;
-    var curPos: number = 0; // log current position when pause
 
     qState.reset();
 
@@ -103,7 +102,7 @@ export default defineComponent({
       isCountingDown = true;
       qState.calculateAdjustTime(countDownTime);
       const start = new Date().getTime();
-      curPos = pos;
+      qState.setCurPos(pos);
 
       const _tick = () => {
         if (!isCountingDown){
@@ -155,7 +154,7 @@ export default defineComponent({
         router.replace("/result");
         return;
       } //to result page when the session ends
-      curPos = 0;
+      qState.setCurPos(0);
       fullText.value = qStore.getQuestion(curInd.value).q_text;
       barLength.value = 100;
       answer.value = ""; //init countdown bar and answer value
@@ -166,7 +165,7 @@ export default defineComponent({
       cancelAnimationFrame(countDownId);
       isCountingDown = false; //cancel countdown
 
-      useCheckAnswer(curInd.value, answer.value, curPos); //check if the answer is right and write the result to store
+      useCheckAnswer(curInd.value, answer.value, qState.curPos); //check if the answer is right and write the result to store
       qState.setDisplaySpeed(fastForwardSpeed);
     });
 
