@@ -46,7 +46,7 @@
 
 <script>
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
-import { useQuestionStore, useResultStore, useButtonStatusStore } from "../store";
+import { useQuestionStore, useResultStore, useQuestionStateStore } from "../store";
 import { buttonGood, buttonBad } from "../composables";
 import Carousel from 'bootstrap/js/dist/carousel';
 import ResultGrid from "./ResultGrid.vue";
@@ -61,7 +61,7 @@ export default defineComponent({
     const userAns = new Array();
     const qStore = useQuestionStore();
     const res = useResultStore();
-    const button = useButtonStatusStore();
+    const button = useQuestionStateStore();
     const currentIdx = ref(0);
     let carouselInstance = null;
     

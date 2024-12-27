@@ -1,11 +1,12 @@
 import { useResultStore, useQuestionStore, useUserStore } from "../store";
 import { getBit, setBit, fromBase64, toBase64 } from "./index";
 
-export function useCheckAnswer(qInd: number, ans: string) {
+export function useCheckAnswer(qInd: number, ans: string, interval: number) {
   const res = useResultStore();
   const qStore = useQuestionStore();
   const qData = qStore.getQuestion(qInd);
 
+  setInterval(qInd, interval, qStore, res);
   updateResultStore(qInd, qStore, ans, res);
   updateLocalAnswerBit(qInd, qData.qid, res);
   if (res.getRes(qInd).correct) {
@@ -29,6 +30,15 @@ export function getQid(qInd: number) {
   const qStore = useQuestionStore();
   const qid = qStore.getQuestion(qInd).qid;
   return qid;
+}
+
+function setInterval(qInd: number, interval: number, qStore: any, res: any) {
+  if (interval === 0) {
+    res.setRes(qInd, { interval: qStore.getQuestion(qInd).q_text.length});
+  }
+  else {
+    res.setRes(qInd, { interval: interval });
+  }
 }
 
 function updateResultStore(qInd: number, qStore: any, ans: string, res: any) {
