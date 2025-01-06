@@ -30,6 +30,7 @@
   </div>
   <QuestionButtons
     :curInd="curInd"
+    :curAns="answer"
     :onPause="buttonStop"
     :onNext="startDisplayingText"
     :onAnswer="checkAnswer"

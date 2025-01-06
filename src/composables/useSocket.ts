@@ -14,7 +14,7 @@ export function useSocket(url:string) {
     socket.value?.on(event, callback);
   };
   
-  const emitEvent = (event: string, data: any) => {
+  const emitEvent = (event: string, data?: any) => {
     socket.value?.emit(event, data);
   };
 
