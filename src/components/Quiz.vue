@@ -30,7 +30,6 @@ export default defineComponent({
     const total = computed(() => res.total);
 
     res.clearDataList();
-    res.setType(props.qType);
     res.initDataList();
 
     button.setType(props.qType);
