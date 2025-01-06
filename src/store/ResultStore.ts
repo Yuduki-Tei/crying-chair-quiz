@@ -9,14 +9,10 @@ interface resData {
 
 export const useResultStore = defineStore("Result", {
   state: () => ({
-    isWeekly: false, //status to check if function buttons are available
     total: 0,
     dataList: [] as resData[],
   }),
   actions: {
-    setType(type: string) {
-      this.isWeekly = type === "weekly";
-    },
     initDataList() {
       var data = Array.from({ length: 10 }, () => ({
         answer: "",
@@ -30,7 +26,6 @@ export const useResultStore = defineStore("Result", {
     clearDataList() {
       this.total = 0;
       this.dataList = [];
-      this.isWeekly = false;
     },
     getRes(index: number) {
       if (index >= 0 && index < this.dataList.length) {
