@@ -137,8 +137,7 @@ import {
   onMounted,
   onBeforeUnmount,
 } from "vue";
-import { useQuestionStateStore, useUserStore } from "../store";
-import { useSocket } from "../composables";
+import { useQuestionStateStore, useUserStore, useSocketStore } from "../store";
 
 export default defineComponent({
   name: "QuestionButtons",
@@ -181,7 +180,7 @@ export default defineComponent({
   setup(props) {
     const qState = useQuestionStateStore();
     const user = useUserStore();
-    const {emitEvent, socketConnected } = useSocket('https://hfffcf-5000.csb.app/');
+    const socket = useSocketStore();
 
     const userRating = computed(() =>
       user.getUserRate(Math.min(Math.max(props.curInd, 0), 9))
@@ -194,29 +193,30 @@ export default defineComponent({
     const hintOK = computed(() => qState.hintOK && !qState.isWeekly);
     const plusTimeOK = computed(() => qState.plusTimeOK && !qState.isWeekly);
     const plusTextOK = computed(() => qState.plusTextOK && !qState.isWeekly);
-    const funcsOK = computed(() => !qState.isWeekly && qState.answerOK);
+    const funcsOK = computed(() => !qState.isWeekly && qState.answerOK && !socket.socketConnected);
 
     const pauseQuestion = () => {
       qState.pauseQuestion();
       props.onPause && props.onPause();
-      if (socketConnected){
-        emitEvent('sync_pause', qState.curPos);
+      if (socket.socketConnected){
+        console.log('emit sync_pause', qState.curPos);
+        socket.emitEvent('sync_pause', qState.curPos);
       }
     };
 
     const displayNextQuestion = () => {
       qState.displayQuestion();
       props.onNext && props.onNext();
-      if (socketConnected){
-        emitEvent('sync_ready');
+      if (socket.socketConnected){
+        socket.emitEvent('sync_ready');
       }
     };
 
     const checkAnswer = () => {
       qState.submitAnswer();
       props.onAnswer && props.onAnswer();
-      if (socketConnected){
-        emitEvent('sync_answer', props.curAns);
+      if (socket.socketConnected){
+        socket.emitEvent('sync_answer', props.curAns);
       }
     };
 

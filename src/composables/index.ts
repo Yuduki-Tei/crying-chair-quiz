@@ -9,4 +9,3 @@ export {
   compareBitArrays,
   orBitArrays,
 } from "./useBit.ts";
-export { useSocket } from './useSocket.ts';
