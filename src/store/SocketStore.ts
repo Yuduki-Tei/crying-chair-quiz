@@ -14,12 +14,10 @@ export const useSocketStore = defineStore('Socket',{
 
         this.socket.on('connect', () => {
           this.socketConnected = true;
-          console.log('Socket connected');
         });
 
         this.socket.on('disconnect', () => {
           this.socketConnected = false;
-          console.log('Socket disconnected');
         });
       }
     },
@@ -27,8 +25,6 @@ export const useSocketStore = defineStore('Socket',{
     onEvent(event: string, callback?: (data: any) => void) {
       this.socket?.on(event, (data: any) => {
         this.message = data;
-        console.log(`Received message for event ${event}:`, data);
-
         if (callback) {
           callback(data);
         }
