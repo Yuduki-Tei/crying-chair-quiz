@@ -21,13 +21,7 @@ export default defineComponent({
       qState.pauseQuestion()
       qState.setDisplaySpeed(0)
     }
-
-    onMounted(() => {
-      socket.onEvent('sync_pause', onSyncPause)
-    })
-    return {
-      socketConnected,
-    };
+    socket.onEvent('pause_synced', onSyncPause)
   },
 });
 </script>

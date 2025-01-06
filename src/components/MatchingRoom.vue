@@ -1,36 +1,42 @@
 <template>
   <div class="text-center">
-      <button @click="connectSocket" :disabled="socketConnected">連</button>
-      <button @click="disconnectSocket" :disabled="!socketConnected">斷</button>
-      <button @click="createRoom" :disabled="!socketConnected">開</button>
-      <button @click="joinRoom" :disabled="!socketConnected">加</button>
-      <button @click="leaveRoom" :disabled="!socketConnected">離</button>
+      <button @click="connectSocket" :disabled="connected">連</button>
+      <button @click="disconnectSocket" :disabled="!connected">斷</button>
+      <button @click="createRoom" :disabled="!connected">開</button>
+      <button @click="joinRoom" :disabled="!connected">加</button>
+      <button @click="leaveRoom" :disabled="!connected">離</button>
 
-    <p v-if="socketConnected">WebSocket 已連接</p>
-    <p v-if="!socketConnected">WebSocket 尚未連接</p>
+    <p v-if="connected">WebSocket 已連接</p>
+    <p v-if="!connected">WebSocket 尚未連接</p>
 
     <div>
       <p>接收到的訊息：</p>
-      <pre>{{ message }}</pre>
+      <p>{{ message }}</p>
     </div>
   </div>
 </template>
 
 <script>
-import { defineComponent, ref, onMounted, computed } from 'vue';
+import { defineComponent, ref, onUnmounted, computed } from 'vue';
 import { useSocketStore } from '../store';
 
 export default defineComponent({
   name: 'MatchingRoom',
   setup() {
     const socket = useSocketStore();
+    const connected = computed(() => socket.socketConnected)
     const message = computed(() => socket.message);
 
     const createRoom = () => {
+      socket.onEvent('room_created')
+      socket.onEvent('room_joined')
+      socket.onEvent('room_left')
       socket.emitEvent('create_room')
     }
 
     const joinRoom = () => {
+      socket.onEvent('room_joined')
+      socket.onEvent('room_left')
       let roomId = prompt('enter room id')
       socket.emitEvent('join_room', roomId)
     }
@@ -46,6 +52,13 @@ export default defineComponent({
     const disconnectSocket = () =>{
       socket.disconnect()
     }
+    onUnmounted(() => {
+      if (socket.value) {
+        socket.value.removeAllListeners();
+        disconnectSocket();
+      }
+    });
+
     return {
       connectSocket,
       disconnectSocket,
@@ -53,7 +66,7 @@ export default defineComponent({
       joinRoom,
       leaveRoom,
       message,
-      socketConnected,
+      connected,
     };
   },
 });
