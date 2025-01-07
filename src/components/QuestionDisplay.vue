@@ -3,12 +3,13 @@
     class="container px-1 py-1 d-block justify-content-center"
     style="max-width: 450px"
   >
-    <CountdownBar :barLength="barLength" />
+    <Countdown :countdownTime= "countdownTime" :ansLen="ansLen" :state="countdownState" @checkAnswer="checkAnswer" />
     <ResultGrid :act="curInd" />
     <div class="row border m-auto" style="min-width: 280px; min-height: 180px">
       <TextDisplay class="mt-1"
         :fullText="fullText"
         :normalSpeed="normalSpeed"
+        :displaySpeed="displaySpeed"
         @countdown="startCountDown"
         @finish="onFinish"
       />
@@ -47,7 +48,7 @@ import { defineComponent, ref, watch, nextTick, computed } from "vue";
 import { useRouter } from "vue-router";
 import QuestionButtons from "./QuestionButtons.vue";
 import ResultGrid from "./ResultGrid.vue";
-import CountdownBar from "./CountdownBar.vue";
+import Countdown from "./Countdown.vue";
 import TextDisplay from "./TextDisplay.vue";
 import { useCheckAnswer, buttonBad, buttonGood } from "../composables";
 import {
@@ -57,10 +58,10 @@ import {
 
 export default defineComponent({
   name: "QuestionDisplay",
-  components: { QuestionButtons, ResultGrid, CountdownBar, TextDisplay },
+  components: { QuestionButtons, ResultGrid, Countdown, TextDisplay },
   setup() {
     // the time, and question numbers
-    const countDownTime: number = 15; //seconds
+    const countdownTime: number = 15; //seconds
     const normalSpeed: number = 120; // miliseconds / chr
     const fastForwardSpeed: number = 30; // miliseconds / chr
     const totalQuestionCount: number = 9; //zero indexed
@@ -70,20 +71,21 @@ export default defineComponent({
     const qState = useQuestionStateStore();
     const qStore = useQuestionStore();
 
-    // data for ref
+    // props
+    const ansLen = ref<number>(0);
+    const countdownState = ref<string>("");
+    const displaySpeed = ref<number>(0);
+
+    // ref
     const answerOK = computed(() => qState.answerOK);
-    const curInd = computed(() => qState.curInd);
-    const labelText = computed(() => qState.labelText);
-    
+    const curInd = ref<number>(-1);
+    const labelText = ref<string>("");
     const fullText = ref<string>("");
     const answer = ref<string>("");
     const answerInput = ref<HTMLInputElement | null>(null);
-    const barLength = ref<number>(100);
 
-    //local var
-    const adjustedCountDownTime = computed(() => qState.adjustedTime);
-    var countDownId: number = 0;
-    var isCountingDown: boolean = false;
+    // local var
+    var curPos:number = 0;
 
     qState.reset();
 
@@ -99,75 +101,61 @@ export default defineComponent({
     };
 
     const startCountDown = (pos: number) => {
-      if (isCountingDown) return;
-      isCountingDown = true;
-      qState.calculateAdjustTime(countDownTime);
-      const start = new Date().getTime();
-      qState.setCurPos(pos);
-
-      const _tick = () => {
-        if (!isCountingDown){
-          cancelAnimationFrame(countDownId)
-          return; //isCountingDown == false means the countdown has been canceled
-        }
-
-        const curTime = new Date().getTime() - start;
-        barLength.value = Math.floor(
-          Math.max((1 - curTime / (adjustedCountDownTime.value * 1000)) * 100, 0)
-        );
-
-        if (curTime > adjustedCountDownTime.value  * 1010) {// timeout
-          // 1.01x tolerance
-          cancelAnimationFrame(countDownId)
-          isCountingDown = false;
-          checkAnswer();
-        } else {
-          countDownId = requestAnimationFrame(_tick); // recursive functioncall
-        }
-      };
-      countDownId = requestAnimationFrame(_tick); // trigger
+      curPos = pos;
+      ansLen.value = qStore.checkAnswerLength(curInd.value);
+      countdownState.value = "start";
     };
 
-    const buttonHint = _throttle(() => {
+    const buttonHint = () => {
       let firstWord = qStore.getOneWordOfAnswer(curInd.value);
       answer.value = firstWord;
-    });
+    };
 
-    const buttonPlusTime = _throttle(() => {
-      qState.plusAdjustedTime(countDownTime);
-    });
+    const buttonPlusTime = () => {
+      countdownState.value = "plus";
+    };
 
     const buttonPlusText = _throttle(() => {
-      qState.setDisplaySpeed(1);
+      displaySpeed.value = 1;
     });
+
+    const setLabelText = () => {
+      const qStore = useQuestionStore();
+      ansLen.value = qStore.checkAnswerLength(curInd.value);// get minus number when the first character is not KANJI
+      if (ansLen.value > 0) {
+        labelText.value = `最佳答案 : 中文${ansLen.value}字`;
+      } else {
+        labelText.value = `最佳答案 : 非中文${-ansLen.value}詞`;
+      }
+    };
 
     const buttonStop = _throttle(() => {
       //when user push the pause button
-      qState.setLabelText();
-      qState.setDisplaySpeed(0);
+      setLabelText();
+      countdownState.value = "start";
+      displaySpeed.value = 0;
     });
 
     const startDisplayingText = _throttle(() => {
       // start/next button
-      qState.plusCurInd(); //current local question index
+      curInd.value ++; //current local question index
 
       if (curInd.value > totalQuestionCount) {
         router.replace("/result");
         return;
       } //to result page when the session ends
-      qState.setCurPos(0);
+      curPos = 0;
       fullText.value = qStore.getQuestion(curInd.value).q_text;
-      barLength.value = 100;
+      countdownState.value = "reset";
       answer.value = ""; //init countdown bar and answer value
-      qState.setDisplaySpeed(normalSpeed);
+      displaySpeed.value = normalSpeed;
     });
 
     const checkAnswer = _throttle(() => {
-      cancelAnimationFrame(countDownId);
-      isCountingDown = false; //cancel countdown
+      countdownState.value = "stop";
 
-      useCheckAnswer(curInd.value, answer.value, qState.curPos); //check if the answer is right and write the result to store
-      qState.setDisplaySpeed(fastForwardSpeed);
+      useCheckAnswer(curInd.value, answer.value, curPos); //check if the answer is right and write the result to store
+      displaySpeed.value = fastForwardSpeed;
     });
 
     const onFinish = () =>{
@@ -196,10 +184,13 @@ export default defineComponent({
       labelText,
       answerInput,
       curInd,
+      ansLen,
       answer,
       answerOK,
-      barLength,
+      countdownState,
+      countdownTime,
       normalSpeed,
+      displaySpeed,
     };
   },
 });

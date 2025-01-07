@@ -198,26 +198,26 @@ export default defineComponent({
     const pauseQuestion = () => {
       qState.pauseQuestion();
       props.onPause && props.onPause();
-      if (socket.socketConnected){
-        console.log('emit sync_pause', qState.curPos);
-        socket.emitEvent('sync_pause', qState.curPos);
-      }
+      // if (socket.socketConnected){
+      //   console.log('emit sync_pause', qState.curPos);
+      //   socket.emitEvent('sync_pause', qState.curPos);
+      // }
     };
 
     const displayNextQuestion = () => {
       qState.displayQuestion();
       props.onNext && props.onNext();
-      if (socket.socketConnected){
-        socket.emitEvent('sync_ready');
-      }
+      // if (socket.socketConnected){
+      //   socket.emitEvent('sync_ready');
+      // }
     };
 
     const checkAnswer = () => {
       qState.submitAnswer();
       props.onAnswer && props.onAnswer();
-      if (socket.socketConnected){
-        socket.emitEvent('sync_answer', props.curAns);
-      }
+      // if (socket.socketConnected){
+      //   socket.emitEvent('sync_answer', props.curAns);
+      // }
     };
 
     const getOneWord = () => {

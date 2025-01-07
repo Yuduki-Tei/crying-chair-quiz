@@ -19,7 +19,7 @@ export default defineComponent({
     const onSyncPause = () => {
       consloe.log('sync paused')
       qState.pauseQuestion()
-      qState.setDisplaySpeed(0)
+      // qState.setDisplaySpeed(0)
     }
     socket.onEvent('pause_synced', onSyncPause)
   },
