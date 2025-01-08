@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 export const useQuestionStateStore = defineStore("QuestionState", {
   state: () => ({
     isWeekly: true,
+    isBattle: false,
     answerOK: false,
     nextOK: false,
     startOK: true,
@@ -15,6 +16,7 @@ export const useQuestionStateStore = defineStore("QuestionState", {
   actions: {
     setType(type: string) {
       this.isWeekly = type === "weekly";
+      this.isBattle = type === "battle";
     },
     displayQuestion() {
       // when push the start button
