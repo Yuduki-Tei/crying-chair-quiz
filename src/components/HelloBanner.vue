@@ -3,11 +3,8 @@
     <p class="mb-1">
       這是一個開發中的Web App，有任何問題都可以從意見表單反映。
     </p>
-    <p class="mt-2 mb-0">2024/10/28</p>
-    <li>修正了新倒數方式的小bug。</li>
-    <p class="mt-2 mb-0">2024/10/27</p>
-    <li>更新了每週問題，本週也是關聯題組。</li>
-    <li>大改了存取資料庫與localStorage的使用的方式。</li>
+    <p class="mt-2 mb-0">2024/11/24</p>
+    <li>更新每周十題，是用我在看某部作品的時候看到的keyword出的。</li>
     <p class="mt-2 me-5 text-end">by dev</p>
   </Modal>
 </template>
@@ -19,7 +16,7 @@ export default defineComponent({
   name: "HelloBanner",
   components: { Modal },
   setup() {
-    const helloID = "20241028";
+    const helloID = "20241124";
     const showModal = ref<boolean>(true);
 
     if (

@@ -3,9 +3,10 @@
 </template>
   
 <script lang="ts">
-import { defineComponent, ref, watch } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
+import { useQuestionStateStore } from "../store";
   
-export default defineComponent({
+  export default defineComponent({
     name: "TextDisplay",
     props: {
       fullText: {
@@ -16,14 +17,12 @@ export default defineComponent({
         type: Number,
         default: 120, // ms/chr
       },
-      displaySpeed: {
-        type: Number,
-        default: 120, // ms/chr
-      },
     },
     emits: ["countdown", "finish"],
     setup(props, { emit }) {
+      const qState = useQuestionStateStore();
       const normalSpeed = props.normalSpeed;
+      const displaySpeed = computed(() => qState.displaySpeed);
 
       const displayedText = ref("");
       var isTextDisplaying = false;
@@ -44,14 +43,14 @@ export default defineComponent({
         let lastUpdateTime = startTime;
         const _updateText = () =>{
           if(!isTextDisplaying){// isTextDisplaying == false means text update has been canceled
-            emit("countdown");
+            emit("countdown", curText.length);
             cancelAnimationFrame(textDisplayId);
             return;
           }
 
           if (char >= props.fullText.length) {
             if (speed === normalSpeed) { //nomal display ends
-              emit("countdown");
+              emit("countdown", curText.length);
             } else { //fastforward display ends
               emit("finish");
               clearAll = true;
@@ -73,29 +72,27 @@ export default defineComponent({
         textDisplayId = requestAnimationFrame(_updateText); // trigger
       };
 
-      const getCurPos = () => curText.length;
-
       const textPlus = () => {
         let qt = props.fullText;
         let allLen = qt.length;
         let p = Math.max(Math.ceil(allLen / 10), 5); //magic numbers, determine by UX, no special meaning
         displayedText.value = qt.slice(0, Math.min(curText.length + p, allLen));
       };
-      watch(() => props.displaySpeed, (newValue: number) => {
-        if(newValue === 0){
+      watch(displaySpeed, (newValue: number) => {
+        let speed = newValue;
+        if(speed === 0){
           isTextDisplaying = false;
         }
-        else if(newValue === 1){
+        else if(speed === 1){
           textPlus();
         }
         else{
-          displayTextByCharacter(newValue);
+          displayTextByCharacter(speed);
         }
       });
 
     return {
       displayedText,
-      getCurPos
     };
 
     },

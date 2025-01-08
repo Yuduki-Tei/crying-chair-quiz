@@ -1,4 +1,4 @@
-export { useCheckAnswer, checkOpponentAnswer, buttonGood, buttonBad, getQid } from "./check.ts";
+export { useCheckAnswer, buttonGood, buttonBad, getQid } from "./check.ts";
 export {
   setBit,
   getBit,
