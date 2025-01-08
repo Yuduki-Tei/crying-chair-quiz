@@ -1,15 +1,7 @@
 import { defineStore } from "pinia";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  increment,
-  updateDoc,
-  writeBatch,
-} from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-import { getBit, fromBase64, compareBitArrays, getQid } from "../composables";
+import axios from "axios";
+import { getFirebaseIdToken } from "../services/firebase";
+import { getBit, fromBase64, getQid } from "../composables";
 
 interface userData {
   uid: string;
@@ -24,8 +16,8 @@ interface userData {
 
 export const useUserStore = defineStore("User", {
   state: () => ({
-    snapShot: {} as userData,
     dataList: {} as userData,
+    apiUrl: import.meta.env.VITE_BACKEND_API_URL,
   }),
   actions: {
     resetStore() {
@@ -48,180 +40,48 @@ export const useUserStore = defineStore("User", {
       return rate;
     },
 
+    async _updateUserData(data: Record<string, any>) {
+      try {
+        await axios.put(
+          `${this.apiUrl}/user-data`,
+          { ...data },
+          {
+            headers: {
+              Authorization: await getFirebaseIdToken(),
+            },
+          }
+        );
+      } catch (error) {
+        console.error("Error updating user data", error);
+      }
+    },
+
     async checkUserAccount() {
-      const user = getAuth().currentUser;
-      if (!user) {
-        console.error("no user found");
-        return;
-      }
-      const db = getFirestore();
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-      if (!userDoc.exists()) {
-        await setDoc(userDocRef, {
-          uid: user.uid || "",
-          user_name: user.displayName || "",
-          user_mail: user.email || "",
-          answer_history: "",
-          correct_history: "",
-          bad_history: "",
-          good_history: "",
-          last_active_time: "",
+      try {
+        const response = await axios.get(`${this.apiUrl}/user-data`, {
+          headers: {
+            Authorization: await getFirebaseIdToken(),
+          },
         });
-      } else {
-        const data = userDoc.data();
-        this.dataList = {
-          uid: data.uid,
-          user_name: data.user_name || "",
-          user_mail: data.user_mail || "",
-          answer_history: data.answer_history || "",
-          correct_history: data.correct_history || "",
-          bad_history: data.bad_history || "",
-          good_history: data.good_history || "",
-          last_active_time: data.last_active_time || "",
-        };
-        this.snapShot = {...this.dataList};
+        this.dataList = response.data;
+      } catch (error) {
+        console.error("Error fetching user data", error);
       }
+    },
+
+    async updateRes() {
+      let data = {
+        answer_history: this.dataList.answer_history,
+        correct_history: this.dataList.correct_history,
+        bad_history: this.dataList.bad_history,
+        good_history: this.dataList.good_history,
+        last_active_time: new Date().toLocaleString("sv-SE"),
+      };
+      await this._updateUserData(data);
     },
 
     async updateUserName(name: string) {
-      const db = getFirestore();
-      const user = getAuth().currentUser;
-      if (!user) {
-        console.error("no user found");
-        return;
-      }
-      const userDocRef = doc(db, "users", user.uid);
-      const updates = {
-        user_name: name,
-      };
-      await updateDoc(userDocRef, updates);
-    },
-
-    async updateResToDatabase() {
-      if (
-        this.snapShot.last_active_time &&
-        this.dataList.last_active_time &&
-        this.snapShot.last_active_time.trim() !=
-          this.dataList.last_active_time.trim() // when user is tyring to upload an old version data
-      ) {
-        console.error("data version mismatch, roll back to online data");
-        this.dataList = this.snapShot;
-        return;
-      }
-
-      let ans_diff =
-        this.dataList.answer_history !== this.snapShot.answer_history;
-      let rate_diff =
-        this.dataList.bad_history !== this.snapShot.bad_history ||
-        this.dataList.good_history !== this.snapShot.good_history;
-      if (!ans_diff && !rate_diff) {
-        //same result as old data, no need to upload
-        return;
-      } else {
-        const db = getFirestore();
-        const userDocRef = doc(db, "users", this.dataList.uid);
-
-        const updatedData = {
-          answer_history: this.dataList.answer_history,
-          correct_history: this.dataList.correct_history,
-          bad_history: this.dataList.bad_history,
-          good_history: this.dataList.good_history,
-          last_active_time: new Date().toLocaleString("sv-SE"), //only this format can get correct != result somehow
-        };
-
-        await updateDoc(userDocRef, updatedData);
-      }
-    },
-    async updateStatsToDatabase() {
-      const db = getFirestore();
-      let inds = compareBitArrays(
-        fromBase64(this.snapShot.answer_history),
-        fromBase64(this.dataList.answer_history)
-      );
-
-      for (let index of inds) {
-        let updates = {};
-        let bit = fromBase64(this.dataList.correct_history);
-        if (getBit(bit, index) === 1) {
-          //correct answer
-          updates = {
-            attempt_count: increment(1),
-            correct_count: increment(1),
-          };
-        } else {
-          updates = {
-            //incorrect answer
-            attempt_count: increment(1),
-          };
-        }
-
-        const docRef = doc(db, "Stats", index.toString());
-        await updateDoc(docRef, updates);
-      }
-    },
-
-    _ratingBatchGenerate(
-      batch: any,
-      oldData: string,
-      newData: string,
-      type: string
-    ) {
-      const db = getFirestore();
-
-      let old_bit = fromBase64(oldData);
-      let new_bit = fromBase64(newData);
-      let ind = compareBitArrays(old_bit, new_bit);
-
-      for (let qid of ind) {
-        let updates = {};
-        if (getBit(new_bit, qid) > getBit(old_bit, qid)) {
-          // new > old, user adds a new rate
-          if (type === "good") {
-            updates = {
-              good_count: increment(1),
-            };
-          } else {
-            updates = {
-              bad_count: increment(1),
-            };
-          }
-        } else {
-          //getBit(new_bit, qid) < getBit(old_bit, qid), user removed a rate
-          if (type === "good") {
-            updates = {
-              good_count: increment(-1),
-            };
-          } else {
-            updates = {
-              bad_count: increment(-1),
-            };
-          }
-        }
-        const docRef = doc(db, "Stats", qid.toString());
-        batch.update(docRef, updates);
-      }
-      return batch;
-    },
-    async updateRatingToDatabase() {
-      const db = getFirestore();
-      var batch = writeBatch(db);
-
-      batch = this._ratingBatchGenerate(
-        batch,
-        this.snapShot.good_history,
-        this.dataList.good_history,
-        "good"
-      );
-
-      batch = this._ratingBatchGenerate(
-        batch,
-        this.snapShot.bad_history,
-        this.dataList.bad_history,
-        "bad"
-      );
-
-      await batch.commit();
+      await this._updateUserData({ user_name: name });
     },
   },
   persist: true,

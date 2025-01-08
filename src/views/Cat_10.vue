@@ -35,7 +35,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
-import { useQuestionStore, useCatStore, useUserStore } from "../store";
+import { useQuestionStore, useUserStore } from "../store";
 import { fromBase64, getBit } from "../composables";
 import Quiz from "../components/Quiz.vue";
 import DropDown from "../components/DropDown.vue";
@@ -46,7 +46,6 @@ export default defineComponent({
   components: { Quiz, DropDown, Loading },
   setup() {
     const qStore = useQuestionStore();
-    const cStore = useCatStore();
     const user = useUserStore();
     const catSelected = ref<boolean>(false);
     const isLoading = ref<boolean>(true);
@@ -65,7 +64,7 @@ export default defineComponent({
     };
 
     const getCatCount = (cat:string) => {//get total question amount and user answer count
-      let cats = cStore.getCat(cat);
+      let cats = qStore.getCatQids(cat)
       let len = cats.length;
       let ansCount = 0;
       let ans = user.dataList.answer_history || "";
@@ -77,9 +76,7 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      for (const cat of categories) {
-        await qStore.fetchCategoryQids(cat);
-      };
+      await qStore.fetchCatQidsFromDatabase();
       isLoading.value = false;
       
     });

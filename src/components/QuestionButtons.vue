@@ -143,6 +143,7 @@ export default defineComponent({
   name: "QuestionButtons",
   props: {
     curInd: { type: Number, default: 0 },
+    curAns:{ type: String, default: ''},
     onPause: {
       type: Function as PropType<() => void>,
       default: null,
@@ -177,57 +178,49 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const questionState = useQuestionStateStore();
+    const qState = useQuestionStateStore();
     const user = useUserStore();
 
     const userRating = computed(() =>
       user.getUserRate(Math.min(Math.max(props.curInd, 0), 9))
     );
-    const answerOK = computed(() => questionState.answerOK);
-    const nextOK = computed(() => questionState.nextOK);
-    const stopOK = computed(() => questionState.stopOK);
-    const startOK = computed(() => questionState.startOK);
-    const rateOK = computed(() => questionState.rateOK);
-    const hintOK = computed(
-      () => questionState.hintOK && !questionState.isWeekly
-    );
-    const plusTimeOK = computed(
-      () => questionState.plusTimeOK && !questionState.isWeekly
-    );
-    const plusTextOK = computed(
-      () => questionState.plusTextOK && !questionState.isWeekly
-    );
-    const funcsOK = computed(
-      () => !questionState.isWeekly && questionState.answerOK
-    );
+    const answerOK = computed(() => qState.answerOK);
+    const nextOK = computed(() => qState.nextOK);
+    const stopOK = computed(() => qState.stopOK);
+    const startOK = computed(() => qState.startOK);
+    const rateOK = computed(() => qState.rateOK);
+    const hintOK = computed(() => qState.hintOK && !qState.isWeekly);
+    const plusTimeOK = computed(() => qState.plusTimeOK && !qState.isWeekly);
+    const plusTextOK = computed(() => qState.plusTextOK && !qState.isWeekly);
+    const funcsOK = computed(() => qState.answerOK && !qState.isWeekly && !qState.isBattle);
 
     const pauseQuestion = () => {
-      questionState.pauseQuestion();
+      qState.pauseQuestion();
       props.onPause && props.onPause();
     };
 
     const displayNextQuestion = () => {
-      questionState.displayQuestion();
+      qState.displayQuestion();
       props.onNext && props.onNext();
     };
 
     const checkAnswer = () => {
-      questionState.submitAnswer();
+      qState.submitAnswer();
       props.onAnswer && props.onAnswer();
     };
 
     const getOneWord = () => {
-      questionState.hintOK = false;
+      qState.hintOK = false;
       props.onHint && props.onHint();
     };
 
     const plusTime = () => {
-      questionState.plusTimeOK = false;
+      qState.plusTimeOK = false;
       props.onPlusTime && props.onPlusTime();
     };
 
     const plusText = () => {
-      questionState.plusTextOK = false;
+      qState.plusTextOK = false;
       props.onPlusText && props.onPlusText();
     };
 

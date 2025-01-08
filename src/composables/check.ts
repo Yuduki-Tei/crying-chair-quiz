@@ -18,6 +18,16 @@ export function useCheckAnswer(qInd: number, ans: string, interval: number) {
   }
 }
 
+export function checkOpponentAnswer(qInd: number, ans: string) {
+  const qStore = useQuestionStore();
+  let isMatch = qStore
+  .getQuestion(qInd)
+  .q_answer.some(
+    (item: any) => item.trim().toLowerCase() === ans.trim().toLowerCase()
+  ); 
+  return isMatch;
+}
+
 export function buttonGood(qInd: number) {
   updateLocalRatingBit(qInd, 1);
 }
