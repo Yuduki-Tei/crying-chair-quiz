@@ -54,8 +54,9 @@ export default defineComponent({
     }
     onUnmounted(() => {
       if (socket.value) {
-        socket.value.removeAllListeners();
-        disconnectSocket();
+        socket.off('room_created')
+        socket.off('room_joined')
+        socket.off('room_left')
       }
     });
 

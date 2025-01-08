@@ -43,8 +43,8 @@
     :onBad="buttonBad"
   />
   <Battle ref = "battleRef"
-  :curPos ="curPos"
-  :answer = "answer"
+  :curPos="curPos"
+  :answer="answer"
   @battle_pause="onBattlePause"
   @battle_answer="onBattleAnswer"
   @battle_ready="buttonDisplayText"/>
@@ -63,7 +63,6 @@ import {
   useQuestionStore,
   useQuestionStateStore,
 } from "../store";
-import { _elementsEqual } from "chart.js/dist/helpers/helpers.core";
 
 export default defineComponent({
   name: "QuestionDisplay",
@@ -96,7 +95,7 @@ export default defineComponent({
     const battleRef = ref<{ battlePause: (curPos: number) => void; battleAnswer: (answer: string) => void } | null>(null);
 
     // local var
-    var curPos:number = 0;
+    let curPos:number = 0;
 
     qState.reset();
 
@@ -131,8 +130,7 @@ export default defineComponent({
     };
 
     const setLabelText = () => {
-      const qStore = useQuestionStore();
-      ansLen.value = qStore.checkAnswerLength(curInd.value);// get minus number when the first character is not KANJI
+      ansLen.value = qStore.checkAnswerLength(curInd.value); // Answer length is negative if the first character is not a Chinese character
       if (ansLen.value > 0) {
         labelText.value = `最佳答案 : 中文${ansLen.value}字`;
       } else {
@@ -202,6 +200,8 @@ export default defineComponent({
     });
 
     return {
+      battleRef,
+      textDisplayRef,
       checkAnswer,
       buttonDisplayText,
       startCountDown,
