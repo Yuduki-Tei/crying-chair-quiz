@@ -11,6 +11,7 @@ import Result from "../views/Result.vue";
 import Cat_10 from "../views/Cat_10.vue";
 import Contribution from "../views/Contribution.vue";
 import Principle from "../views/Principle.vue";
+import Battel_10 from "../views/Battel_10.vue";
 
 // route for production environment
 const routes = [
@@ -31,6 +32,11 @@ const routes = [
   {
     path: "/cat-10",
     component: Cat_10,
+    meta: { requiresAuth: true, fromMenu: true },
+  },
+  {
+    path: "/battel-10",
+    component: Battel_10,
     meta: { requiresAuth: true, fromMenu: true },
   },
   {
