@@ -1,3 +1,4 @@
+<template />
 <script lang = "ts">
 import { defineComponent } from 'vue';
 import { useSocketStore, useQuestionStateStore } from '../store';
@@ -27,10 +28,10 @@ export default defineComponent({
         };
         listenerActivate();
 
-        defineExpose({
+        return{
             battlePause,
             battleAnswer,
-        });
+        };
     },
 });
 </script>

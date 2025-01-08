@@ -1,5 +1,5 @@
 <template>
-  <Quiz pageTitle="對戰十題" qType="random"/>
+  <Quiz pageTitle="對戰十題" qType="battle"/>
   <MatchingRoom />
 </template>
 

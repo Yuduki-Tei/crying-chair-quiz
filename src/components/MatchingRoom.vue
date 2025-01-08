@@ -46,7 +46,7 @@ export default defineComponent({
     }
 
     const connectSocket = () =>{
-      socket.connect('https://hfffcf-5000.csb.app/')
+      socket.connect(import.meta.env.VITE_TMP_SOCKET_URL)
     }
 
     const disconnectSocket = () =>{

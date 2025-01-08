@@ -46,7 +46,8 @@
   :curPos ="curPos"
   :answer = "answer"
   @battle_pause="onBattlePause"
-  @battle_answer="onBattleAnswer"/>
+  @battle_answer="onBattleAnswer"
+  @battle_ready="buttonDisplayText"/>
 </template>
 
 <script lang="ts">
@@ -66,7 +67,7 @@ import { _elementsEqual } from "chart.js/dist/helpers/helpers.core";
 
 export default defineComponent({
   name: "QuestionDisplay",
-  components: { QuestionButtons, ResultGrid, Countdown, TextDisplay },
+  components: { QuestionButtons, ResultGrid, Countdown, TextDisplay, Battle },
   setup() {
     // the time, and question numbers
     const countdownTime: number = 15; //seconds
@@ -150,6 +151,7 @@ export default defineComponent({
 
     const buttonDisplayText = _throttle(() => {
       // start/next button
+      qState.displayQuestion();
       curInd.value ++; //current local question index
 
       if (curInd.value > totalQuestionCount) {
