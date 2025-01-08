@@ -44,14 +44,14 @@ export default defineComponent({
         let lastUpdateTime = startTime;
         const _updateText = () =>{
           if(!isTextDisplaying){// isTextDisplaying == false means text update has been canceled
-            emit("countdown", curText.length);
+            emit("countdown");
             cancelAnimationFrame(textDisplayId);
             return;
           }
 
           if (char >= props.fullText.length) {
             if (speed === normalSpeed) { //nomal display ends
-              emit("countdown", curText.length);
+              emit("countdown");
             } else { //fastforward display ends
               emit("finish");
               clearAll = true;
@@ -73,6 +73,8 @@ export default defineComponent({
         textDisplayId = requestAnimationFrame(_updateText); // trigger
       };
 
+      const getCurPos = () => curText.length;
+
       const textPlus = () => {
         let qt = props.fullText;
         let allLen = qt.length;
@@ -93,6 +95,7 @@ export default defineComponent({
 
     return {
       displayedText,
+      getCurPos
     };
 
     },
