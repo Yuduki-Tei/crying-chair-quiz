@@ -1,4 +1,4 @@
-<template>
+storeq<template>
   <div v-if="dataLoaded">
     <h3 class="m-3 text-center">{{ pageTitle }} <i class = "fs-5"> 總分 : <NumberIncrement :total = total /></i> </h3>
   </div>
@@ -30,6 +30,7 @@ export default defineComponent({
     const total = computed(() => res.total);
 
     res.clearDataList();
+    res.setType(props.qType);
     res.initDataList();
 
     button.setType(props.qType);
