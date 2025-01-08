@@ -12,17 +12,6 @@ import { useQuestionStateStore, useSocketStore } from '../store';
 export default defineComponent({
   name: 'Battle_10',
   components: { MatchingRoom, Quiz },
-  setup() {
-    const qState = useQuestionStateStore();
-    const socket = useSocketStore();
-
-    const onSyncPause = () => {
-      consloe.log('sync paused')
-      qState.pauseQuestion()
-      // qState.setDisplaySpeed(0)
-    }
-    socket.onEvent('pause_synced', onSyncPause)
-  },
 });
 </script>
 
