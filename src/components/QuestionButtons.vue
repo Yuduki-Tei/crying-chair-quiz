@@ -137,7 +137,7 @@ import {
   onMounted,
   onBeforeUnmount,
 } from "vue";
-import { useQuestionStateStore, useUserStore, useSocketStore } from "../store";
+import { useQuestionStateStore, useUserStore } from "../store";
 
 export default defineComponent({
   name: "QuestionButtons",
@@ -180,7 +180,6 @@ export default defineComponent({
   setup(props) {
     const qState = useQuestionStateStore();
     const user = useUserStore();
-    const socket = useSocketStore();
 
     const userRating = computed(() =>
       user.getUserRate(Math.min(Math.max(props.curInd, 0), 9))
@@ -193,31 +192,21 @@ export default defineComponent({
     const hintOK = computed(() => qState.hintOK && !qState.isWeekly);
     const plusTimeOK = computed(() => qState.plusTimeOK && !qState.isWeekly);
     const plusTextOK = computed(() => qState.plusTextOK && !qState.isWeekly);
-    const funcsOK = computed(() => !qState.isWeekly && qState.answerOK && !socket.socketConnected);
+    const funcsOK = computed(() => qState.answerOK && !qState.isWeekly && !qState.isBattle);
 
     const pauseQuestion = () => {
       qState.pauseQuestion();
       props.onPause && props.onPause();
-      // if (socket.socketConnected){
-      //   console.log('emit sync_pause', qState.curPos);
-      //   socket.emitEvent('sync_pause', qState.curPos);
-      // }
     };
 
     const displayNextQuestion = () => {
       qState.displayQuestion();
       props.onNext && props.onNext();
-      // if (socket.socketConnected){
-      //   socket.emitEvent('sync_ready');
-      // }
     };
 
     const checkAnswer = () => {
       qState.submitAnswer();
       props.onAnswer && props.onAnswer();
-      // if (socket.socketConnected){
-      //   socket.emitEvent('sync_answer', props.curAns);
-      // }
     };
 
     const getOneWord = () => {
