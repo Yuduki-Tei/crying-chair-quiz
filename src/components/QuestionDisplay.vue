@@ -7,6 +7,7 @@
     <ResultGrid :act="curInd" />
     <div class="row border m-auto" style="min-width: 280px; min-height: 180px">
       <TextDisplay class="mt-1"
+        ref="textDisplayRef"
         :fullText="fullText"
         :normalSpeed="normalSpeed"
         :displaySpeed="displaySpeed"
@@ -33,7 +34,7 @@
     :curInd="curInd"
     :curAns="answer"
     :onPause="buttonStop"
-    :onNext="startDisplayingText"
+    :onNext="buttonDisplayText"
     :onAnswer="checkAnswer"
     :onHint="buttonHint"
     :onPlusTime="buttonPlusTime"
@@ -41,6 +42,11 @@
     :onGood="buttonGood"
     :onBad="buttonBad"
   />
+  <Battle ref = "battleRef"
+  :curPos ="curPos"
+  :answer = "answer"
+  @battle_pause="onBattlePause"
+  @battle_answer="onBattleAnswer"/>
 </template>
 
 <script lang="ts">
@@ -50,11 +56,13 @@ import QuestionButtons from "./QuestionButtons.vue";
 import ResultGrid from "./ResultGrid.vue";
 import Countdown from "./Countdown.vue";
 import TextDisplay from "./TextDisplay.vue";
-import { useCheckAnswer, buttonBad, buttonGood } from "../composables";
+import Battle from "./Battle.vue";
+import { useCheckAnswer, checkOpponentAnswer, buttonBad, buttonGood} from "../composables";
 import {
   useQuestionStore,
   useQuestionStateStore,
 } from "../store";
+import { _elementsEqual } from "chart.js/dist/helpers/helpers.core";
 
 export default defineComponent({
   name: "QuestionDisplay",
@@ -83,6 +91,8 @@ export default defineComponent({
     const fullText = ref<string>("");
     const answer = ref<string>("");
     const answerInput = ref<HTMLInputElement | null>(null);
+    const textDisplayRef = ref<{ getCurPos: () => number } | null>(null);
+    const battleRef = ref<{ battlePause: (curPos: number) => void; battleAnswer: (answer: string) => void } | null>(null);
 
     // local var
     var curPos:number = 0;
@@ -100,8 +110,8 @@ export default defineComponent({
       };
     };
 
-    const startCountDown = (pos: number) => {
-      curPos = pos;
+    const startCountDown = () => {
+      curPos = textDisplayRef.value?.getCurPos() || 0;
       ansLen.value = qStore.checkAnswerLength(curInd.value);
       countdownState.value = "start";
     };
@@ -115,9 +125,9 @@ export default defineComponent({
       countdownState.value = "plus";
     };
 
-    const buttonPlusText = _throttle(() => {
+    const buttonPlusText = () => {
       displaySpeed.value = 1;
-    });
+    };
 
     const setLabelText = () => {
       const qStore = useQuestionStore();
@@ -129,14 +139,16 @@ export default defineComponent({
       }
     };
 
-    const buttonStop = _throttle(() => {
+    const buttonStop = () => {
       //when user push the pause button
+      curPos = textDisplayRef.value?.getCurPos() || 0;
+      battleRef.value?.battlePause(curPos);
       setLabelText();
       countdownState.value = "start";
       displaySpeed.value = 0;
-    });
+    };
 
-    const startDisplayingText = _throttle(() => {
+    const buttonDisplayText = _throttle(() => {
       // start/next button
       curInd.value ++; //current local question index
 
@@ -152,15 +164,33 @@ export default defineComponent({
     });
 
     const checkAnswer = _throttle(() => {
+      battleRef.value?.battleAnswer(answer.value);
+      qState.submitAnswer();
       countdownState.value = "stop";
-
-      useCheckAnswer(curInd.value, answer.value, curPos); //check if the answer is right and write the result to store
       displaySpeed.value = fastForwardSpeed;
+      useCheckAnswer(curInd.value, answer.value, curPos); //check if the answer is right and write the result to store
     });
 
     const onFinish = () =>{
       qState.endQuestion();
-    }
+    };
+
+    const onBattlePause = (pos: number) => {
+      console.log(`position = ${pos}`)
+      displaySpeed.value = 0;
+    };
+
+    const onBattleAnswer = (ans: string) => {
+      const isCorrect = checkOpponentAnswer(curInd.value, ans);
+      if (isCorrect){
+        qState.submitAnswer();
+        displaySpeed.value = fastForwardSpeed;
+      }
+      else{
+        qState.displayQuestion();
+        displaySpeed.value = normalSpeed;
+      }
+    };
 
     watch(answerOK, async (newValue: boolean) => { //auto focus when input box appears
       if (newValue) {
@@ -171,7 +201,7 @@ export default defineComponent({
 
     return {
       checkAnswer,
-      startDisplayingText,
+      buttonDisplayText,
       startCountDown,
       buttonStop,
       buttonHint,
@@ -179,11 +209,14 @@ export default defineComponent({
       buttonPlusText,
       buttonBad,
       buttonGood,
+      onBattlePause,
+      onBattleAnswer,
       onFinish,
       fullText,
       labelText,
       answerInput,
       curInd,
+      curPos,
       ansLen,
       answer,
       answerOK,
