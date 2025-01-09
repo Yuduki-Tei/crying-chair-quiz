@@ -4,7 +4,7 @@ import { defineComponent } from 'vue';
 import { useSocketStore, useQuestionStateStore } from '../store';
 export default defineComponent({
     name: "Battle",
-    emits: ['battle_pause', 'battle_answer', 'battle_ready'],
+    emits: ['battle_pause', 'battle_answer', 'battle_start'],
     setup(_, { emit }){
         const socket = useSocketStore();
         const qState = useQuestionStateStore();
@@ -23,7 +23,7 @@ export default defineComponent({
                 emit('battle_answer', ans);
             });
             socket.onEvent('sync_start', () => {
-                emit('battle_ready');
+                emit('battle_start');
             });
         };
         listenerActivate();

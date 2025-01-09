@@ -47,7 +47,7 @@
   :answer="answer"
   @battle_pause="onBattlePause"
   @battle_answer="onBattleAnswer"
-  @battle_ready="buttonDisplayText"/>
+  @battle_start="buttonDisplayText"/>
 </template>
 
 <script lang="ts">
