@@ -16,7 +16,7 @@ export const useQuestionStateStore = defineStore("QuestionState", {
   actions: {
     setType(type: string) {
       this.isWeekly = type === "weekly";
-      this.isBattle = type === "battle";
+      this.isBattle = type.startsWith("battle");
     },
     displayQuestion() {
       // when push the start button
