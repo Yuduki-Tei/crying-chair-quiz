@@ -4,6 +4,7 @@
       <button @click="disconnectSocket" :disabled="!connected">斷</button>
       <button @click="createRoom" :disabled="!connected">開</button>
       <button @click="joinRoom" :disabled="!connected">加</button>
+      <button @click="getReady" :disabled="!connected">準</button>
       <button @click="leaveRoom" :disabled="!connected">離</button>
 
     <p v-if="connected">WebSocket 已連接</p>
@@ -16,33 +17,33 @@
   </div>
 </template>
 
-<script>
-import { defineComponent, ref, onUnmounted, computed } from 'vue';
-import { useSocketStore } from '../store';
+<script lang="ts">
+import { defineComponent, computed } from 'vue';
+import { useSocketStore, useUserStore } from '../store';
 
 export default defineComponent({
   name: 'MatchingRoom',
   setup() {
     const socket = useSocketStore();
+    const user = useUserStore();
     const connected = computed(() => socket.socketConnected)
-    const message = computed(() => socket.message);
+    const message = computed(() => socket.message)
 
     const createRoom = () => {
-      socket.onEvent('room_created')
-      socket.onEvent('room_joined')
-      socket.onEvent('room_left')
       socket.emitEvent('create_room')
     }
 
     const joinRoom = () => {
-      socket.onEvent('room_joined')
-      socket.onEvent('room_left')
       let roomId = prompt('enter room id')
-      socket.emitEvent('join_room', roomId)
+      socket.emitEvent('join_room', {'room_id': roomId, 'name': user.dataList.user_name})
+    }
+
+    const getReady = () => {
+      socket.emitEvent('sync_ready', {'name': user.dataList.user_name})
     }
 
     const leaveRoom = () => {
-      socket.emitEvent('leave_room')
+      socket.emitEvent('leave_room', {'name': user.dataList.user_name})
     }
 
     const connectSocket = () =>{
@@ -52,13 +53,6 @@ export default defineComponent({
     const disconnectSocket = () =>{
       socket.disconnect()
     }
-    onUnmounted(() => {
-      if (socket.value) {
-        socket.off('room_created')
-        socket.off('room_joined')
-        socket.off('room_left')
-      }
-    });
 
     return {
       connectSocket,
@@ -66,6 +60,7 @@ export default defineComponent({
       createRoom,
       joinRoom,
       leaveRoom,
+      getReady,
       message,
       connected,
     };
