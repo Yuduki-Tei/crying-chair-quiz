@@ -24,11 +24,15 @@ export const useSocketStore = defineStore('Socket',{
 
     onEvent(event: string, callback?: (data: any) => void) {
       this.socket?.on(event, (data: any) => {
-        this.message = data;
+        this.message = data.message || "";
         if (callback) {
           callback(data);
         }
       });
+    },
+
+    offEvent(event: string) {
+      this.socket?.off(event);
     },
 
     emitEvent(event: string, data?: any) {
