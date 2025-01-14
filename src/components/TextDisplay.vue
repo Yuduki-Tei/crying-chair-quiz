@@ -44,14 +44,14 @@ export default defineComponent({
         let lastUpdateTime = startTime;
         const _updateText = () =>{
           if(!isTextDisplaying){// isTextDisplaying == false means text update has been canceled
-            emit("countdown");
+            emit("countdown",  true);
             cancelAnimationFrame(textDisplayId);
             return;
           }
 
           if (char >= props.fullText.length) {
             if (speed === normalSpeed) { //nomal display ends
-              emit("countdown");
+              emit("countdown", true);
             } else { //fastforward display ends
               emit("finish");
               clearAll = true;
