@@ -24,10 +24,14 @@ export default defineComponent({
     const mode = ref<string>('battle');
 
     const updateModeText = (roomId: string) => {
-      mode.value += roomId;
+      mode.value = 'battle' + roomId;
     }
 
     socket.onEvent('room_created', (data: any) => {
+      updateModeText(data.room_id);
+    })
+  
+    socket.onEvent('room_joined', (data: any) => {
       updateModeText(data.room_id);
     })
 
