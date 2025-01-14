@@ -1,5 +1,5 @@
 <template>
-  <ResultGrid class ="grid" :act="currentIdx" @select-grid="gotoSlide" />
+  <ResultGrid class="grid" :act="currentIdx" @select-grid="gotoSlide" />
   <div id="questionCarousel" class="carousel slide" data-interval="false">
     <div class="carousel-inner">
       <div
@@ -12,7 +12,7 @@
           style="min-width: 280px; min-height: 200px"
         >
           <p class="mt-1">{{ item }}</p>
-          <div class ="m-auto text-buttom p-0 mb-1">
+          <div class="m-auto text-buttom p-0 mb-1">
             <p class="text-center p-0 m-0">
               你的答案: {{ userAns[idx] }}  <br> 預設答案: {{ resultAText[idx] }}
             </p>
@@ -38,13 +38,13 @@
     </button>
   </div>
   <QuestionButtons 
-  :curInd = "currentIdx"
-  :onGood = "buttonGood"
-  :onBad = "buttonBad"
+    :curInd="currentIdx" 
+    @good="buttonGood(currentIdx)" 
+    @bad="buttonBad(currentIdx)" 
   />
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
 import { useQuestionStore, useResultStore, useQuestionStateStore } from "../store";
 import { buttonGood, buttonBad } from "../composables";
@@ -56,37 +56,43 @@ export default defineComponent({
   name: "QuestionCarousel",
   components: { ResultGrid, QuestionButtons },
   setup() {
-    const resultQText = new Array();
-    const resultAText = new Array();
-    const userAns = new Array();
+    const resultQText = ref<string[]>([]);
+    const resultAText = ref<string[]>([]);
+    const userAns = ref<string[]>([]);
     const qStore = useQuestionStore();
     const res = useResultStore();
     const button = useQuestionStateStore();
-    const currentIdx = ref(0);
-    let carouselInstance = null;
-    
+    const currentIdx = ref<number>(0);
+    let carouselInstance: Carousel | null = null;
+
     button.disableAll();
     button.rateOK = true;
 
     for (let i = 0; i < 10; i++) {
-      let qTxt = qStore.getQuestion(i).q_text;
-      let aTxt = qStore.getQuestion(i).q_answer[0];
-      let uAns = res.getRes(i).answer;
-      let interval = res.getRes(i).interval;
-      resultQText.push(
+      const question = qStore.getQuestion(i);
+      const result = res.getRes(i);
+      const qTxt = question.q_text;
+      const aTxt = question.q_answer[0];
+      const uAns = result.answer;
+      const interval = result.interval;
+
+      resultQText.value.push(
         qTxt.slice(0, interval) + "／" + qTxt.slice(interval)
       );
-      resultAText.push(aTxt);
-      userAns.push(uAns);
+      resultAText.value.push(aTxt);
+      userAns.value.push(uAns);
     }
+
     onMounted(() => {
-      const carouselElement = document.querySelector("#questionCarousel");
+      const carouselElement = document.querySelector("#questionCarousel") as HTMLElement;
       carouselInstance = new Carousel(carouselElement, {
         interval: false,
       });
 
-      const handleSlide = (event) => {
-        currentIdx.value = event.to;
+      const handleSlide = (event: Event) => {
+        const target = event.target as HTMLElement;
+        const activeIndex = Array.from(target.parentNode!.children).indexOf(target);
+        currentIdx.value = activeIndex;
       };
 
       carouselElement.addEventListener("slide.bs.carousel", handleSlide);
@@ -96,9 +102,11 @@ export default defineComponent({
       });
     });
 
-    const gotoSlide = (index) => {
-      carouselInstance.to(index);
-      currentIdx.value = index;
+    const gotoSlide = (index: number) => {
+      if (carouselInstance) {
+        carouselInstance.to(index);
+        currentIdx.value = index;
+      }
     };
 
     return {

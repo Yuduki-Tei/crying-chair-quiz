@@ -133,7 +133,6 @@
 import {
   defineComponent,
   computed,
-  PropType,
   onMounted,
   onBeforeUnmount,
 } from "vue";
@@ -143,41 +142,9 @@ export default defineComponent({
   name: "QuestionButtons",
   props: {
     curInd: { type: Number, default: 0 },
-    curAns:{ type: String, default: ''},
-    onPause: {
-      type: Function as PropType<() => void>,
-      default: null,
-    },
-    onNext: {
-      type: Function as PropType<() => void>,
-      default: null,
-    },
-    onAnswer: {
-      type: Function as PropType<() => void>,
-      default: null,
-    },
-    onHint: {
-      type: Function as PropType<() => void>,
-      default: null,
-    },
-    onPlusTime: {
-      type: Function as PropType<() => void>,
-      default: null,
-    },
-    onPlusText: {
-      type: Function as PropType<() => void>,
-      default: null,
-    },
-    onGood: {
-      type: Function as PropType<(arg0: number) => void>,
-      default: null,
-    },
-    onBad: {
-      type: Function as PropType<(arg0: number) => void>,
-      default: null,
-    },
   },
-  setup(props) {
+  emits: ["pause", "next", "answer", "hint", "plus_time", "plus_text", "good", "bad"],
+  setup(props, { emit }) {
     const qState = useQuestionStateStore();
     const user = useUserStore();
 
@@ -196,40 +163,40 @@ export default defineComponent({
 
     const pauseQuestion = () => {
       qState.pauseQuestion();
-      props.onPause && props.onPause();
+      emit("pause");
     };
 
     const displayNextQuestion = () => {
       qState.displayQuestion();
-      props.onNext && props.onNext();
+      emit("next");
     };
 
     const checkAnswer = () => {
       qState.submitAnswer();
-      props.onAnswer && props.onAnswer();
+      emit("answer");
     };
 
     const getOneWord = () => {
       qState.hintOK = false;
-      props.onHint && props.onHint();
+      emit("hint");
     };
 
     const plusTime = () => {
       qState.plusTimeOK = false;
-      props.onPlusTime && props.onPlusTime();
+      emit("plus_time");
     };
 
     const plusText = () => {
       qState.plusTextOK = false;
-      props.onPlusText && props.onPlusText();
+      emit("plus_text");
     };
 
     const giveGood = () => {
-      props.onGood && props.onGood(props.curInd);
+      emit("good", props.curInd);
     };
 
     const giveBad = () => {
-      props.onBad && props.onBad(props.curInd);
+      emit("bad", props.curInd);
     };
 
     const isMac = navigator.userAgent.toUpperCase().indexOf("MAC") >= 0;
