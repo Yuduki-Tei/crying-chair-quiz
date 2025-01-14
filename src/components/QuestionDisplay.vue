@@ -32,17 +32,18 @@
   </div>
   <QuestionButtons
     :curInd="curInd"
-    :curAns="answer"
-    :onPause="buttonStop"
-    :onNext="buttonDisplayText"
-    :onAnswer="checkAnswer"
-    :onHint="buttonHint"
-    :onPlusTime="buttonPlusTime"
-    :onPlusText="buttonPlusText"
-    :onGood="buttonGood"
-    :onBad="buttonBad"
+    @pause="buttonStop"
+    @next="buttonDisplayText"
+    @answer="checkAnswer"
+    @hint="buttonHint"
+    @plus_time="buttonPlusTime"
+    @plus_text="buttonPlusText"
+    @good="buttonGood(curInd)"
+    @bad="buttonBad(curInd)"
   />
-  <Battle ref = "battleRef"
+  <Battle
+  v-if = "isBattle"
+  ref = "battleRef"
   :curPos="curPos"
   :answer="answer"
   @battle_pause="onBattlePause"
@@ -83,6 +84,7 @@ export default defineComponent({
     const ansLen = ref<number>(0);
     const countdownState = ref<string>("");
     const displaySpeed = ref<number>(0);
+    const isBattle = qState.isBattle
 
     // ref
     const answerOK = computed(() => qState.answerOK);
@@ -226,6 +228,7 @@ export default defineComponent({
       countdownTime,
       normalSpeed,
       displaySpeed,
+      isBattle,
     };
   },
 });
