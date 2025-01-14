@@ -25,6 +25,9 @@ export function checkOpponentAnswer(qInd: number, ans: string) {
   .q_answer.some(
     (item: any) => item.trim().toLowerCase() === ans.trim().toLowerCase()
   ); 
+  if(isMatch){
+    updateResultStore(qInd, qStore, ans, useResultStore());
+  };
   return isMatch;
 }
 
@@ -63,7 +66,12 @@ function updateResultStore(qInd: number, qStore: any, ans: string, res: any) {
       (item: any) => item.trim().toLowerCase() === ans.trim().toLowerCase()
     ); //check if matches any answer in list
   res.setRes(qInd, { done: true }); // mark the question as done
-  res.setRes(qInd, { correct: isMatch });
+  if (ans == '對方正解'){
+    res.setRes(qInd, { skipped: true });
+  }
+  else{
+    res.setRes(qInd, { correct: isMatch });
+  }
 }
 
 function updateLocalAnswerBit(qInd: number, qid: number, res: any) {

@@ -5,6 +5,7 @@ interface resData {
   answer: string;
   correct: boolean;
   done: boolean;
+  skipped: boolean;
 }
 
 export const useResultStore = defineStore("Result", {
@@ -20,6 +21,7 @@ export const useResultStore = defineStore("Result", {
         correct: false,
         point: 0,
         done: false,
+        skipped: false,
       }));
       this.dataList = data;
     },

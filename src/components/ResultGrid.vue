@@ -8,8 +8,9 @@
       <span
         class="font-monospace fs-2 fw-bold d-flex align-items-center justify-content-center"
         :class="{
+          'text-skipped': item.skipped,
           'text-correct': item.correct,
-          'text-incorrect': !item.correct,
+          'text-incorrect': !item.correct && !item.skipped,
           active: index === act,
         }"
       >
@@ -17,8 +18,9 @@
           class="d-flex align-items-center justify-content-center"
           v-if="item.done"
           :class="{
+            'bi bi-slash-lg': item.skipped,
             'bi bi-circle': item.correct,
-            'bi bi-x-lg': !item.correct,
+            'bi bi-x-lg': !item.correct && !item.skipped,
           }"
         ></i>
       </span>
