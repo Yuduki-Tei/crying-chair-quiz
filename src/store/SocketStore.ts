@@ -14,6 +14,7 @@ export const useSocketStore = defineStore('Socket',{
 
         this.socket.on('connect', () => {
           this.socketConnected = true;
+          this.onEvent('message');
         });
 
         this.socket.on('disconnect', () => {
