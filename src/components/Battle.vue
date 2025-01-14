@@ -14,15 +14,18 @@ export default defineComponent({
         const battleAnswer = (answer: string) =>{
             socket.emitEvent('sync_answer', answer);
         };
+        const battleStart = () =>{
+            socket.emitEvent('sync_ready')
+        }
         const listenerActivate = () => {
-            socket.onEvent('sync_pause', (pos: number) => {
+            socket.onEvent('sync_pause', (data: any) => {
                 qState.disableAll();
-                emit('battle_pause', pos);
+                emit('battle_pause', data.pos);
             });
-            socket.onEvent('sync_answer', (ans: string) => {
-                emit('battle_answer', ans);
+            socket.onEvent('sync_answer', (data: any) => {
+                emit('battle_answer', data.ans);
             });
-            socket.onEvent('sync_start', () => {
+            socket.onEvent('all_ready', () => {
                 emit('battle_start');
             });
         };
@@ -31,6 +34,7 @@ export default defineComponent({
         return{
             battlePause,
             battleAnswer,
+            battleStart,
         };
     },
 });
