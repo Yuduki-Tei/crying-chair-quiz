@@ -33,7 +33,7 @@
   <QuestionButtons
     :curInd="curInd"
     @pause="buttonStop"
-    @next="buttonDisplayText"
+    @next="buttonNext"
     @answer="checkAnswer"
     @hint="buttonHint"
     @plus_time="buttonPlusTime"
@@ -48,7 +48,7 @@
   :answer="answer"
   @battle_pause="onBattlePause"
   @battle_answer="onBattleAnswer"
-  @battle_start="buttonDisplayText"/>
+  @battle_start="displayText"/>
 </template>
 
 <script lang="ts">
@@ -94,7 +94,7 @@ export default defineComponent({
     const answer = ref<string>("");
     const answerInput = ref<HTMLInputElement | null>(null);
     const textDisplayRef = ref<{ getCurPos: () => number } | null>(null);
-    const battleRef = ref<{ battlePause: (curPos: number) => void; battleAnswer: (answer: string) => void } | null>(null);
+    const battleRef = ref<{ battlePause: (curPos: number) => void; battleAnswer: (answer: string) => void; battleStart: () => void } | null>(null);
 
     // local var
     let curPos:number = 0;
@@ -112,7 +112,10 @@ export default defineComponent({
       };
     };
 
-    const startCountDown = () => {
+    const startCountDown = (localStop: false) => {
+      if(!localStop){
+        return
+      }
       curPos = textDisplayRef.value?.getCurPos() || 0;
       ansLen.value = qStore.checkAnswerLength(curInd.value);
       countdownState.value = "start";
@@ -149,7 +152,16 @@ export default defineComponent({
       displaySpeed.value = 0;
     };
 
-    const buttonDisplayText = _throttle(() => {
+    const buttonNext = _throttle(() => {
+      if(!isBattle){
+        displayText()
+      }
+      else{
+        battleRef.value?.battleStart();
+      }
+    });
+
+    const displayText = _throttle(() => {
       // start/next button
       qState.displayQuestion();
       curInd.value ++; //current local question index
@@ -205,7 +217,8 @@ export default defineComponent({
       battleRef,
       textDisplayRef,
       checkAnswer,
-      buttonDisplayText,
+      buttonNext,
+      displayText,
       startCountDown,
       buttonStop,
       buttonHint,
