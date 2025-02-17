@@ -39,6 +39,10 @@ export default defineComponent({
         const plusAdjustedTime = () =>{
             adjustedTime += countdownTime * 2;
         };
+
+        const opponentWrongAnswer = () =>{
+          adjustedTime += countdownTime;
+        };
         const startCountDown = () => {
             if (isCountingDown) return; // prevent multiple countdowns
             isCountingDown = true;
@@ -80,6 +84,9 @@ export default defineComponent({
             }
             else if(newVal == "plus"){
                 plusAdjustedTime();
+            }
+            else if(newVal == "wrong"){
+                opponentWrongAnswer();
             }
         });
         return{

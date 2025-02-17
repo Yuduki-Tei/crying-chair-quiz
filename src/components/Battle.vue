@@ -14,7 +14,7 @@ export default defineComponent({
         const battleAnswer = (answer: string) =>{
             socket.emitEvent('sync_answer', answer);
         };
-        const battleStart = () =>{
+        const battleReady = () =>{
             socket.emitEvent('sync_ready')
         }
         const listenerActivate = () => {
@@ -25,8 +25,13 @@ export default defineComponent({
             socket.onEvent('sync_answer', (data: any) => {
                 emit('battle_answer', data.ans);
             });
-            socket.onEvent('all_ready', () => {
-                emit('battle_start');
+            socket.onEvent('all_ready', (data: any) => {
+                let startAt = data.start_at
+                const now = Date.now() / 1000;
+                const delay = Math.max(0, startAt - now) * 1000;
+                setTimeout(() => {
+                    emit('battle_start');
+                }, delay);
             });
         };
         listenerActivate();
@@ -34,7 +39,7 @@ export default defineComponent({
         return{
             battlePause,
             battleAnswer,
-            battleStart,
+            battleReady,
         };
     },
 });

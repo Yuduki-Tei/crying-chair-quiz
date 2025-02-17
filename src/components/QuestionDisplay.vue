@@ -94,7 +94,7 @@ export default defineComponent({
     const answer = ref<string>("");
     const answerInput = ref<HTMLInputElement | null>(null);
     const textDisplayRef = ref<{ getCurPos: () => number } | null>(null);
-    const battleRef = ref<{ battlePause: (curPos: number) => void; battleAnswer: (answer: string) => void; battleStart: () => void } | null>(null);
+    const battleRef = ref<{ battlePause: (curPos: number) => void; battleAnswer: (answer: string) => void; battleReady: () => void } | null>(null);
 
     // local var
     let curPos:number = 0;
@@ -157,7 +157,7 @@ export default defineComponent({
         displayText()
       }
       else{
-        battleRef.value?.battleStart();
+        battleRef.value?.battleReady();
       }
     });
 
@@ -187,6 +187,7 @@ export default defineComponent({
 
     const onFinish = () =>{
       qState.endQuestion();
+      battleRef.value?.battleReady();
     };
 
     const onBattlePause = (pos: number) => {
@@ -199,6 +200,7 @@ export default defineComponent({
       if (isCorrect){
         qState.submitAnswer();
         displaySpeed.value = fastForwardSpeed;
+        countdownState.value = "wrong";
       }
       else{
         qState.displayQuestion();

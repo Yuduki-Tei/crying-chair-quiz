@@ -26,7 +26,7 @@ export function checkOpponentAnswer(qInd: number, ans: string) {
     (item: any) => item.trim().toLowerCase() === ans.trim().toLowerCase()
   ); 
   if(isMatch){
-    updateResultStore(qInd, qStore, ans, useResultStore());
+    updateResultStore(qInd, qStore, "對方正解", useResultStore());
   };
   return isMatch;
 }

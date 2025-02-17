@@ -152,7 +152,7 @@ export default defineComponent({
       user.getUserRate(Math.min(Math.max(props.curInd, 0), 9))
     );
     const answerOK = computed(() => qState.answerOK);
-    const nextOK = computed(() => qState.nextOK);
+    const nextOK = computed(() => qState.nextOK && !qState.isBattle);
     const stopOK = computed(() => qState.stopOK);
     const startOK = computed(() => qState.startOK);
     const rateOK = computed(() => qState.rateOK);
