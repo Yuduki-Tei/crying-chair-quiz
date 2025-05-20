@@ -13,8 +13,8 @@
           <i class="bi bi-activity"></i>
         </div>
         <div>
-          <h3 class="fs-3 text-body-emphasis">每週十題</h3>
-          <p>每週日22:00(UTC+8)更新</p>
+          <h3 class="fs-3 text-body-emphasis">最新十題</h3>
+          <p>不定期更新</p>
           <button
             @click="goToPage('weekly-10')"
             type="button"
@@ -32,7 +32,7 @@
         </div>
         <div>
           <h3 class="fs-3 text-body-emphasis">隨機十題</h3>
-          <p>從題庫中隨機抽選10題</p>
+          <p>從題庫中隨機抽選最新以外的10題</p>
           <button
             @click="goToPage('random-10')"
             type="button"

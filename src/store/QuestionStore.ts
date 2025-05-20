@@ -33,23 +33,23 @@ export const useQuestionStore = defineStore("Question", {
   }),
   actions: {
     async _getMaxQid() {
-      const lastmaxQidUpdate = localStorage.getItem("maxQidLastUpdate") || "";
+      // const lastmaxQidUpdate = localStorage.getItem("maxQidLastUpdate") || "";
       let maxQid = 0;
-      if (!lastmaxQidUpdate || lastmaxQidUpdate < this._getLastSunday()) {
-        const db = getFirestore();
-        const mq = query(
-          //get the document with maximum id from database
-          collection(db, "Questions"),
-          orderBy("qid", "desc"),
-          limit(1)
-        );
-        const maxSnapshot = await getDocs(mq);
-        maxSnapshot.forEach((doc: any) => {
-          maxQid = doc.data().qid;
-          localStorage.setItem("maxQidLastUpdate", new Date().toISOString());
-          localStorage.setItem("maxQid", maxQid.toString());
-        });
-      }
+      // if (!lastmaxQidUpdate || lastmaxQidUpdate < this._getLastSunday()) {
+      const db = getFirestore();
+      const mq = query(
+        //get the document with maximum id from database
+        collection(db, "Questions"),
+        orderBy("qid", "desc"),
+        limit(1)
+      );
+      const maxSnapshot = await getDocs(mq);
+      maxSnapshot.forEach((doc: any) => {
+        maxQid = doc.data().qid;
+        localStorage.setItem("maxQidLastUpdate", new Date().toISOString());
+        localStorage.setItem("maxQid", maxQid.toString());
+      });
+      // }
       maxQid = parseInt(localStorage.getItem("maxQid") || "0");
       return maxQid;
     },
@@ -71,27 +71,27 @@ export const useQuestionStore = defineStore("Question", {
       return qids;
     },
 
-    _getLastSunday() {
-      const now = new Date();
-      const dayOfWeek = now.getUTCDay();
-      const lastSunday = new Date(now);
-      lastSunday.setUTCDate(now.getUTCDate() - dayOfWeek);
-      lastSunday.setUTCHours(14, 0, 0, 0);
-      if (lastSunday > new Date()){
-        lastSunday.setUTCDate(now.getUTCDate() - 7);
-      }
-      return lastSunday.toISOString();
-    },
+    // _getLastSunday() {
+    //   const now = new Date();
+    //   const dayOfWeek = now.getUTCDay();
+    //   const lastSunday = new Date(now);
+    //   lastSunday.setUTCDate(now.getUTCDate() - dayOfWeek);
+    //   lastSunday.setUTCHours(14, 0, 0, 0);
+    //   if (lastSunday > new Date()){
+    //     lastSunday.setUTCDate(now.getUTCDate() - 7);
+    //   }
+    //   return lastSunday.toISOString();
+    // },
 
     async fetchCategoryQids(type: string): Promise<number[]> {
 
-      const catLastUpdate = localStorage.getItem("catLastUpdate");
+      // const catLastUpdate = localStorage.getItem("catLastUpdate");
       const cStore = useCatStore()
 
-      if (!catLastUpdate || catLastUpdate < this._getLastSunday()){
-        await cStore.updateCat();
-        localStorage.setItem("catLastUpdate", new Date().toISOString())
-      }
+      // if (!catLastUpdate || catLastUpdate < this._getLastSunday()){
+      await cStore.updateCat();
+      localStorage.setItem("catLastUpdate", new Date().toISOString())
+      // }
 
       let cat = cStore.getCat(type);
 

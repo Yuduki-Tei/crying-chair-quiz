@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var admin = require("firebase-admin");
-var serviceAccount = require("./crying-chair-firebase-adminsdk-chqay-8460731472.json");
+var serviceAccount = require("./crying-chair-firebase-adminsdk-8tkis-8b0bed55c7.json");
 var fs = require("fs");
 var questionsData = JSON.parse(fs.readFileSync('./output.json', 'utf-8'));
 var statsData = JSON.parse(fs.readFileSync('./stats.json', 'utf-8'));
